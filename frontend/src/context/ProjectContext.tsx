@@ -4,13 +4,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
 
 import type {
   Analysis,
-  AppState,
   CreateFeatureInput,
   CreateProjectInput,
   Feature,
@@ -18,19 +18,25 @@ import type {
   UpdateFeatureInput,
 } from '../types'
 
-import { loadState, saveState, seedDemoData } from '../services/storage'
-import { generateId } from '../utils/formatters'
+import { api } from '../services/api'
 
-interface ProjectContextValue extends AppState {
-  createProject: (input: CreateProjectInput) => Project
-  updateProject: (id: string, updates: Partial<Project>) => void
-  deleteProject: (id: string) => void
+interface State {
+  projects: Project[]
+  features: Feature[]
+  analyses: Analysis[]
+  loading: boolean
+}
+
+interface ProjectContextValue extends State {
+  createProject: (input: CreateProjectInput) => Promise<Project>
+  updateProject: (id: string, updates: Partial<Project>) => Promise<void>
+  deleteProject: (id: string) => Promise<void>
   getProject: (id: string | null) => Project | undefined
   getProjectFeatures: (projectId: string, type?: Feature['type']) => Feature[]
-  addFeature: (projectId: string, input: CreateFeatureInput) => Feature
-  updateFeature: (id: string, updates: UpdateFeatureInput) => void
-  deleteFeature: (id: string) => void
-  reorderFeatures: (projectId: string, orderedIds: string[]) => void
+  addFeature: (projectId: string, input: CreateFeatureInput) => Promise<Feature>
+  updateFeature: (id: string, updates: UpdateFeatureInput) => Promise<void>
+  deleteFeature: (id: string) => Promise<void>
+  reorderFeatures: (projectId: string, orderedIds: string[]) => Promise<void>
   getLatestAnalysis: (projectId: string) => Analysis | undefined
   activeProjectId: string | null
   setActiveProjectId: (id: string | null) => void
@@ -38,138 +44,137 @@ interface ProjectContextValue extends AppState {
 
 const ProjectContext = createContext<ProjectContextValue | null>(null)
 
+const INITIAL: State = { projects: [], features: [], analyses: [], loading: false }
+
 export function ProjectProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AppState>(() => {
-    const loaded = loadState()
-    if (loaded.projects.length === 0) {
-      return seedDemoData()
-    }
-    return loaded
-  })
-
+  const [state, setState] = useState<State>(INITIAL)
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
+  const loadedFeatureProjects = useRef<Set<string>>(new Set())
 
-  // ✅ Sync URL → active project (IMPORTANT FIX)
+  const setLoading = (loading: boolean) =>
+    setState((prev) => ({ ...prev, loading }))
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const projectId = params.get('project')
-
-    if (projectId) {
-      setActiveProjectId(projectId)
-    }
+    const pid = params.get('project')
+    if (pid) setActiveProjectId(pid)
   }, [])
 
-  // ✅ Persist state
   useEffect(() => {
-    saveState(state)
-  }, [state])
+    setLoading(true)
+    api.get<Project[]>('/projects')
+      .then((projects) => setState((prev) => ({ ...prev, projects })))
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
 
-  const createProject = useCallback((input: CreateProjectInput): Project => {
-    const now = new Date().toISOString()
+  useEffect(() => {
+    if (!activeProjectId) return
+    if (loadedFeatureProjects.current.has(activeProjectId)) return
+    loadedFeatureProjects.current.add(activeProjectId)
 
-    const project: Project = {
-      id: generateId(),
-      name: input.name,
-      description: input.description,
-      type: input.type,
-      status: 'draft',
-      createdAt: now,
-      updatedAt: now,
-    }
+    api.get<Feature[]>(`/projects/${activeProjectId}/features`)
+      .then((features) =>
+        setState((prev) => ({
+          ...prev,
+          features: [
+            ...prev.features.filter((f) => f.projectId !== activeProjectId),
+            ...features,
+          ],
+        }))
+      )
+      .catch(console.error)
 
-    setState((prev) => ({
-      ...prev,
-      projects: [project, ...prev.projects],
-    }))
+    api.get<Analysis[]>(`/projects/${activeProjectId}/analyses`)
+      .then((analyses) =>
+        setState((prev) => ({
+          ...prev,
+          analyses: [
+            ...prev.analyses.filter((a) => a.projectId !== activeProjectId),
+            ...analyses,
+          ],
+        }))
+      )
+      .catch(console.error)
+  }, [activeProjectId])
 
+  const createProject = useCallback(async (input: CreateProjectInput): Promise<Project> => {
+    const project = await api.post<Project>('/projects', { ...input, status: 'draft' })
+    setState((prev) => ({ ...prev, projects: [project, ...prev.projects] }))
     return project
   }, [])
 
-  const updateProject = useCallback((id: string, updates: Partial<Project>) => {
+  const updateProject = useCallback(async (id: string, updates: Partial<Project>) => {
+    const project = await api.put<Project>(`/projects/${id}`, updates)
     setState((prev) => ({
       ...prev,
-      projects: prev.projects.map((p) =>
-        p.id === id
-          ? { ...p, ...updates, updatedAt: new Date().toISOString() }
-          : p
-      ),
+      projects: prev.projects.map((p) => (p.id === id ? project : p)),
     }))
   }, [])
 
-  const deleteProject = useCallback((id: string) => {
+  const deleteProject = useCallback(async (id: string) => {
+    await api.delete(`/projects/${id}`)
     setState((prev) => ({
+      ...prev,
       projects: prev.projects.filter((p) => p.id !== id),
       features: prev.features.filter((f) => f.projectId !== id),
       analyses: prev.analyses.filter((a) => a.projectId !== id),
     }))
   }, [])
 
-  // ✅ SAFE GET PROJECT
   const getProject = useCallback(
-    (id: string | null) => {
-      if (!id) return undefined
-      return state.projects.find((p) => p.id === id)
-    },
+    (id: string | null) => (id ? state.projects.find((p) => p.id === id) : undefined),
     [state.projects]
   )
 
   const getProjectFeatures = useCallback(
-    (projectId: string, type?: Feature['type']) => {
-      return state.features
+    (projectId: string, type?: Feature['type']) =>
+      state.features
         .filter((f) => f.projectId === projectId && (type ? f.type === type : true))
-        .sort((a, b) => a.order - b.order)
-    },
+        .sort((a, b) => a.order - b.order),
     [state.features]
   )
 
   const addFeature = useCallback(
-    (projectId: string, input: CreateFeatureInput): Feature => {
-      const existing = state.features.filter((f) => f.projectId === projectId)
-
-      const feature: Feature = {
-        id: generateId(),
-        projectId,
-        title: input.title,
-        description: input.description,
-        category: input.category,
-        priority: input.priority,
-        order: existing.length,
+    async (projectId: string, input: CreateFeatureInput): Promise<Feature> => {
+      const order = state.features.filter((f) => f.projectId === projectId).length
+      const feature = await api.post<Feature>(`/projects/${projectId}/features`, {
+        ...input,
+        order,
         type: input.type ?? 'original',
-      }
-
-      setState((prev) => ({
-        ...prev,
-        features: [...prev.features, feature],
-        projects: prev.projects.map((p) =>
-          p.id === projectId
-            ? { ...p, updatedAt: new Date().toISOString() }
-            : p
-        ),
-      }))
-
+      })
+      setState((prev) => ({ ...prev, features: [...prev.features, feature] }))
       return feature
     },
     [state.features]
   )
 
-  const updateFeature = useCallback((id: string, updates: UpdateFeatureInput) => {
+  const updateFeature = useCallback(async (id: string, updates: UpdateFeatureInput) => {
+    const feature = state.features.find((f) => f.id === id)
+    if (!feature) return
+    const updated = await api.put<Feature>(
+      `/projects/${feature.projectId}/features/${id}`,
+      updates
+    )
     setState((prev) => ({
       ...prev,
-      features: prev.features.map((f) =>
-        f.id === id ? { ...f, ...updates } : f
-      ),
+      features: prev.features.map((f) => (f.id === id ? updated : f)),
     }))
-  }, [])
+  }, [state.features])
 
-  const deleteFeature = useCallback((id: string) => {
+  const deleteFeature = useCallback(async (id: string) => {
+    const feature = state.features.find((f) => f.id === id)
+    if (!feature) return
+    await api.delete(`/projects/${feature.projectId}/features/${id}`)
     setState((prev) => ({
       ...prev,
       features: prev.features.filter((f) => f.id !== id),
     }))
-  }, [])
+  }, [state.features])
 
   const reorderFeatures = useCallback(
-    (projectId: string, orderedIds: string[]) => {
+    async (projectId: string, orderedIds: string[]) => {
+      await api.put(`/projects/${projectId}/features/reorder`, { orderedIds })
       setState((prev) => ({
         ...prev,
         features: prev.features.map((f) => {
@@ -183,15 +188,13 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   )
 
   const getLatestAnalysis = useCallback(
-    (projectId: string) => {
-      return state.analyses
+    (projectId: string) =>
+      state.analyses
         .filter((a) => a.projectId === projectId)
         .sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() -
-            new Date(a.createdAt).getTime()
-        )[0]
-    },
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0],
     [state.analyses]
   )
 
@@ -227,17 +230,11 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     ]
   )
 
-  return (
-    <ProjectContext.Provider value={value}>
-      {children}
-    </ProjectContext.Provider>
-  )
+  return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
 }
 
 export function useProjects() {
-  const context = useContext(ProjectContext)
-  if (!context) {
-    throw new Error('useProjects must be used within ProjectProvider')
-  }
-  return context
+  const ctx = useContext(ProjectContext)
+  if (!ctx) throw new Error('useProjects must be used within ProjectProvider')
+  return ctx
 }
