@@ -2,6 +2,57 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 
+const inputCls =
+  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+
+const selectCls =
+  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 appearance-none cursor-pointer'
+
+const labelCls = 'block text-xs font-medium text-gray-600 mb-1.5'
+
+const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'> = {
+  'Web App': 'saas',
+  'Mobile App': 'saas',
+  SaaS: 'saas',
+  API: 'saas',
+  'E-commerce': 'ecommerce',
+  Chatbot: 'chatbot',
+  'Landing Page': 'landing_page',
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  options: string[]
+  placeholder: string
+}) {
+  return (
+    <div>
+      <label className={labelCls}>{label}</label>
+      <div className="relative">
+        <select value={value} onChange={(e) => onChange(e.target.value)} className={selectCls}>
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export function CreateProjectPage() {
   const navigate = useNavigate()
   const { createProject } = useProjects()
@@ -13,18 +64,10 @@ export function CreateProjectPage() {
   const [techStack, setTechStack] = useState('')
   const [projectType, setProjectType] = useState('')
   const [experienceLevel, setExperienceLevel] = useState('')
-  const [complexity, setComplexity] = useState('')
-  const [priority, setPriority] = useState('')
   const [deadline, setDeadline] = useState('')
+  const [workingHours, setWorkingHours] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-
-  const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'> = {
-    'Web App': 'saas',
-    'Mobile App': 'saas',
-    'SaaS': 'saas',
-    'API': 'saas',
-  }
 
   const handleCreate = async () => {
     if (!name.trim()) return
@@ -44,133 +87,146 @@ export function CreateProjectPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-8">
-      <div className="w-full max-w-4xl space-y-6">
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="mx-auto max-w-3xl">
 
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Create Project</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Enter project metadata below to generate accurate impact analysis.
+        {/* Page header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Create New Project</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Enter project metadata to help AI generate accurate impact analysis
           </p>
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
-        <div className="bg-white rounded-xl border border-gray-200 p-8">
-          <h2 className="text-sm font-semibold text-gray-800 mb-6">Project Metadata</h2>
+        {/* Card */}
+        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
 
-          <div className="space-y-8">
-            <div className="grid grid-cols-2 gap-8">
+          <h2 className="mb-6 text-sm font-semibold text-gray-800">Project Metadata</h2>
+
+          <div className="space-y-6">
+
+            {/* Row 1 — Project Name + Description */}
+            <div className="grid grid-cols-2 gap-5">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Project Name</label>
+                <label className={labelCls}>
+                  Project Name <span className="text-red-500">*</span>
+                </label>
                 <input
+                  type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Enter project name"
+                  className={inputCls}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Description</label>
+                <label className={labelCls}>Description</label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+                  placeholder="Enter project description"
+                  className={`${inputCls} resize-none`}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-8">
+            {/* Row 2 — Team Size + Dev Methodology + Technology Stack */}
+            <div className="grid grid-cols-3 gap-5">
+              <SelectField
+                label="Team Size"
+                value={teamSize}
+                onChange={setTeamSize}
+                placeholder="Select size"
+                options={['1–2', '3–5', '6–10', '10+']}
+              />
+              <SelectField
+                label="Development Methodology"
+                value={methodology}
+                onChange={setMethodology}
+                placeholder="Select methodology"
+                options={['Agile', 'Scrum', 'Kanban', 'Waterfall']}
+              />
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Team Size</label>
-                <select value={teamSize} onChange={(e) => setTeamSize(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-indigo-500">
-                  <option value="">Select</option>
-                  <option>1-2</option>
-                  <option>3-5</option>
-                  <option>6-10</option>
-                  <option>10+</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Dev Methodology</label>
-                <select value={methodology} onChange={(e) => setMethodology(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>Agile</option>
-                  <option>Scrum</option>
-                  <option>Kanban</option>
-                  <option>Waterfall</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Technology Stack</label>
-                <select value={techStack} onChange={(e) => setTechStack(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>MERN</option>
-                  <option>Next.js</option>
-                  <option>Django</option>
-                  <option>Spring Boot</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Project Type</label>
-                <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>Web App</option>
-                  <option>Mobile App</option>
-                  <option>SaaS</option>
-                  <option>API</option>
-                </select>
+                <label className={labelCls}>Technology Stack</label>
+                <input
+                  type="text"
+                  value={techStack}
+                  onChange={(e) => setTechStack(e.target.value)}
+                  placeholder="Enter technologies"
+                  className={inputCls}
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-4 gap-8">
+            {/* Row 3 — Project Type + Team Experience Level + Project Deadline */}
+            <div className="grid grid-cols-3 gap-5">
+              <SelectField
+                label="Project Type"
+                value={projectType}
+                onChange={setProjectType}
+                placeholder="Select type"
+                options={['Web App', 'Mobile App', 'SaaS', 'E-commerce', 'Chatbot', 'Landing Page', 'API']}
+              />
+              <SelectField
+                label="Team Experience Level"
+                value={experienceLevel}
+                onChange={setExperienceLevel}
+                placeholder="Select level"
+                options={['Junior', 'Mid-level', 'Senior', 'Mixed']}
+              />
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Experience Level</label>
-                <select value={experienceLevel} onChange={(e) => setExperienceLevel(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>Junior</option>
-                  <option>Mid</option>
-                  <option>Senior</option>
-                  <option>Lead</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Project Complexity</label>
-                <select value={complexity} onChange={(e) => setComplexity(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Project Priority</label>
-                <select value={priority} onChange={(e) => setPriority(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm">
-                  <option value="">Select</option>
-                  <option>High</option>
-                  <option>Medium</option>
-                  <option>Low</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Project Deadline</label>
-                <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                <label className={labelCls}>Project Deadline</label>
+                <input
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className={inputCls}
+                />
               </div>
             </div>
+
+            {/* Row 4 — Working Hours (single column, 1/3 width) */}
+            <div className="grid grid-cols-3 gap-5">
+              <div>
+                <label className={labelCls}>Working Hours / Day (per developer)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={24}
+                  value={workingHours}
+                  onChange={(e) => setWorkingHours(e.target.value)}
+                  placeholder="Enter hours"
+                  className={inputCls}
+                />
+              </div>
+            </div>
+
           </div>
 
-          <div className="flex justify-end gap-4 mt-10 pt-4">
-            <button onClick={() => navigate('/projects')} className="px-5 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+          {/* Buttons */}
+          <div className="mt-8 flex justify-end gap-3 border-t border-gray-100 pt-6">
+            <button
+              onClick={() => navigate('/projects')}
+              className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            >
               Cancel
             </button>
-            <button onClick={handleCreate} disabled={!name || loading} className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50">
+            <button
+              onClick={handleCreate}
+              disabled={!name.trim() || loading}
+              className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
+            >
               {loading ? 'Creating…' : 'Next'}
             </button>
           </div>
+
         </div>
       </div>
     </div>
