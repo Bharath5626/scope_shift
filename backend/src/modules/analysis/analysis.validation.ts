@@ -1,7 +1,12 @@
 import { z } from "zod";
 
-export const runAnalysisSchema = z.object({
-  projectId: z.string(),
-  oldVersionId: z.string(),
-  newVersionId: z.string(),
+const riskLevelEnum = z.enum(["low", "medium", "high"]);
+const complexityEnum = z.enum(["low", "medium", "high"]);
+
+export const createAnalysisSchema = z.object({
+  scopeIncreasePercent: z.number(),
+  additionalHours: z.number(),
+  delayWeeks: z.number(),
+  riskLevel: riskLevelEnum,
+  complexity: complexityEnum,
 });
