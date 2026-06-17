@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import type { Feature } from '../types'
 
@@ -99,8 +99,20 @@ export function ScopeBuilder() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('project') ?? ''
 
-  const { getProject, getProjectFeatures, addFeature, updateFeature, deleteFeature } =
-    useProjects()
+  const {
+    projects,
+    getProject,
+    getProjectFeatures,
+    addFeature,
+    updateFeature,
+    deleteFeature,
+    setActiveProjectId,
+  } = useProjects()
+
+  // Tell the context which project is active so it fetches features
+  useEffect(() => {
+    if (projectId) setActiveProjectId(projectId)
+  }, [projectId, setActiveProjectId])
 
   const project = getProject(projectId)
   const features = getProjectFeatures(projectId, 'original')
@@ -110,9 +122,12 @@ export function ScopeBuilder() {
   const [savingAdd, setSavingAdd] = useState(false)
   const [savingEdit, setSavingEdit] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [addError, setAddError] = useState('')
 
   const handleAdd = async (data: FeatureFormData) => {
+    if (!projectId) return
     setSavingAdd(true)
+    setAddError('')
     try {
       await addFeature(projectId, {
         title: data.title,
@@ -122,6 +137,8 @@ export function ScopeBuilder() {
         type: 'original',
       })
       setShowAddForm(false)
+    } catch (err: any) {
+      setAddError(err.message ?? 'Failed to save feature. Please try again.')
     } finally {
       setSavingAdd(false)
     }
@@ -135,6 +152,8 @@ export function ScopeBuilder() {
         description: data.description,
       })
       setEditingId(null)
+    } catch {
+      // silently keep form open
     } finally {
       setSavingEdit(false)
     }
@@ -147,6 +166,55 @@ export function ScopeBuilder() {
     } finally {
       setDeletingId(null)
     }
+  }
+
+  // No project selected — prompt the user to pick one
+  if (!projectId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm max-w-md w-full">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900">No project selected</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Open a project from the dashboard or projects page to start building its scope.
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Link
+              to="/"
+              className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/projects"
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+            >
+              View Projects
+            </Link>
+          </div>
+          {projects.length > 0 && (
+            <div className="mt-6 border-t border-gray-100 pt-6">
+              <p className="mb-3 text-xs font-medium text-gray-500">Or jump to a project:</p>
+              <div className="space-y-2">
+                {projects.slice(0, 4).map((p) => (
+                  <Link
+                    key={p.id}
+                    to={`/scope-builder?project=${p.id}`}
+                    className="block rounded-lg border border-gray-200 px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-600 transition"
+                  >
+                    {p.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -165,7 +233,7 @@ export function ScopeBuilder() {
               </p>
             </div>
             <button
-              onClick={() => { setShowAddForm(true); setEditingId(null) }}
+              onClick={() => { setShowAddForm(true); setEditingId(null); setAddError('') }}
               className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -180,11 +248,18 @@ export function ScopeBuilder() {
 
             {/* Inline add form */}
             {showAddForm && (
-              <FeatureForm
-                onSave={handleAdd}
-                onCancel={() => setShowAddForm(false)}
-                saving={savingAdd}
-              />
+              <>
+                <FeatureForm
+                  onSave={handleAdd}
+                  onCancel={() => { setShowAddForm(false); setAddError('') }}
+                  saving={savingAdd}
+                />
+                {addError && (
+                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                    {addError}
+                  </div>
+                )}
+              </>
             )}
 
             {/* Feature list */}
@@ -201,9 +276,11 @@ export function ScopeBuilder() {
                     </svg>
                   </div>
                   <p className="text-sm font-medium text-gray-600">No features yet</p>
-                  <p className="mt-1 text-xs text-gray-400">Click "+ Add Feature" to define the original scope</p>
+                  <p className="mt-1 text-xs text-gray-400">
+                    Click "+ Add Feature" to define the original scope
+                  </p>
                 </div>
-              ) : (
+              ) : features.length > 0 ? (
                 <div className="divide-y divide-gray-100 rounded-xl border border-gray-200">
                   {features.map((feature, index) => (
                     <div key={feature.id}>
@@ -258,7 +335,7 @@ export function ScopeBuilder() {
                     </div>
                   ))}
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
 
