@@ -22,42 +22,192 @@ type GenerateFeaturesInput = {
 
 const FALLBACK_FEATURES: Record<string, GeneratedFeature[]> = {
   saas: [
-    { title: "User Registration & Login", description: "Allow users to create accounts and authenticate securely", category: "authentication", priority: "high" },
-    { title: "Dashboard Overview", description: "Central dashboard showing key metrics and project status", category: "ui", priority: "high" },
-    { title: "User Profile Management", description: "Users can update their name, email and preferences", category: "user-management", priority: "medium" },
-    { title: "Subscription & Billing", description: "Manage plans, upgrades and payment processing", category: "billing", priority: "medium" },
-    { title: "Email Notifications", description: "System and user-triggered email alerts", category: "notifications", priority: "medium" },
-    { title: "Role-Based Access Control", description: "Admin, member and viewer permission levels", category: "authentication", priority: "medium" },
-    { title: "Data Export", description: "Export project data as CSV or PDF", category: "reporting", priority: "low" },
-    { title: "Audit Logs", description: "Track user actions and changes within the system", category: "security", priority: "low" },
+    {
+      title: "User Registration & Login",
+      description: "Allow users to create accounts and authenticate securely",
+      category: "authentication",
+      priority: "high",
+    },
+    {
+      title: "Dashboard Overview",
+      description: "Central dashboard showing key metrics and project status",
+      category: "ui",
+      priority: "high",
+    },
+    {
+      title: "User Profile Management",
+      description: "Users can update their name, email and preferences",
+      category: "user-management",
+      priority: "medium",
+    },
+    {
+      title: "Subscription & Billing",
+      description: "Manage plans, upgrades and payment processing",
+      category: "billing",
+      priority: "medium",
+    },
+    {
+      title: "Email Notifications",
+      description: "System and user-triggered email alerts",
+      category: "notifications",
+      priority: "medium",
+    },
+    {
+      title: "Role-Based Access Control",
+      description: "Admin, member and viewer permission levels",
+      category: "authentication",
+      priority: "medium",
+    },
+    {
+      title: "Data Export",
+      description: "Export project data as CSV or PDF",
+      category: "reporting",
+      priority: "low",
+    },
+    {
+      title: "Audit Logs",
+      description: "Track user actions and changes within the system",
+      category: "security",
+      priority: "low",
+    },
   ],
   ecommerce: [
-    { title: "Product Catalog", description: "Browse and search products with filters and categories", category: "catalog", priority: "high" },
-    { title: "Shopping Cart", description: "Add, update and remove items before checkout", category: "cart", priority: "high" },
-    { title: "Checkout & Payment", description: "Secure multi-step checkout with payment gateway", category: "payments", priority: "high" },
-    { title: "Order Management", description: "Track order status from placement to delivery", category: "orders", priority: "high" },
-    { title: "User Authentication", description: "Register, login and manage account details", category: "authentication", priority: "medium" },
-    { title: "Product Reviews & Ratings", description: "Customers can rate and review purchased products", category: "engagement", priority: "medium" },
-    { title: "Inventory Management", description: "Stock levels, low-stock alerts and product availability", category: "admin", priority: "medium" },
-    { title: "Discount & Coupon Codes", description: "Apply promotional codes at checkout", category: "promotions", priority: "low" },
+    {
+      title: "Product Catalog",
+      description: "Browse and search products with filters and categories",
+      category: "catalog",
+      priority: "high",
+    },
+    {
+      title: "Shopping Cart",
+      description: "Add, update and remove items before checkout",
+      category: "cart",
+      priority: "high",
+    },
+    {
+      title: "Checkout & Payment",
+      description: "Secure multi-step checkout with payment gateway",
+      category: "payments",
+      priority: "high",
+    },
+    {
+      title: "Order Management",
+      description: "Track order status from placement to delivery",
+      category: "orders",
+      priority: "high",
+    },
+    {
+      title: "User Authentication",
+      description: "Register, login and manage account details",
+      category: "authentication",
+      priority: "medium",
+    },
+    {
+      title: "Product Reviews & Ratings",
+      description: "Customers can rate and review purchased products",
+      category: "engagement",
+      priority: "medium",
+    },
+    {
+      title: "Inventory Management",
+      description: "Stock levels, low-stock alerts and product availability",
+      category: "admin",
+      priority: "medium",
+    },
+    {
+      title: "Discount & Coupon Codes",
+      description: "Apply promotional codes at checkout",
+      category: "promotions",
+      priority: "low",
+    },
   ],
   chatbot: [
-    { title: "Conversational Interface", description: "Natural language chat UI for user interactions", category: "ui", priority: "high" },
-    { title: "Intent Recognition", description: "Identify user intent from messages accurately", category: "nlp", priority: "high" },
-    { title: "Context Management", description: "Maintain conversation context across multiple turns", category: "nlp", priority: "high" },
-    { title: "Fallback Handling", description: "Graceful responses when intent is unclear", category: "nlp", priority: "medium" },
-    { title: "Integration Webhooks", description: "Connect to third-party services and APIs", category: "integrations", priority: "medium" },
-    { title: "Analytics Dashboard", description: "Track conversations, intents and user satisfaction", category: "reporting", priority: "medium" },
-    { title: "Multi-channel Support", description: "Deploy on web, WhatsApp and Slack", category: "integrations", priority: "low" },
+    {
+      title: "Conversational Interface",
+      description: "Natural language chat UI for user interactions",
+      category: "ui",
+      priority: "high",
+    },
+    {
+      title: "Intent Recognition",
+      description: "Identify user intent from messages accurately",
+      category: "nlp",
+      priority: "high",
+    },
+    {
+      title: "Context Management",
+      description: "Maintain conversation context across multiple turns",
+      category: "nlp",
+      priority: "high",
+    },
+    {
+      title: "Fallback Handling",
+      description: "Graceful responses when intent is unclear",
+      category: "nlp",
+      priority: "medium",
+    },
+    {
+      title: "Integration Webhooks",
+      description: "Connect to third-party services and APIs",
+      category: "integrations",
+      priority: "medium",
+    },
+    {
+      title: "Analytics Dashboard",
+      description: "Track conversations, intents and user satisfaction",
+      category: "reporting",
+      priority: "medium",
+    },
+    {
+      title: "Multi-channel Support",
+      description: "Deploy on web, WhatsApp and Slack",
+      category: "integrations",
+      priority: "low",
+    },
   ],
   landing_page: [
-    { title: "Hero Section", description: "Compelling headline, subtext and primary call-to-action", category: "ui", priority: "high" },
-    { title: "Features / Benefits Section", description: "Highlight key product features with icons or images", category: "ui", priority: "high" },
-    { title: "Lead Capture Form", description: "Email signup or contact form with validation", category: "forms", priority: "high" },
-    { title: "Social Proof / Testimonials", description: "Customer quotes and logos to build trust", category: "ui", priority: "medium" },
-    { title: "Pricing Section", description: "Clear pricing tiers with feature comparisons", category: "ui", priority: "medium" },
-    { title: "SEO Metadata", description: "Page title, description, Open Graph and sitemap", category: "seo", priority: "medium" },
-    { title: "Analytics Integration", description: "Google Analytics or equivalent tracking", category: "analytics", priority: "low" },
+    {
+      title: "Hero Section",
+      description: "Compelling headline, subtext and primary call-to-action",
+      category: "ui",
+      priority: "high",
+    },
+    {
+      title: "Features / Benefits Section",
+      description: "Highlight key product features with icons or images",
+      category: "ui",
+      priority: "high",
+    },
+    {
+      title: "Lead Capture Form",
+      description: "Email signup or contact form with validation",
+      category: "forms",
+      priority: "high",
+    },
+    {
+      title: "Social Proof / Testimonials",
+      description: "Customer quotes and logos to build trust",
+      category: "ui",
+      priority: "medium",
+    },
+    {
+      title: "Pricing Section",
+      description: "Clear pricing tiers with feature comparisons",
+      category: "ui",
+      priority: "medium",
+    },
+    {
+      title: "SEO Metadata",
+      description: "Page title, description, Open Graph and sitemap",
+      category: "seo",
+      priority: "medium",
+    },
+    {
+      title: "Analytics Integration",
+      description: "Google Analytics or equivalent tracking",
+      category: "analytics",
+      priority: "low",
+    },
   ],
 };
 
@@ -88,7 +238,7 @@ type FeatureInput = {
 };
 
 const computeFallbackAnalysis = (
-  features: FeatureInput[]
+  features: FeatureInput[],
 ): ScopeAnalysisResult => {
   const count = features.length;
   const highPriority = features.filter((f) => f.priority === "high").length;
@@ -106,11 +256,22 @@ const computeFallbackAnalysis = (
   const scopeScore = Math.min(95, 20 + count * 9);
 
   const riskFactorPool: Record<string, string[]> = {
-    authentication: ["Session management complexity", "Security compliance requirements"],
+    authentication: [
+      "Session management complexity",
+      "Security compliance requirements",
+    ],
     billing: ["Payment gateway integration", "Subscription state edge cases"],
     integrations: ["External service reliability", "API rate limiting"],
-    general: ["Scope creep risk", "Dependency management", "Cross-browser compatibility"],
-    default: ["Timeline constraints", "Technical debt accumulation", "Change in user flow"],
+    general: [
+      "Scope creep risk",
+      "Dependency management",
+      "Cross-browser compatibility",
+    ],
+    default: [
+      "Timeline constraints",
+      "Technical debt accumulation",
+      "Change in user flow",
+    ],
   };
   const uniqueCategories = [...new Set(features.map((f) => f.category))];
   const riskFactors: string[] = [];
@@ -156,7 +317,9 @@ const computeFallbackAnalysis = (
   };
 
   const typeKey = "general";
-  const recommendations = (recommendationPool[typeKey] ?? recommendationPool.general).slice(0, 4);
+  const recommendations = (
+    recommendationPool[typeKey] ?? recommendationPool.general
+  ).slice(0, 4);
 
   return {
     scopeScore,
@@ -177,7 +340,7 @@ const computeFallbackAnalysis = (
 
 export const analyzeProjectScope = async (
   project: { name: string; description?: string | null; type: string },
-  features: FeatureInput[]
+  features: FeatureInput[],
 ): Promise<ScopeAnalysisResult> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -185,39 +348,113 @@ export const analyzeProjectScope = async (
     try {
       const client = new GoogleGenAI({ apiKey });
       const featureList = features
-        .map((f) => `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? `: ${f.description}` : ""}`)
+        .map(
+          (f) =>
+            `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? `: ${f.description}` : ""}`,
+        )
         .join("\n");
 
-      const prompt = `You are a senior software project estimator. Analyze this project and its features to produce effort estimates and risk analysis.
+      const prompt = `You are a Principal Software Engineering Manager and Estimation Lead responsible for delivering realistic project timelines used for client commitments and sprint planning.
 
-Project: ${project.name}
-Description: ${project.description || "Not provided"}
-Type: ${project.type}
+You must produce disciplined, conservative engineering estimates based on the provided scope. Avoid optimism bias.
 
-Features (${features.length} total):
+---
+
+## Project Context
+- Name: ${project.name}
+- Description: ${project.description || "Not provided"}
+- Type: ${project.type}
+
+## Feature Set
+You are estimating effort for the following features (${features.length} total):
+
 ${featureList}
 
-Based on these features, return ONLY valid JSON matching exactly this shape:
+---
+
+## Estimation Rules (CRITICAL)
+
+You must treat each feature as a production-grade requirement unless explicitly trivial.
+
+Follow this estimation approach mentally:
+
+1. Assign each feature an internal complexity weight:
+   - Simple: 8–16 hours
+   - Medium: 16–40 hours
+   - Complex: 40–80 hours
+   - Very Complex: 80–160 hours
+
+2. Add overhead factors:
+   - Integration overhead: +15–25%
+   - Testing & QA: +20–30%
+   - Coordination / meetings / planning: +10–15%
+   - Rework buffer: +10–20%
+
+3. Calendar conversion rule:
+   - 1 developer = 35 productive hours/week
+   - If features imply parallel work, reduce calendar time slightly but never below 60% of linear estimate
+
+4. Complexity scoring rules:
+   - Base complexity comes from tech complexity + feature count + integration needs
+   - Do NOT inflate scores arbitrarily
+   - Keep score proportional to estimated hours
+
+---
+
+## Output Constraints (STRICT)
+
+Return ONLY valid JSON. No markdown, no commentary.
+
+---
+
+## Output Schema
+
 {
-  "scopeScore": <integer 20-95, overall scope complexity score as a percentage>,
-  "estimatedHours": <integer, total estimated development hours>,
-  "estimatedWeeks": <integer, realistic calendar weeks to deliver>,
+  "scopeScore": <integer 20–95>,
+  "estimatedHours": <integer>,
+  "estimatedWeeks": <integer>,
   "riskLevel": "Low" | "Medium" | "High",
+
   "effortBreakdown": {
-    "development": <integer hours>,
-    "testing": <integer hours>,
-    "integration": <integer hours>,
-    "documentation": <integer hours>
+    "development": <integer>,
+    "testing": <integer>,
+    "integration": <integer>,
+    "documentation": <integer>
   },
+
   "complexity": {
     "level": "Low" | "Medium" | "High",
-    "score": <integer 10-95, complexity score for visualization>
+    "score": <integer 10–95>
   },
-  "riskFactors": [<4 concise risk factor strings specific to this project>],
-  "recommendations": [<4 concise actionable recommendation strings to reduce risk or improve delivery>]
+
+  "riskFactors": [
+    "<4 specific risks tied to architecture, scale, or features>"
+  ],
+
+  "recommendations": [
+    "<4 actionable steps to reduce scope, risk, or delivery time>"
+  ]
 }
 
-Make all numbers realistic for a ${project.type} project with ${features.length} features.`;
+---
+
+## Validation Rules (must satisfy internally before responding)
+
+- estimatedHours MUST equal sum of effortBreakdown values ±5%
+- riskLevel must match complexity.score:
+  - 10–40 = Low
+  - 41–70 = Medium
+  - 71–95 = High
+- estimatedWeeks must satisfy:
+  estimatedHours / 35 rounded UP
+- riskFactors must reference actual feature or system risks (not generic phrases)
+- recommendations must be actionable engineering decisions (not vague advice)
+
+---
+
+## Final Instruction
+
+Be conservative. If uncertain, overestimate effort rather than underestimate.`;
 
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
@@ -225,14 +462,20 @@ Make all numbers realistic for a ${project.type} project with ${features.length}
         config: { responseMimeType: "application/json", temperature: 0.2 },
       });
 
-      const text = (response.text ?? "").trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+      const text = (response.text ?? "")
+        .trim()
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/i, "")
+        .trim();
       const parsed = JSON.parse(text);
 
       return {
         scopeScore: Number(parsed.scopeScore) || 60,
         estimatedHours: Number(parsed.estimatedHours) || 80,
         estimatedWeeks: Number(parsed.estimatedWeeks) || 2,
-        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel) ? parsed.riskLevel : "Medium") as "Low" | "Medium" | "High",
+        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel)
+          ? parsed.riskLevel
+          : "Medium") as "Low" | "Medium" | "High",
         effortBreakdown: {
           development: Number(parsed.effortBreakdown?.development) || 48,
           testing: Number(parsed.effortBreakdown?.testing) || 16,
@@ -240,11 +483,17 @@ Make all numbers realistic for a ${project.type} project with ${features.length}
           documentation: Number(parsed.effortBreakdown?.documentation) || 6,
         },
         complexity: {
-          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level) ? parsed.complexity.level : "Medium") as "Low" | "Medium" | "High",
+          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level)
+            ? parsed.complexity.level
+            : "Medium") as "Low" | "Medium" | "High",
           score: Number(parsed.complexity?.score) || 60,
         },
-        riskFactors: Array.isArray(parsed.riskFactors) ? parsed.riskFactors.slice(0, 4).map(String) : [],
-        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations.slice(0, 4).map(String) : [],
+        riskFactors: Array.isArray(parsed.riskFactors)
+          ? parsed.riskFactors.slice(0, 4).map(String)
+          : [],
+        recommendations: Array.isArray(parsed.recommendations)
+          ? parsed.recommendations.slice(0, 4).map(String)
+          : [],
       };
     } catch (err) {
       console.error("Gemini scope analysis failed, using fallback:", err);
@@ -255,16 +504,18 @@ Make all numbers realistic for a ${project.type} project with ${features.length}
 };
 
 export const generateProjectFeatures = async (
-  input: GenerateFeaturesInput
+  input: GenerateFeaturesInput,
 ): Promise<GeneratedFeature[]> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (apiKey) {
     try {
       const client = new GoogleGenAI({ apiKey });
-      const prompt = `You are a senior software architect. Generate a feature list for this project.
+      const prompt = `You are a Principal Software Architect with 15+ years of experience designing scalable, production-grade systems for startups and enterprise platforms.
 
-Project Details:
+Your task is to design a feature set that is realistic, implementation-ready, and aligned with real-world engineering constraints (cost, scalability, usability, maintainability).
+
+## Project Context
 - Name: ${input.name}
 - Description: ${input.description || "Not provided"}
 - Type: ${input.type || "Web application"}
@@ -274,17 +525,67 @@ Project Details:
 - Experience Level: ${input.experienceLevel || "Not specified"}
 - Deadline: ${input.deadline || "Not specified"}
 
-Generate 6–10 realistic, specific features for this exact project. Each feature should be relevant to the project description.
+---
 
-Return ONLY valid JSON array:
+## Core Requirements
+
+You must generate **6–10 high-quality features** that are:
+
+- Directly derived from the project description (no generic filler)
+- Technically realistic for the given stack and team size
+- Appropriate for the stated experience level and deadline
+- Clearly valuable to end users or internal operators
+- Non-overlapping (each feature must serve a distinct purpose)
+
+Avoid:
+- Vague or buzzword-heavy features
+- Duplicate or closely redundant functionality
+- Over-engineered enterprise features for small/simple projects
+
+---
+
+## Feature Design Rules
+
+Each feature must:
+1. Represent a real product capability (not a UI element or vague idea)
+2. Be implementable in a real system within the constraints provided
+3. Be named clearly in 3–6 words
+4. Have a single-sentence description that explains user value
+5. Be categorized using a lowercase slug (e.g., auth, payments, analytics, admin, notifications)
+6. Have a realistic priority based on user impact and system dependency
+
+Priority rules:
+- "high" → core functionality or MVP-critical
+- "medium" → important but not blocking launch
+- "low" → enhancements, optimizations, or nice-to-have features
+
+---
+
+## Internal Evaluation Checklist (do not output this)
+Before responding, ensure:
+- Each feature maps to a real user or system need
+- The full feature set forms a complete product experience
+- No feature is generic like "User Management" unless specifically justified
+- The output would be acceptable in a real engineering planning document
+
+---
+
+## Output Format (STRICT)
+
+Return ONLY a valid JSON array. No markdown, no commentary, no explanations.
+
 [
   {
-    "title": "Feature name (concise, 3-6 words)",
-    "description": "One sentence explaining what this feature does",
-    "category": "lowercase-category-slug",
-    "priority": "high" | "medium" | "low"
+    "title": "3–6 word feature name",
+    "description": "Single clear sentence describing functionality and value",
+    "category": "lowercase-slug",
+    "priority": "high | medium | low"
   }
-]`;
+]
+
+---
+
+If the project description is insufficient, infer reasonable assumptions—but keep them conservative and aligned with the stated domain.`;
 
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
@@ -292,7 +593,11 @@ Return ONLY valid JSON array:
         config: { responseMimeType: "application/json", temperature: 0.3 },
       });
 
-      const text = (response.text ?? "").trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+      const text = (response.text ?? "")
+        .trim()
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/i, "")
+        .trim();
       const parsed = JSON.parse(text);
 
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -300,7 +605,9 @@ Return ONLY valid JSON array:
           title: String(f.title ?? "Untitled Feature"),
           description: String(f.description ?? ""),
           category: String(f.category ?? "general"),
-          priority: (["low", "medium", "high"].includes(f.priority) ? f.priority : "medium") as "low" | "medium" | "high",
+          priority: (["low", "medium", "high"].includes(f.priority)
+            ? f.priority
+            : "medium") as "low" | "medium" | "high",
         }));
       }
     } catch (err) {
@@ -373,78 +680,165 @@ export const analyzeScopeChanges = async ({
   updatedScope,
 }: AnalyzeScopeChangesInput): Promise<AnalyzeScopeChangesResult> => {
   try {
-    const prompt = `You are a senior software architect.
+    const prompt = `You are a Principal Software Architect and Change Impact Analyst responsible for evaluating scope changes in production software systems.
 
-Original Scope:
+Your job is to perform a precise comparison between two project scopes and identify functional, technical, and delivery impacts.
 
+---
+
+## Input
+
+### Original Scope
 ${originalScope.map((item) => `- ${item}`).join("\n")}
 
-Updated Scope:
-
+### Updated Scope
 ${updatedScope.map((item) => `- ${item}`).join("\n")}
 
-Compare both scopes.
+---
 
-Return ONLY valid JSON:
+## Analysis Rules (CRITICAL)
+
+You must compare scopes using semantic matching, not exact string matching.
+
+### Step 1: Feature Mapping
+- Match features even if wording differs
+- Detect:
+  - renamed features
+  - split features
+  - merged features
+  - removed features
+  - newly added features
+
+### Step 2: Change Classification (changeType)
+Use ONLY these values:
+- "ADDED"
+- "REMOVED"
+- "MODIFIED"
+- "MOVED_SCOPE" (feature exists but significantly redefined)
+- "UNCHANGED" (only include if explicitly necessary)
+
+---
+
+### Step 3: Impact Scoring (0–100)
+
+impactScore must follow:
+
+- 0–20 → negligible change (UI tweaks, wording changes)
+- 21–40 → small functional adjustment
+- 41–60 → moderate backend or logic change
+- 61–80 → major architectural or workflow change
+- 81–100 → critical system redesign, scalability or data model impact
+
+Impact must consider:
+- backend changes
+- data model changes
+- API changes
+- workflow changes
+- integration changes
+
+---
+
+### Step 4: Risk Evaluation
+
+Each risk must be:
+- directly caused by scope delta
+- technically specific (not generic like “delays may happen”)
+- tied to system behavior or delivery complexity
+
+Severity values:
+- "Low"
+- "Medium"
+- "High"
+
+---
+
+### Step 5: Recommendations
+
+Must be:
+- actionable engineering decisions
+- focused on reducing scope risk or complexity
+- aligned with real development workflows
+
+Avoid vague advice like “improve planning”
+
+---
+
+## Output Constraints (STRICT)
+
+Return ONLY valid JSON.
+No markdown, no explanation, no extra keys.
+
+---
+
+## Output Schema
 
 {
   "featureChanges": [
     {
-      "title": "",
+      "title": "concise feature name",
       "impactScore": 0,
-      "changeType": "",
-      "explanation": ""
+      "changeType": "ADDED | REMOVED | MODIFIED | MOVED_SCOPE | UNCHANGED",
+      "explanation": "clear technical explanation of what changed and why it matters"
     }
   ],
   "risks": [
     {
-      "title": "",
-      "description": "",
-      "severity": ""
+      "title": "short risk title",
+      "description": "specific technical or delivery risk tied to scope change",
+      "severity": "Low | Medium | High"
     }
   ],
   "recommendations": [
     {
-      "title": "",
-      "description": "",
-      "priority": ""
+      "title": "action title",
+      "description": "clear engineering or planning action",
+      "priority": "Low | Medium | High"
     }
   ],
   "report": {
-    "reportType": "ANALYSIS",
-    "summary": ""
+    "reportType": "SCOPE_CHANGE_ANALYSIS",
+    "summary": "high-level summary of what changed and overall impact"
   }
-}`;
+}
+
+---
+
+## Final Instruction
+
+Be precise and conservative.
+If uncertain, assume higher impact rather than underestimating system complexity.
+Ensure all changes are explicitly justified from the input scopes.`;
 
     const response = await ai.models.generateContent({
-  model: "gemini-2.5-flash",
-  contents: prompt,
-  config: {
-    responseMimeType: "application/json",
-    temperature: 0.2,
-  },
-});
-console.log("RAW GEMINI RESPONSE:");
-console.log(response.text);
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.2,
+      },
+    });
+    console.log("RAW GEMINI RESPONSE:");
+    console.log(response.text);
     const parsed = JSON.parse(extractJson(response.text ?? ""));
 
     return {
-      featureChanges: Array.isArray(parsed.featureChanges) ? parsed.featureChanges : [],
+      featureChanges: Array.isArray(parsed.featureChanges)
+        ? parsed.featureChanges
+        : [],
       risks: Array.isArray(parsed.risks) ? parsed.risks : [],
       recommendations: Array.isArray(parsed.recommendations)
         ? parsed.recommendations
         : [],
-      report: parsed.report && typeof parsed.report === "object"
-        ? parsed.report
-        : fallbackResult.report,
+      report:
+        parsed.report && typeof parsed.report === "object"
+          ? parsed.report
+          : fallbackResult.report,
     };
-  } 
-  catch (error: any) {
-  console.error("========== GEMINI ERROR ==========");
-  console.error(error);
-  console.error("==================================");
+  } catch (error: any) {
+    console.error("========== GEMINI ERROR ==========");
+    console.error(error);
+    console.error("==================================");
 
-  return fallbackResult;
-  
-}
+    return fallbackResult;
+  }
 };
