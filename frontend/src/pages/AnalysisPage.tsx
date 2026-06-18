@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { PROJECT_TYPE_LABELS, PROJECT_STATUS_LABELS } from '../utils/constants'
 import { formatRelativeDate } from '../utils/formatters'
+import { api } from '../services/api'
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
@@ -9,6 +11,27 @@ const statusStyles: Record<Project['status'], string> = {
   active:    'bg-green-50 text-green-600',
   completed: 'bg-indigo-50 text-indigo-600',
   at_risk:   'bg-red-50 text-red-600',
+}
+
+const RISK_COLORS: Record<string, { badge: string; text: string; bar: string }> = {
+  Low:    { badge: 'bg-green-100 text-green-700',  text: 'text-green-700',  bar: 'bg-green-400' },
+  Medium: { badge: 'bg-amber-100 text-amber-700',  text: 'text-amber-700',  bar: 'bg-amber-400' },
+  High:   { badge: 'bg-red-100 text-red-700',      text: 'text-red-700',    bar: 'bg-red-400' },
+}
+
+interface AnalysisRow {
+  id: string
+  scopeIncreasePercent: number
+  additionalHours: number
+  delayWeeks: number
+  riskLevel: string
+  complexity: string
+  createdAt: string
+}
+
+interface AnalyzedProject {
+  id: string
+  analyses: AnalysisRow[]
 }
 
 function Step({ number, title, desc }: { number: number; title: string; desc: string }) {
@@ -25,9 +48,16 @@ function Step({ number, title, desc }: { number: number; title: string; desc: st
   )
 }
 
-function AnalysisProjectCard({ project }: { project: Project }) {
+function AnalysisProjectCard({
+  project,
+  lastAnalysis,
+}: {
+  project: Project
+  lastAnalysis: AnalysisRow | null
+}) {
   const navigate = useNavigate()
   const { setActiveProjectId } = useProjects()
+  const risk = lastAnalysis ? RISK_COLORS[lastAnalysis.riskLevel] ?? RISK_COLORS.Medium : null
 
   const handleRun = () => {
     setActiveProjectId(project.id)
@@ -35,45 +65,111 @@ function AnalysisProjectCard({ project }: { project: Project }) {
   }
 
   return (
-    <div className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+    <div className="flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md">
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-semibold text-gray-900">
-            {project.name}
-          </h3>
-          <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-            {project.description || <span className="italic text-gray-300">No description</span>}
+      {/* Card header */}
+      <div className="p-6 pb-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-base font-semibold text-gray-900">{project.name}</h3>
+            <p className="mt-1 line-clamp-2 text-sm text-gray-500">
+              {project.description || <span className="italic text-gray-300">No description</span>}
+            </p>
+          </div>
+          <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[project.status]}`}>
+            {PROJECT_STATUS_LABELS[project.status]}
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+          <span className="font-medium text-gray-500">{PROJECT_TYPE_LABELS[project.type]}</span>
+          <span>Updated {formatRelativeDate(project.updatedAt)}</span>
+        </div>
+      </div>
+
+      {/* Last analysis summary */}
+      {lastAnalysis && risk ? (
+        <div className="mx-6 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Last Analysis</p>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${risk.badge}`}>
+              {lastAnalysis.riskLevel} Risk
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center">
+              <p className="text-xs text-gray-400">Scope</p>
+              <p className="mt-0.5 text-sm font-bold text-indigo-700">{lastAnalysis.scopeIncreasePercent}%</p>
+            </div>
+            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center">
+              <p className="text-xs text-gray-400">Hours</p>
+              <p className="mt-0.5 text-sm font-bold text-indigo-700">{lastAnalysis.additionalHours}h</p>
+            </div>
+            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center">
+              <p className="text-xs text-gray-400">Delay</p>
+              <p className="mt-0.5 text-sm font-bold text-indigo-700">{lastAnalysis.delayWeeks}w</p>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400">
+            Run {formatRelativeDate(lastAnalysis.createdAt)}
           </p>
         </div>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[project.status]}`}>
-          {PROJECT_STATUS_LABELS[project.status]}
-        </span>
+      ) : (
+        <div className="mx-6 mb-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-3 text-center">
+          <p className="text-xs text-gray-400">No analysis run yet</p>
+        </div>
+      )}
+
+      {/* Action buttons */}
+      <div className="mt-auto flex gap-2 border-t border-gray-100 p-4">
+        <button
+          onClick={handleRun}
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 active:scale-[0.98]"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+          {lastAnalysis ? 'Re-run Analysis' : 'Run AI Analysis'}
+        </button>
+
+        {lastAnalysis && (
+          <Link
+            to={`/reports/${project.id}`}
+            className="flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-[0.98]"
+            title="View full report"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Report
+          </Link>
+        )}
       </div>
 
-      {/* Meta */}
-      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 text-xs text-gray-400">
-        <span className="font-medium text-gray-500">{PROJECT_TYPE_LABELS[project.type]}</span>
-        <span>Updated {formatRelativeDate(project.updatedAt)}</span>
-      </div>
-
-      {/* CTA */}
-      <button
-        onClick={handleRun}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 active:scale-[0.98]"
-      >
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-        Run AI Analysis
-      </button>
     </div>
   )
 }
 
 export function AnalysisPage() {
-  const { projects, loading } = useProjects()
+  const { projects, loading: projectsLoading } = useProjects()
+  const [analysisMap, setAnalysisMap] = useState<Record<string, AnalysisRow | null>>({})
+  const [analysisLoading, setAnalysisLoading] = useState(true)
+
+  useEffect(() => {
+    api.get<AnalyzedProject[]>('/projects/analyzed')
+      .then((analyzed) => {
+        const map: Record<string, AnalysisRow | null> = {}
+        analyzed.forEach((p) => {
+          map[p.id] = p.analyses[0] ?? null
+        })
+        setAnalysisMap(map)
+      })
+      .catch(() => setAnalysisMap({}))
+      .finally(() => setAnalysisLoading(false))
+  }, [])
+
+  const loading = projectsLoading || analysisLoading
+  const analyzedCount = Object.values(analysisMap).filter(Boolean).length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -84,7 +180,11 @@ export function AnalysisPage() {
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">AI Impact Analysis</h1>
             <p className="mt-1 text-sm text-gray-500">
-              Select a project below to run an AI-powered scope analysis
+              {projects.length === 0
+                ? 'Create a project to get started'
+                : analyzedCount > 0
+                  ? `${analyzedCount} of ${projects.length} project${projects.length === 1 ? '' : 's'} analysed`
+                  : `${projects.length} project${projects.length === 1 ? '' : 's'} — no analysis run yet`}
             </p>
           </div>
           {projects.length > 0 && (
@@ -97,32 +197,20 @@ export function AnalysisPage() {
           )}
         </div>
 
-        {/* How it works banner */}
+        {/* How it works */}
         <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50/60 px-8 py-6">
-          <p className="mb-5 text-sm font-semibold text-indigo-700 uppercase tracking-wide">How it works</p>
+          <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-indigo-600">How it works</p>
           <div className="grid gap-5 sm:grid-cols-3">
-            <Step
-              number={1}
-              title="Define your scope"
-              desc="Add original and new features to your project in the Scope Builder."
-            />
-            <Step
-              number={2}
-              title="Run AI analysis"
-              desc="Gemini analyses effort, risk level, complexity, and timeline impact."
-            />
-            <Step
-              number={3}
-              title="Review results"
-              desc="Get a breakdown of hours, delay, risk factors, and recommendations."
-            />
+            <Step number={1} title="Define your scope" desc="Add original and new features in the Scope Builder." />
+            <Step number={2} title="Run AI analysis" desc="Gemini analyses effort, risk, complexity, and timeline." />
+            <Step number={3} title="Review results" desc="Get hours, delay, risk factors, and recommendations." />
           </div>
         </div>
 
         {/* Content */}
         <div className="mt-10">
 
-          {/* Loading */}
+          {/* Loading skeletons */}
           {loading && (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
@@ -134,14 +222,14 @@ export function AnalysisPage() {
                     </div>
                     <div className="h-6 w-14 rounded-full bg-gray-100" />
                   </div>
-                  <div className="h-px w-full bg-gray-100" />
+                  <div className="h-24 w-full rounded-xl bg-gray-100" />
                   <div className="h-9 w-full rounded-xl bg-gray-100" />
                 </div>
               ))}
             </div>
           )}
 
-          {/* No projects — empty state */}
+          {/* No projects */}
           {!loading && projects.length === 0 && (
             <div className="rounded-2xl border border-gray-200 bg-white p-14 text-center shadow-sm">
               <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
@@ -150,8 +238,8 @@ export function AnalysisPage() {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900">No projects to analyse yet</h3>
-              <p className="mt-2 text-sm text-gray-500 max-w-sm mx-auto">
-                Create your first project, add features in the Scope Builder, then come back here to run an AI analysis.
+              <p className="mt-2 mx-auto max-w-sm text-sm text-gray-500">
+                Create a project, add features in the Scope Builder, then come back here to run an AI analysis.
               </p>
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                 <Link
@@ -177,11 +265,17 @@ export function AnalysisPage() {
           {!loading && projects.length > 0 && (
             <>
               <p className="mb-4 text-xs text-gray-400">
-                {projects.length} project{projects.length === 1 ? '' : 's'} available — click "Run AI Analysis" on any card
+                {analyzedCount > 0
+                  ? `${analyzedCount} project${analyzedCount === 1 ? '' : 's'} with past results — hover "Report" to revisit, or re-run the analysis`
+                  : 'Click "Run AI Analysis" on any project to get started'}
               </p>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (
-                  <AnalysisProjectCard key={project.id} project={project} />
+                  <AnalysisProjectCard
+                    key={project.id}
+                    project={project}
+                    lastAnalysis={analysisMap[project.id] ?? null}
+                  />
                 ))}
               </div>
             </>
