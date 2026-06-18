@@ -27,3 +27,16 @@ export const updateProject = async (
 export const deleteProject = async (id: string) => {
   return prisma.project.delete({ where: { id } });
 };
+
+export const getAnalyzedProjects = async () => {
+  return prisma.project.findMany({
+    where: { analyses: { some: {} } },
+    include: {
+      analyses: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+};

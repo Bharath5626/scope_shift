@@ -53,6 +53,9 @@ model Analysis {
   delayWeeks           Float
   riskLevel            String
   complexity           String
+  effortBreakdown      Json?
+  riskFactors          Json?
+  recommendations      Json?
 
   createdAt DateTime @default(now())
 

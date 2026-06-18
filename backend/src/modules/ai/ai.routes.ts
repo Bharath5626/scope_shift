@@ -35,6 +35,9 @@ router.post(
         delayWeeks: result.estimatedWeeks,
         riskLevel: result.riskLevel,
         complexity: result.complexity.level,
+        effortBreakdown: result.effortBreakdown,
+        riskFactors: result.riskFactors,
+        recommendations: result.recommendations,
       },
     });
 

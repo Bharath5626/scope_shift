@@ -10,6 +10,8 @@ import { ProjectsPage } from '../pages/ProjectsPage'
 import { CreateProjectPage } from '../pages/CreateProjectPage'
 import { AnalyzingPage } from '../pages/AnalyzingPage'
 import { AnalysisResultsPage } from '../pages/AnalysisResultsPage'
+import { ReportsPage } from '../pages/ReportsPage'
+import { ReportDetailPage } from '../pages/ReportDetailPage'
 
 export function AppRouter() {
   const { isAuthenticated } = useAuth()
@@ -37,10 +39,8 @@ export function AppRouter() {
           path="/analysis"
           element={<PlaceholderPage title="Analysis" subtitle="Run AI impact analysis on scope changes" />}
         />
-        <Route
-          path="/reports"
-          element={<PlaceholderPage title="Reports" subtitle="View detailed impact analysis reports" />}
-        />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/reports/:projectId" element={<ReportDetailPage />} />
         <Route
           path="/history"
           element={<PlaceholderPage title="Project History" subtitle="Browse all projects and their analysis history" />}

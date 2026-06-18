@@ -191,7 +191,7 @@ export function AnalysisResultsPage() {
         {/* Footer action */}
         <div className="flex justify-end">
           <button
-            onClick={() => navigate(`/scope-builder?project=${projectId}`)}
+            onClick={() => navigate(`/reports/${projectId}`)}
             className="rounded-lg bg-indigo-600 px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
           >
             View Detailed Report

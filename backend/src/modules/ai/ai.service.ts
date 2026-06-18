@@ -77,6 +77,7 @@ export type ScopeAnalysisResult = {
     score: number;
   };
   riskFactors: string[];
+  recommendations: string[];
 };
 
 type FeatureInput = {
@@ -121,6 +122,42 @@ const computeFallbackAnalysis = (
   while (riskFactors.length < 4)
     riskFactors.push(riskFactorPool.default[riskFactors.length % 3]);
 
+  const recommendationPool: Record<string, string[]> = {
+    saas: [
+      "Define clear API contracts before implementation begins",
+      "Implement caching early to avoid performance bottlenecks",
+      "Set up error monitoring (e.g. Sentry) from day one",
+      "Design for horizontal scaling from the start",
+    ],
+    ecommerce: [
+      "Optimise the checkout flow to reduce cart abandonment",
+      "Test all payment flows thoroughly in a staging environment",
+      "Add inventory webhooks for real-time stock updates",
+      "Implement product search with proper indexing",
+    ],
+    chatbot: [
+      "Log all conversations for training data collection",
+      "Add a human escalation fallback for low-confidence responses",
+      "Test with diverse user inputs and edge cases",
+      "Monitor intent confidence scores over time",
+    ],
+    landing_page: [
+      "A/B test the hero section CTA for conversion",
+      "Optimise images for Core Web Vitals",
+      "Add schema markup for improved SEO",
+      "Set up conversion tracking from day one",
+    ],
+    general: [
+      "Start with a minimal viable scope and expand iteratively",
+      "Establish clear acceptance criteria for each feature",
+      "Schedule weekly scope review meetings to catch drift early",
+      "Document all third-party dependencies and their SLAs",
+    ],
+  };
+
+  const typeKey = "general";
+  const recommendations = (recommendationPool[typeKey] ?? recommendationPool.general).slice(0, 4);
+
   return {
     scopeScore,
     estimatedHours: totalHours,
@@ -134,6 +171,7 @@ const computeFallbackAnalysis = (
     },
     complexity: { level: complexityLevel, score: complexityScore },
     riskFactors: riskFactors.slice(0, 4),
+    recommendations,
   };
 };
 
@@ -175,7 +213,8 @@ Based on these features, return ONLY valid JSON matching exactly this shape:
     "level": "Low" | "Medium" | "High",
     "score": <integer 10-95, complexity score for visualization>
   },
-  "riskFactors": [<4 concise risk factor strings specific to this project>]
+  "riskFactors": [<4 concise risk factor strings specific to this project>],
+  "recommendations": [<4 concise actionable recommendation strings to reduce risk or improve delivery>]
 }
 
 Make all numbers realistic for a ${project.type} project with ${features.length} features.`;
@@ -205,6 +244,7 @@ Make all numbers realistic for a ${project.type} project with ${features.length}
           score: Number(parsed.complexity?.score) || 60,
         },
         riskFactors: Array.isArray(parsed.riskFactors) ? parsed.riskFactors.slice(0, 4).map(String) : [],
+        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations.slice(0, 4).map(String) : [],
       };
     } catch (err) {
       console.error("Gemini scope analysis failed, using fallback:", err);

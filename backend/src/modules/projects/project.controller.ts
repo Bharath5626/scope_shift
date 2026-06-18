@@ -29,3 +29,8 @@ export const deleteProject = asyncHandler(async (req: Request, res: Response) =>
   await ProjectService.deleteProject(req.params.id);
   res.json({ success: true, message: "Project deleted successfully" });
 });
+
+export const getAnalyzedProjects = asyncHandler(async (_req: Request, res: Response) => {
+  const projects = await ProjectService.getAnalyzedProjects();
+  res.json({ success: true, data: projects });
+});

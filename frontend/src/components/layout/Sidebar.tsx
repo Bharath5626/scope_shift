@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext'
 
 const EXTRA_ACTIVE: Record<string, string[]> = {
   '/analysis': ['/analyzing', '/analysis-results'],
+  '/reports': ['/reports/'],
   '/scope-builder': ['/scope-builder'],
 }
 
