@@ -356,105 +356,152 @@ export const analyzeProjectScope = async (
 
       const prompt = `You are a Principal Software Engineering Manager and Estimation Lead responsible for delivering realistic project timelines used for client commitments and sprint planning.
 
-You must produce disciplined, conservative engineering estimates based on the provided scope. Avoid optimism bias.
+      You must produce disciplined, conservative engineering estimates based on the provided scope. Avoid optimism bias.
 
----
+      ---
 
-## Project Context
-- Name: ${project.name}
-- Description: ${project.description || "Not provided"}
-- Type: ${project.type}
+      ## Project Context
+      - Name: ${project.name}
+      - Description: ${project.description || "Not provided"}
+      - Type: ${project.type}
 
-## Feature Set
-You are estimating effort for the following features (${features.length} total):
+      ## Feature Set
+      You are estimating effort for the following features (${features.length} total):
 
-${featureList}
+      ${featureList}
 
----
+      ---
 
-## Estimation Rules (CRITICAL)
+      ## Estimation Rules (CRITICAL)
 
-You must treat each feature as a production-grade requirement unless explicitly trivial.
+      You must treat each feature as a production-grade requirement unless explicitly trivial.
 
-Follow this estimation approach mentally:
+      Follow this estimation approach:
 
-1. Assign each feature an internal complexity weight:
-   - Simple: 8–16 hours
-   - Medium: 16–40 hours
-   - Complex: 40–80 hours
-   - Very Complex: 80–160 hours
+      ---
 
-2. Add overhead factors:
-   - Integration overhead: +15–25%
-   - Testing & QA: +20–30%
-   - Coordination / meetings / planning: +10–15%
-   - Rework buffer: +10–20%
+      ### 1. Feature Effort Estimation
+      Assign each feature an internal complexity weight:
 
-3. Calendar conversion rule:
-   - 1 developer = 35 productive hours/week
-   - If features imply parallel work, reduce calendar time slightly but never below 60% of linear estimate
+      - Simple: 8–16 hours
+      - Medium: 16–40 hours
+      - Complex: 40–80 hours
+      - Very Complex: 80–160 hours
 
-4. Complexity scoring rules:
-   - Base complexity comes from tech complexity + feature count + integration needs
-   - Do NOT inflate scores arbitrarily
-   - Keep score proportional to estimated hours
+      ---
 
----
+      ### 2. Mandatory Overhead Application
+      After summing all feature efforts, apply:
 
-## Output Constraints (STRICT)
+      - Integration overhead: +15–25%
+      - Testing & QA: +20–30%
+      - Coordination / planning: +10–15%
+      - Rework buffer: +10–20%
 
-Return ONLY valid JSON. No markdown, no commentary.
+      These must be included in final estimatedHours.
 
----
+      ---
 
-## Output Schema
+      ### 3. TEAM-BASED CALENDAR MODEL (CRITICAL)
 
-{
-  "scopeScore": <integer 20–95>,
-  "estimatedHours": <integer>,
-  "estimatedWeeks": <integer>,
-  "riskLevel": "Low" | "Medium" | "High",
+      You MUST use the provided implicit team context.
 
-  "effortBreakdown": {
-    "development": <integer>,
-    "testing": <integer>,
-    "integration": <integer>,
-    "documentation": <integer>
-  },
+      If team size is NOT explicitly provided, assume:
+      - Default team size = 3 developers
 
-  "complexity": {
-    "level": "Low" | "Medium" | "High",
-    "score": <integer 10–95>
-  },
+      Rules:
 
-  "riskFactors": [
-    "<4 specific risks tied to architecture, scale, or features>"
-  ],
+      - 1 developer = 35 productive hours/week
+      - Total team capacity = teamSize × 35 hours/week
+      - Work is parallelized BUT NOT perfectly
 
-  "recommendations": [
-    "<4 actionable steps to reduce scope, risk, or delivery time>"
-  ]
-}
+      Parallel efficiency rules:
+      - Small dependencies → 75% efficiency
+      - Medium complexity systems → 65% efficiency
+      - High integration systems → 50–60% efficiency
 
----
+      FINAL RULE:
+      - estimatedWeeks = ceil( estimatedHours / (teamSize × 35 × efficiency) )
 
-## Validation Rules (must satisfy internally before responding)
+      You MUST NOT default to single-developer timeline.
 
-- estimatedHours MUST equal sum of effortBreakdown values ±5%
-- riskLevel must match complexity.score:
-  - 10–40 = Low
-  - 41–70 = Medium
-  - 71–95 = High
-- estimatedWeeks must satisfy:
-  estimatedHours / 35 rounded UP
-- riskFactors must reference actual feature or system risks (not generic phrases)
-- recommendations must be actionable engineering decisions (not vague advice)
+      ---
 
----
+      ### 4. Critical Path Rule
+      Identify that not all work is parallel.
 
-## Final Instruction
+      At least 30–50% of work is sequential due to:
+      - backend dependencies
+      - API contracts
+      - shared components
+      - integration/testing bottlenecks
 
-Be conservative. If uncertain, overestimate effort rather than underestimate.`;
+      This must influence timeline, not just hours.
+
+      ---
+
+      ### 5. Complexity Scoring Rules
+      - Must scale proportionally with estimatedHours + integration complexity
+      - Do NOT inflate scopeScore arbitrarily
+      - Higher integration → higher complexity score
+
+      ---
+
+      ## Output Constraints (STRICT)
+
+      Return ONLY valid JSON. No markdown, no commentary.
+
+      ---
+
+      ## Output Schema
+
+      {
+        "scopeScore": <integer 20–95>,
+        "estimatedHours": <integer>,
+        "estimatedWeeks": <integer>,
+        "riskLevel": "Low" | "Medium" | "High",
+
+        "effortBreakdown": {
+          "development": <integer>,
+          "testing": <integer>,
+          "integration": <integer>,
+          "documentation": <integer>
+        },
+
+        "complexity": {
+          "level": "Low" | "Medium" | "High",
+          "score": <integer 10–95>
+        },
+
+        "riskFactors": [
+          "<4 specific risks tied to architecture, dependencies, or system scaling>"
+        ],
+
+        "recommendations": [
+          "<4 actionable engineering strategies to reduce timeline or risk>"
+        ]
+      }
+
+      ---
+
+      ## Validation Rules (must satisfy internally before responding)
+
+      - estimatedHours MUST equal sum of effortBreakdown values ±5%
+      - estimatedWeeks MUST be computed using team-based formula above
+      - riskLevel must match complexity.score:
+        - 10–40 = Low
+        - 41–70 = Medium
+        - 71–95 = High
+      - riskFactors must be feature-specific (no generic risks)
+      - recommendations must be execution-level actions, not advice
+
+      ---
+
+      ## Final Instruction
+
+      Be conservative.
+      Prefer overestimation in ambiguity.
+      Always assume real-world engineering constraints and partial parallelization limits.`;
 
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
@@ -501,143 +548,6 @@ Be conservative. If uncertain, overestimate effort rather than underestimate.`;
   }
 
   return computeFallbackAnalysis(features);
-};
-
-export const analyzeWithNewScope = async (
-  project: { name: string; description?: string | null; type: string },
-  originalFeatures: FeatureInput[],
-  newFeatures: FeatureInput[],
-): Promise<ScopeAnalysisResult> => {
-  const apiKey = process.env.GEMINI_API_KEY;
-
-  const formatList = (items: FeatureInput[]) =>
-    items
-      .map(
-        (f) =>
-          `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? ": " + f.description : ""}`,
-      )
-      .join("\n");
-
-  if (apiKey && newFeatures.length > 0) {
-    try {
-      const client = new GoogleGenAI({ apiKey });
-
-      const prompt = `You are a Principal Software Engineering Manager evaluating scope creep on an active software project.
-
-Your task is to assess the IMPACT of client-requested additions on the original agreed scope. You must produce an accurate delta analysis — focused entirely on the NEW features.
-
----
-
-## Project Context
-- Name: ${project.name}
-- Description: ${project.description || "Not provided"}
-- Type: ${project.type}
-
-## ORIGINAL Agreed Scope (${originalFeatures.length} features — already committed)
-${formatList(originalFeatures) || "(No original features defined)"}
-
-## CLIENT ADDITIONS — Scope Creep (${newFeatures.length} new features — NOT yet committed)
-${formatList(newFeatures)}
-
----
-
-## Analysis Instructions
-
-You are computing the delta introduced by the NEW CLIENT ADDITIONS against the original scope.
-
-1. scopeScore: The percentage INCREASE in total project scope caused by the new features.
-   Guidelines:
-   - 1–2 minor additions to a large original scope: 8–20%
-   - 3–5 moderate additions: 25–50%
-   - Major new additions or deep integrations: 50–80%
-   - Keep proportional: more original features = smaller % from same additions
-
-2. estimatedHours: TOTAL additional engineering hours to implement ALL new client features only.
-   Per-feature guidelines: Simple=8–16h, Medium=16–40h, Complex=40–80h. Add 15–25% overhead.
-
-3. estimatedWeeks: Additional calendar weeks (ceil(estimatedHours / 35))
-
-4. riskLevel: Risk from adding these features MID-PROJECT:
-   - Low: isolated, low-dependency, no rework needed
-   - Medium: some integration with existing code, moderate rework
-   - High: architectural changes, significant rework, delivery risk
-
-5. effortBreakdown: Hours for the NEW features only (must sum ≈ estimatedHours)
-
-6. riskFactors: 4 specific risks tied to adding these features mid-stream (not generic)
-
-7. recommendations: 4 actionable steps to manage this scope change professionally
-
----
-
-## Output (STRICT JSON only, no markdown)
-
-{
-  "scopeScore": <integer 5–90>,
-  "estimatedHours": <integer>,
-  "estimatedWeeks": <integer>,
-  "riskLevel": "Low" | "Medium" | "High",
-  "effortBreakdown": {
-    "development": <integer>,
-    "testing": <integer>,
-    "integration": <integer>,
-    "documentation": <integer>
-  },
-  "complexity": {
-    "level": "Low" | "Medium" | "High",
-    "score": <integer 10–95>
-  },
-  "riskFactors": ["<risk 1>", "<risk 2>", "<risk 3>", "<risk 4>"],
-  "recommendations": ["<rec 1>", "<rec 2>", "<rec 3>", "<rec 4>"]
-}
-
-Validation: estimatedHours ≈ sum(effortBreakdown) ±5%. estimatedWeeks = ceil(estimatedHours/35).`;
-
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json", temperature: 0.2 },
-      });
-
-      const text = (response.text ?? "")
-        .trim()
-        .replace(/^```(?:json)?/i, "")
-        .replace(/```$/i, "")
-        .trim();
-      const parsed = JSON.parse(text);
-
-      return {
-        scopeScore: Number(parsed.scopeScore) || 30,
-        estimatedHours: Number(parsed.estimatedHours) || 40,
-        estimatedWeeks: Number(parsed.estimatedWeeks) || 2,
-        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel)
-          ? parsed.riskLevel
-          : "Medium") as "Low" | "Medium" | "High",
-        effortBreakdown: {
-          development: Number(parsed.effortBreakdown?.development) || 24,
-          testing: Number(parsed.effortBreakdown?.testing) || 8,
-          integration: Number(parsed.effortBreakdown?.integration) || 5,
-          documentation: Number(parsed.effortBreakdown?.documentation) || 3,
-        },
-        complexity: {
-          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level)
-            ? parsed.complexity.level
-            : "Medium") as "Low" | "Medium" | "High",
-          score: Number(parsed.complexity?.score) || 50,
-        },
-        riskFactors: Array.isArray(parsed.riskFactors)
-          ? parsed.riskFactors.slice(0, 4).map(String)
-          : [],
-        recommendations: Array.isArray(parsed.recommendations)
-          ? parsed.recommendations.slice(0, 4).map(String)
-          : [],
-      };
-    } catch (err) {
-      console.error("Gemini scope creep analysis failed, using fallback:", err);
-    }
-  }
-
-  return computeFallbackAnalysis(newFeatures.length > 0 ? newFeatures : originalFeatures);
 };
 
 export const generateProjectFeatures = async (
