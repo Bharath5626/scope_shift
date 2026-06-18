@@ -64,15 +64,18 @@ export const login = async (data: LoginInput) => {
     },
   });
 
-  if (!user) {
-    throw createHttpError("Invalid credentials", 401);
-  }
+ if (!user) {
+  throw createHttpError("Email is not registered", 404);
+}
 
-  const isPasswordValid = await bcrypt.compare(data.password, user.password);
+const isPasswordValid = await bcrypt.compare(
+  data.password,
+  user.password
+);
 
-  if (!isPasswordValid) {
-    throw createHttpError("Invalid credentials", 401);
-  }
+if (!isPasswordValid) {
+  throw createHttpError("Incorrect password", 401);
+}
 
   const token = jwt.sign(
     {

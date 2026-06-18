@@ -27,19 +27,13 @@ router.post(
       }),
     ]);
 
-    const { analyzeProjectScope, analyzeWithNewScope } = await import("./ai.service");
+    const { analyzeProjectScope } = await import("./ai.service");
 
-    const result =
-      newFeatures.length > 0
-        ? await analyzeWithNewScope(
-            { name: project.name, description: project.description, type: project.type },
-            originalFeatures,
-            newFeatures,
-          )
-        : await analyzeProjectScope(
-            { name: project.name, description: project.description, type: project.type },
-            originalFeatures,
-          );
+    const projectInfo = { name: project.name, description: project.description, type: project.type };
+
+    const result = newFeatures.length > 0
+      ? await analyzeProjectScope(projectInfo, originalFeatures, newFeatures)
+      : await analyzeProjectScope(projectInfo, originalFeatures, []);
 
     await prisma.analysis.create({
       data: {

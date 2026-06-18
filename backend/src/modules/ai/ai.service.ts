@@ -22,55 +22,43 @@ type GenerateFeaturesInput = {
 
 const FALLBACK_FEATURES: Record<string, GeneratedFeature[]> = {
   saas: [
-    {
-      title: "User Registration & Login",
-      description: "Allow users to create accounts and authenticate securely",
-      category: "authentication",
-      priority: "high",
-    },
-    {
-      title: "Dashboard Overview",
-      description: "Central dashboard showing key metrics and project status",
-      category: "ui",
-      priority: "high",
-    },
-    {
-      title: "User Profile Management",
-      description: "Users can update their name, email and preferences",
-      category: "user-management",
-      priority: "medium",
-    },
-    {
-      title: "Subscription & Billing",
-      description: "Manage plans, upgrades and payment processing",
-      category: "billing",
-      priority: "medium",
-    },
-    {
-      title: "Email Notifications",
-      description: "System and user-triggered email alerts",
-      category: "notifications",
-      priority: "medium",
-    },
-    {
-      title: "Role-Based Access Control",
-      description: "Admin, member and viewer permission levels",
-      category: "authentication",
-      priority: "medium",
-    },
-    {
-      title: "Data Export",
-      description: "Export project data as CSV or PDF",
-      category: "reporting",
-      priority: "low",
-    },
-    {
-      title: "Audit Logs",
-      description: "Track user actions and changes within the system",
-      category: "security",
-      priority: "low",
-    },
-  ],
+  {
+    title: "Create Project Workspace",
+    description: "Users can initialize and configure a new project workspace",
+    category: "workflow",
+    priority: "high",
+  },
+  {
+    title: "Invite Collaborators",
+    description: "Project owners can invite team members to collaborate",
+    category: "workflow",
+    priority: "high",
+  },
+  {
+    title: "Manage Project Tasks",
+    description: "Users can create and track tasks within a project workflow",
+    category: "workflow",
+    priority: "high",
+  },
+  {
+    title: "Track Project Activity",
+    description: "System records key actions and project events",
+    category: "tracking",
+    priority: "medium",
+  },
+  {
+    title: "Export Project Data",
+    description: "Users can export project data for reporting and analysis",
+    category: "reporting",
+    priority: "low",
+  },
+  {
+    title: "Configure Project Settings",
+    description: "Users can manage project-level configuration options",
+    category: "configuration",
+    priority: "medium",
+  },
+],
   ecommerce: [
     {
       title: "Product Catalog",
@@ -339,8 +327,7 @@ const computeFallbackAnalysis = (
 };
 
 export const analyzeProjectScope = async (
-  project: { name: string; description?: string | null; type: string },
-  features: FeatureInput[],
+project: { name: string; description?: string | null; type: string; }, features: FeatureInput[], newFeatures: { projectId: string; id: string; description: string | null; type: string; title: string; category: string; priority: string; order: number; }[],
 ): Promise<ScopeAnalysisResult> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -560,7 +547,9 @@ export const generateProjectFeatures = async (
       const client = new GoogleGenAI({ apiKey });
       const prompt = `You are a Principal Software Architect with 15+ years of experience designing scalable, production-grade systems for startups and enterprise platforms.
 
-Your task is to design a feature set that is realistic, implementation-ready, and aligned with real-world engineering constraints (cost, scalability, usability, maintainability).
+Your task is to design a feature set that is realistic, implementation-ready, and aligned with real-world engineering constraints.
+
+---
 
 ## Project Context
 - Name: ${input.name}
@@ -570,70 +559,95 @@ Your task is to design a feature set that is realistic, implementation-ready, an
 - Team Size: ${input.teamSize || "Not specified"}
 - Methodology: ${input.methodology || "Not specified"}
 - Experience Level: ${input.experienceLevel || "Not specified"}
-- Deadline: ${input.deadline || "Not specified"}
+- Deadline Constraint: ${input.deadline ? `Must deliver by ${input.deadline}` : "No deadline constraint"}
 
 ---
 
-## Core Requirements
+## 🧠 FEATURE GENERATION ENGINE (STRICT WORKFLOW MODEL)
 
-You must generate **6–10 high-quality features** that are:
-
-- Directly derived from the project description (no generic filler)
-- Technically realistic for the given stack and team size
-- Appropriate for the stated experience level and deadline
-- Clearly valuable to end users or internal operators
-- Non-overlapping (each feature must serve a distinct purpose)
-
-Avoid:
-- Vague or buzzword-heavy features
-- Duplicate or closely redundant functionality
-- Over-engineered enterprise features for small/simple projects
+You MUST think in USER WORKFLOWS, NOT software modules.
 
 ---
 
-## Feature Design Rules
-
-Each feature must:
-1. Represent a real product capability (not a UI element or vague idea)
-2. Be implementable in a real system within the constraints provided
-3. Be named clearly in 3–6 words
-4. Have a single-sentence description that explains user value
-5. Be categorized using a lowercase slug (e.g., auth, payments, analytics, admin, notifications)
-6. Have a realistic priority based on user impact and system dependency
-
-Priority rules:
-- "high" → core functionality or MVP-critical
-- "medium" → important but not blocking launch
-- "low" → enhancements, optimizations, or nice-to-have features
+### STEP 1: Identify Actors
+Identify real users (customer, admin, staff, external system).
 
 ---
 
-## Internal Evaluation Checklist (do not output this)
-Before responding, ensure:
-- Each feature maps to a real user or system need
-- The full feature set forms a complete product experience
-- No feature is generic like "User Management" unless specifically justified
-- The output would be acceptable in a real engineering planning document
+### STEP 2: Identify Goals
+Define what each actor is trying to achieve.
 
 ---
 
-## Output Format (STRICT)
+### STEP 3: Convert Goals → Workflows
+Workflows must include real actions, not UI screens.
 
-Return ONLY a valid JSON array. No markdown, no commentary, no explanations.
+Example:
+Customer → search → select → book → confirm → track status
+
+---
+
+### STEP 4: Convert Workflows → Features
+Each feature MUST represent a workflow step or outcome.
+
+NOT allowed:
+- dashboard
+- login
+- signup
+- RBAC (unless explicitly required)
+- notifications (unless required by workflow)
+
+---
+
+### STEP 5: System Features ONLY if required
+Only include system-level features if workflows depend on them.
+
+---
+
+## ❌ QUALITY FILTER (MANDATORY)
+
+Reject features if:
+- they are generic SaaS modules
+- they are not user-action based
+- they duplicate another feature
+- they are UI-only concepts
+
+Replace them with workflow-based features.
+
+---
+
+## OUTPUT NORMALIZATION RULES
+
+- title = action-based (verb + object preferred)
+- description = user-focused outcome
+- category = domain action (not generic "ui/system")
+- priority:
+  - high → required for core workflow
+  - medium → supports workflow
+  - low → enhancement
+
+---
+
+## FINAL PRIORITY RULE
+
+If conflict exists:
+👉 ALWAYS prefer workflow-based feature over SaaS template feature.
+
+---
+
+## OUTPUT FORMAT (STRICT)
+
+Return ONLY JSON array:
 
 [
   {
     "title": "3–6 word feature name",
-    "description": "Single clear sentence describing functionality and value",
+    "description": "single sentence user value",
     "category": "lowercase-slug",
     "priority": "high | medium | low"
   }
 ]
-
----
-
-If the project description is insufficient, infer reasonable assumptions—but keep them conservative and aligned with the stated domain.`;
-
+`;
       const response = await client.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,

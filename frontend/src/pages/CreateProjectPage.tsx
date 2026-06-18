@@ -3,6 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
 
+const SectionCard = ({
+  title,
+  description,
+  children,
+}: {
+  title: string
+  description?: string
+  children: React.ReactNode
+}) => {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+        {description && <p className="mt-1 text-xs text-gray-500">{description}</p>}
+      </div>
+      {children}
+    </div>
+  )
+}
+
 const inputCls =
   'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition'
 
@@ -21,63 +41,15 @@ const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'
   'Landing Page': 'landing_page',
 }
 
-const PROJECT_TYPES = ['Web App', 'Mobile App', 'SaaS', 'E-commerce', 'Chatbot', 'Landing Page', 'API']
-
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-  placeholder,
-  icon,
-}: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  options: string[]
-  placeholder: string
-  icon?: React.ReactNode
-}) {
-  return (
-    <div>
-      <label className={labelCls}>{label}</label>
-      <div className="relative">
-        {icon && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            {icon}
-          </span>
-        )}
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`${selectCls} ${icon ? 'pl-9' : ''}`}
-        >
-          <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o}>{o}</option>
-          ))}
-        </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </span>
-      </div>
-    </div>
-  )
-}
-
-function SectionCard({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-5">
-        <h2 className="text-base font-semibold text-gray-900">{title}</h2>
-        <p className="mt-0.5 text-sm text-gray-500">{description}</p>
-      </div>
-      {children}
-    </div>
-  )
-}
+const PROJECT_TYPES = [
+  'Web App',
+  'Mobile App',
+  'SaaS',
+  'E-commerce',
+  'Chatbot',
+  'Landing Page',
+  'API',
+]
 
 type Step = 'form' | 'generating'
 
@@ -85,22 +57,30 @@ export function CreateProjectPage() {
   const navigate = useNavigate()
   const { createProject } = useProjects()
 
+  // 🧠 CORE
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [teamSize, setTeamSize] = useState('')
-  const [methodology, setMethodology] = useState('')
+
+  // ⚙️ CONTEXT
   const [techStack, setTechStack] = useState('')
-  const [projectType, setProjectType] = useState('')
+  const [teamSize, setTeamSize] = useState('')
   const [experienceLevel, setExperienceLevel] = useState('')
   const [deadline, setDeadline] = useState('')
+
+  // 🟡 OPTIONAL
+  const [projectType, setProjectType] = useState('')
+  const [methodology, setMethodology] = useState('')
   const [workingHours, setWorkingHours] = useState('')
+
   const [step, setStep] = useState<Step>('form')
   const [error, setError] = useState('')
-
+  const [showOptional, setShowOptional] = useState(false)
   const handleCreate = async () => {
-    if (!name.trim()) return
+    if (!name.trim() || !description.trim()) return
+
     setStep('generating')
     setError('')
+
     try {
       const project = await createProject({
         name,
@@ -109,12 +89,21 @@ export function CreateProjectPage() {
       })
 
       await api.post(`/projects/${project.id}/generate-features`, {
-        techStack,
-        teamSize,
-        methodology,
-        experienceLevel,
-        deadline,
-        workingHours,
+        core: {
+          name,
+          description,
+        },
+        context: {
+          techStack,
+          teamSize,
+          experienceLevel,
+          deadline,
+        },
+        optional: {
+          projectType,
+          methodology,
+          workingHours,
+        },
       })
 
       navigate(`/scope-builder?project=${project.id}`)
@@ -134,19 +123,13 @@ export function CreateProjectPage() {
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">Generating features with AI</h2>
+
+          <h2 className="text-lg font-semibold text-gray-900">
+            Generating features with AI
+          </h2>
           <p className="mt-2 text-sm text-gray-500">
             Analysing your project details and building the initial feature list…
           </p>
-          <div className="mt-6 flex justify-center gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <span
-                key={i}
-                className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              />
-            ))}
-          </div>
         </div>
       </div>
     )
@@ -156,14 +139,17 @@ export function CreateProjectPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-5xl px-8 py-10">
 
-        {/* Page header */}
+        {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Create New Project</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Create New Project
+            </h1>
             <p className="mt-1 text-sm text-gray-500">
-              Fill in the details — Gemini AI will generate an initial feature list for the Scope Builder
+              Fill in the details — AI will generate features based on structured inputs
             </p>
           </div>
+
           <button
             onClick={() => navigate('/projects')}
             className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition hover:bg-gray-50"
@@ -174,22 +160,19 @@ export function CreateProjectPage() {
 
         {error && (
           <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
-            <svg className="h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
             <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
         <div className="space-y-5">
 
-          {/* Section 1: Project Identity */}
+          {/* CORE */}
           <SectionCard
             title="Project Identity"
-            description="The name and description are used by AI to generate relevant features."
+            description="Core inputs drive AI feature generation quality."
           >
             <div className="grid gap-5 sm:grid-cols-2">
-              <div className="sm:col-span-1">
+              <div>
                 <label className={labelCls}>
                   Project Name <span className="text-red-500">*</span>
                 </label>
@@ -199,120 +182,155 @@ export function CreateProjectPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Customer Portal MVP"
                   className={inputCls}
-                  autoFocus
                 />
               </div>
-              <div className="sm:col-span-1">
-                <SelectField
-                  label="Project Type"
-                  value={projectType}
-                  onChange={setProjectType}
-                  placeholder="Select type"
-                  options={PROJECT_TYPES}
-                />
-              </div>
-              <div className="sm:col-span-2">
+
+              <div>
                 <label className={labelCls}>Description</label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe what this project does, who it's for, and any key requirements…"
+                  placeholder="Describe what this project does..."
                   className={`${inputCls} resize-none`}
                 />
               </div>
             </div>
           </SectionCard>
 
-          {/* Section 2: Team Configuration */}
+          {/* CONTEXT */}
           <SectionCard
-            title="Team Configuration"
-            description="Helps AI tailor the feature set to your team's capacity and approach."
+            title="Team & Context"
+            description="Helps AI understand constraints and complexity."
           >
             <div className="grid gap-5 sm:grid-cols-3">
-              <SelectField
-                label="Team Size"
-                value={teamSize}
-                onChange={setTeamSize}
-                placeholder="Select size"
-                options={['1–2', '3–5', '6–10', '10+']}
-              />
-              <SelectField
-                label="Development Methodology"
-                value={methodology}
-                onChange={setMethodology}
-                placeholder="Select methodology"
-                options={['Agile', 'Scrum', 'Kanban', 'Waterfall']}
-              />
-              <SelectField
-                label="Team Experience Level"
-                value={experienceLevel}
-                onChange={setExperienceLevel}
-                placeholder="Select level"
-                options={['Junior', 'Mid-level', 'Senior', 'Mixed']}
-              />
-            </div>
-          </SectionCard>
 
-          {/* Section 3: Technical Details */}
-          <SectionCard
-            title="Technical Details"
-            description="Technology context improves the accuracy of AI-generated features and effort estimates."
-          >
-            <div className="grid gap-5 sm:grid-cols-3">
-              <div className="sm:col-span-2">
-                <label className={labelCls}>Technology Stack</label>
+              <div>
+                <label className={labelCls}>Tech Stack</label>
                 <input
-                  type="text"
+                  className={inputCls}
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
-                  placeholder="e.g. React, Node.js, PostgreSQL, AWS"
-                  className={inputCls}
+                  placeholder="React, Node.js..."
                 />
               </div>
+
               <div>
-                <label className={labelCls}>Working Hours / Dev / Day</label>
+                <label className={labelCls}>Team Size</label>
+                <select
+                  className={selectCls}
+                  value={teamSize}
+                  onChange={(e) => setTeamSize(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  <option value="1-2">1-2</option>
+                  <option value="3-5">3-5</option>
+                  <option value="6-10">6-10</option>
+                  <option value="10+">10+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className={labelCls}>Experience Level</label>
+                <select
+                  className={selectCls}
+                  value={experienceLevel}
+                  onChange={(e) => setExperienceLevel(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  <option value="junior">Junior</option>
+                  <option value="mid">Mid</option>
+                  <option value="senior">Senior</option>
+                </select>
+              </div>
+
+              <div>
+                <label className={labelCls}>Deadline</label>
                 <input
-                  type="number"
-                  min={1}
-                  max={24}
-                  value={workingHours}
-                  onChange={(e) => setWorkingHours(e.target.value)}
-                  placeholder="e.g. 7"
+                  type="date"
                   className={inputCls}
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
                 />
               </div>
+
             </div>
           </SectionCard>
 
-          {/* Section 4: Timeline */}
-          <SectionCard
-            title="Timeline"
-            description="Deadline information helps produce realistic estimates and flag any at-risk features."
-          >
-            <div className="grid gap-5 sm:grid-cols-3">
-              <div>
-                <label className={labelCls}>Project Deadline</label>
-                <input
-                  type="date"
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                  className={inputCls}
-                />
-              </div>
-            </div>
-          </SectionCard>
+          {/* OPTIONAL */}
+         <SectionCard
+  title="Optional Settings"
+  description="Advanced configuration for project behavior."
+>
+  <div className="group relative">
+
+    {/* hint (always visible) */}
+    <p className="text-xs text-gray-400 mb-3">
+      Hover to configure optional settings
+    </p>
+
+    {/* hidden until hover */}
+    <div className="grid gap-5 sm:grid-cols-3 opacity-0 max-h-0 overflow-hidden transition-all duration-300 group-hover:opacity-100 group-hover:max-h-96">
+
+      <div>
+        <label className={labelCls}>Project Type</label>
+        <select
+          className={selectCls}
+          value={projectType}
+          onChange={(e) => setProjectType(e.target.value)}
+        >
+          <option value="">Select</option>
+          {PROJECT_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className={labelCls}>Methodology</label>
+        <select
+          className={selectCls}
+          value={methodology}
+          onChange={(e) => setMethodology(e.target.value)}
+        >
+          <option value="">Select</option>
+          <option value="agile">Agile</option>
+          <option value="scrum">Scrum</option>
+          <option value="kanban">Kanban</option>
+          <option value="waterfall">Waterfall</option>
+        </select>
+      </div>
+
+      <div>
+        <label className={labelCls}>Working Hours / Day</label>
+        <select
+          className={selectCls}
+          value={workingHours}
+          onChange={(e) => setWorkingHours(e.target.value)}
+        >
+          <option value="">Select</option>
+          <option value="2">2 hrs</option>
+          <option value="4">4 hrs</option>
+          <option value="6">6 hrs</option>
+          <option value="8">8 hrs</option>
+          <option value="10">10+ hrs</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+</SectionCard>
 
         </div>
 
-        {/* Action footer */}
+        {/* Footer */}
         <div className="mt-8 flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <svg className="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
             AI will generate 6–10 features based on your inputs
           </div>
+
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -320,15 +338,13 @@ export function CreateProjectPage() {
             >
               Back
             </button>
+
             <button
               onClick={handleCreate}
               disabled={!name.trim()}
               className="flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
             >
               Generate Features & Continue
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
             </button>
           </div>
         </div>

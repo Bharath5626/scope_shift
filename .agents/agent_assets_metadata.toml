@@ -1,8 +1,0 @@
-uploads = []
-generated = []
-
-[[outputs]]
-id = "WEU03X_raLWthGQ9_b19h"
-uri = "file://README.md"
-type = "text"
-title = "ScopeAI README"
