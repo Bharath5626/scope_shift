@@ -1,7 +1,12 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { NAV_ITEMS } from '../../utils/constants'
 import { useAuth } from '../../context/AuthContext'
+
+const EXTRA_ACTIVE: Record<string, string[]> = {
+  '/analysis': ['/analyzing', '/analysis-results'],
+  '/scope-builder': ['/scope-builder'],
+}
 
 function NavIcon({ icon }: { icon: string }) {
   const icons: Record<string, ReactNode> = {
@@ -46,6 +51,7 @@ function NavIcon({ icon }: { icon: string }) {
 
 export function Sidebar() {
   const { user, logout } = useAuth()
+  const { pathname } = useLocation()
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -66,23 +72,29 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-white text-indigo-700 shadow-lg'
-                  : 'text-indigo-100 hover:bg-white/10 hover:text-white'
-              }`
-            }
-          >
-            <NavIcon icon={item.icon} />
-            {item.label}
-          </NavLink>
-        ))}
+        {NAV_ITEMS.map((item) => {
+          const extraPaths = EXTRA_ACTIVE[item.path] ?? []
+          const isExtraActive = extraPaths.some((p) => pathname.startsWith(p))
+
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === '/'}
+              className={({ isActive }) => {
+                const active = isActive || isExtraActive
+                return `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  active
+                    ? 'bg-white text-indigo-700 shadow-lg'
+                    : 'text-indigo-100 hover:bg-white/10 hover:text-white'
+                }`
+              }}
+            >
+              <NavIcon icon={item.icon} />
+              {item.label}
+            </NavLink>
+          )
+        })}
       </nav>
 
       {/* User + Logout */}
