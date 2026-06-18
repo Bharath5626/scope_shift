@@ -12,6 +12,7 @@ import { AnalyzingPage } from '../pages/AnalyzingPage'
 import { AnalysisResultsPage } from '../pages/AnalysisResultsPage'
 import { ReportsPage } from '../pages/ReportsPage'
 import { ReportDetailPage } from '../pages/ReportDetailPage'
+import { ProjectHistoryPage } from '../pages/ProjectHistoryPage'
 
 export function AppRouter() {
   const { isAuthenticated } = useAuth()
@@ -41,10 +42,7 @@ export function AppRouter() {
         />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/reports/:projectId" element={<ReportDetailPage />} />
-        <Route
-          path="/history"
-          element={<PlaceholderPage title="Project History" subtitle="Browse all projects and their analysis history" />}
-        />
+        <Route path="/history" element={<ProjectHistoryPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppLayout>
