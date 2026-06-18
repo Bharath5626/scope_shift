@@ -16,16 +16,30 @@ router.post(
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    const features = await prisma.feature.findMany({
-      where: { projectId, type: "original" },
-      orderBy: { order: "asc" },
-    });
+    const [originalFeatures, newFeatures] = await Promise.all([
+      prisma.feature.findMany({
+        where: { projectId, type: "original" },
+        orderBy: { order: "asc" },
+      }),
+      prisma.feature.findMany({
+        where: { projectId, type: "new" },
+        orderBy: { order: "asc" },
+      }),
+    ]);
 
-    const { analyzeProjectScope } = await import("./ai.service");
-    const result = await analyzeProjectScope(
-      { name: project.name, description: project.description, type: project.type },
-      features
-    );
+    const { analyzeProjectScope, analyzeWithNewScope } = await import("./ai.service");
+
+    const result =
+      newFeatures.length > 0
+        ? await analyzeWithNewScope(
+            { name: project.name, description: project.description, type: project.type },
+            originalFeatures,
+            newFeatures,
+          )
+        : await analyzeProjectScope(
+            { name: project.name, description: project.description, type: project.type },
+            originalFeatures,
+          );
 
     await prisma.analysis.create({
       data: {
@@ -42,7 +56,7 @@ router.post(
     });
 
     res.status(201).json({ success: true, data: result });
-  })
+  }),
 );
 
 router.post(
@@ -83,12 +97,12 @@ router.post(
             type: "original",
             order: existingCount + i,
           },
-        })
-      )
+        }),
+      ),
     );
 
     res.status(201).json({ success: true, data: created });
-  })
+  }),
 );
 
 export default router;

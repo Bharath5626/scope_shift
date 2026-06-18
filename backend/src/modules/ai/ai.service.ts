@@ -503,6 +503,143 @@ Be conservative. If uncertain, overestimate effort rather than underestimate.`;
   return computeFallbackAnalysis(features);
 };
 
+export const analyzeWithNewScope = async (
+  project: { name: string; description?: string | null; type: string },
+  originalFeatures: FeatureInput[],
+  newFeatures: FeatureInput[],
+): Promise<ScopeAnalysisResult> => {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  const formatList = (items: FeatureInput[]) =>
+    items
+      .map(
+        (f) =>
+          `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? ": " + f.description : ""}`,
+      )
+      .join("\n");
+
+  if (apiKey && newFeatures.length > 0) {
+    try {
+      const client = new GoogleGenAI({ apiKey });
+
+      const prompt = `You are a Principal Software Engineering Manager evaluating scope creep on an active software project.
+
+Your task is to assess the IMPACT of client-requested additions on the original agreed scope. You must produce an accurate delta analysis — focused entirely on the NEW features.
+
+---
+
+## Project Context
+- Name: ${project.name}
+- Description: ${project.description || "Not provided"}
+- Type: ${project.type}
+
+## ORIGINAL Agreed Scope (${originalFeatures.length} features — already committed)
+${formatList(originalFeatures) || "(No original features defined)"}
+
+## CLIENT ADDITIONS — Scope Creep (${newFeatures.length} new features — NOT yet committed)
+${formatList(newFeatures)}
+
+---
+
+## Analysis Instructions
+
+You are computing the delta introduced by the NEW CLIENT ADDITIONS against the original scope.
+
+1. scopeScore: The percentage INCREASE in total project scope caused by the new features.
+   Guidelines:
+   - 1–2 minor additions to a large original scope: 8–20%
+   - 3–5 moderate additions: 25–50%
+   - Major new additions or deep integrations: 50–80%
+   - Keep proportional: more original features = smaller % from same additions
+
+2. estimatedHours: TOTAL additional engineering hours to implement ALL new client features only.
+   Per-feature guidelines: Simple=8–16h, Medium=16–40h, Complex=40–80h. Add 15–25% overhead.
+
+3. estimatedWeeks: Additional calendar weeks (ceil(estimatedHours / 35))
+
+4. riskLevel: Risk from adding these features MID-PROJECT:
+   - Low: isolated, low-dependency, no rework needed
+   - Medium: some integration with existing code, moderate rework
+   - High: architectural changes, significant rework, delivery risk
+
+5. effortBreakdown: Hours for the NEW features only (must sum ≈ estimatedHours)
+
+6. riskFactors: 4 specific risks tied to adding these features mid-stream (not generic)
+
+7. recommendations: 4 actionable steps to manage this scope change professionally
+
+---
+
+## Output (STRICT JSON only, no markdown)
+
+{
+  "scopeScore": <integer 5–90>,
+  "estimatedHours": <integer>,
+  "estimatedWeeks": <integer>,
+  "riskLevel": "Low" | "Medium" | "High",
+  "effortBreakdown": {
+    "development": <integer>,
+    "testing": <integer>,
+    "integration": <integer>,
+    "documentation": <integer>
+  },
+  "complexity": {
+    "level": "Low" | "Medium" | "High",
+    "score": <integer 10–95>
+  },
+  "riskFactors": ["<risk 1>", "<risk 2>", "<risk 3>", "<risk 4>"],
+  "recommendations": ["<rec 1>", "<rec 2>", "<rec 3>", "<rec 4>"]
+}
+
+Validation: estimatedHours ≈ sum(effortBreakdown) ±5%. estimatedWeeks = ceil(estimatedHours/35).`;
+
+      const response = await client.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: { responseMimeType: "application/json", temperature: 0.2 },
+      });
+
+      const text = (response.text ?? "")
+        .trim()
+        .replace(/^```(?:json)?/i, "")
+        .replace(/```$/i, "")
+        .trim();
+      const parsed = JSON.parse(text);
+
+      return {
+        scopeScore: Number(parsed.scopeScore) || 30,
+        estimatedHours: Number(parsed.estimatedHours) || 40,
+        estimatedWeeks: Number(parsed.estimatedWeeks) || 2,
+        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel)
+          ? parsed.riskLevel
+          : "Medium") as "Low" | "Medium" | "High",
+        effortBreakdown: {
+          development: Number(parsed.effortBreakdown?.development) || 24,
+          testing: Number(parsed.effortBreakdown?.testing) || 8,
+          integration: Number(parsed.effortBreakdown?.integration) || 5,
+          documentation: Number(parsed.effortBreakdown?.documentation) || 3,
+        },
+        complexity: {
+          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level)
+            ? parsed.complexity.level
+            : "Medium") as "Low" | "Medium" | "High",
+          score: Number(parsed.complexity?.score) || 50,
+        },
+        riskFactors: Array.isArray(parsed.riskFactors)
+          ? parsed.riskFactors.slice(0, 4).map(String)
+          : [],
+        recommendations: Array.isArray(parsed.recommendations)
+          ? parsed.recommendations.slice(0, 4).map(String)
+          : [],
+      };
+    } catch (err) {
+      console.error("Gemini scope creep analysis failed, using fallback:", err);
+    }
+  }
+
+  return computeFallbackAnalysis(newFeatures.length > 0 ? newFeatures : originalFeatures);
+};
+
 export const generateProjectFeatures = async (
   input: GenerateFeaturesInput,
 ): Promise<GeneratedFeature[]> => {
