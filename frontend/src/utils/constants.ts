@@ -24,7 +24,6 @@ export const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: 'dashboard' },
   { label: 'New Project', path: '/projects/new', icon: 'plus' },
   { label: 'Scope Builder', path: '/scope-builder', icon: 'layers' },
-  { label: 'New Scope', path: '/new-scope', icon: 'edit' },
   { label: 'Analysis', path: '/analysis', icon: 'activity' },
   { label: 'Reports', path: '/reports', icon: 'file' },
   { label: 'Project History', path: '/history', icon: 'clock' },

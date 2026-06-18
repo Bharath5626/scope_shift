@@ -30,10 +30,6 @@ export function AppRouter() {
         <Route path="/projects/new" element={<CreateProjectPage />} />
         <Route path="/scope-builder" element={<ScopeBuilder />} />
         <Route
-          path="/new-scope"
-          element={<PlaceholderPage title="New Scope Changes" subtitle="Add new features and compare against the original scope" />}
-        />
-        <Route
           path="/analysis"
           element={<PlaceholderPage title="Analysis" subtitle="Run AI impact analysis on scope changes" />}
         />

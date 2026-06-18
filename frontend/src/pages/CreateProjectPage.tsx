@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
+import { api } from '../services/api'
 
 const inputCls =
   'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
@@ -53,6 +54,8 @@ function SelectField({
   )
 }
 
+type Step = 'form' | 'generating'
+
 export function CreateProjectPage() {
   const navigate = useNavigate()
   const { createProject } = useProjects()
@@ -66,12 +69,12 @@ export function CreateProjectPage() {
   const [experienceLevel, setExperienceLevel] = useState('')
   const [deadline, setDeadline] = useState('')
   const [workingHours, setWorkingHours] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState<Step>('form')
   const [error, setError] = useState('')
 
   const handleCreate = async () => {
     if (!name.trim()) return
-    setLoading(true)
+    setStep('generating')
     setError('')
     try {
       const project = await createProject({
@@ -79,22 +82,59 @@ export function CreateProjectPage() {
         description,
         type: TYPE_MAP[projectType] ?? 'saas',
       })
+
+      await api.post(`/projects/${project.id}/generate-features`, {
+        techStack,
+        teamSize,
+        methodology,
+        experienceLevel,
+        deadline,
+        workingHours,
+      })
+
       navigate(`/scope-builder?project=${project.id}`)
     } catch (err: any) {
-      setError(err.message ?? 'Failed to create project. Please try again.')
-      setLoading(false)
+      setError(err.message ?? 'Something went wrong. Please try again.')
+      setStep('form')
     }
+  }
+
+  if (step === 'generating') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+        <div className="rounded-2xl border border-gray-200 bg-white p-14 text-center shadow-sm max-w-sm w-full">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50">
+            <svg className="h-7 w-7 animate-spin text-indigo-600" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900">Generating features with AI</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Analysing your project details and building the initial feature list…
+          </p>
+          <div className="mt-5 flex justify-center gap-1.5">
+            {[0, 1, 2].map((i) => (
+              <span
+                key={i}
+                className="h-2 w-2 rounded-full bg-indigo-400 animate-bounce"
+                style={{ animationDelay: `${i * 0.15}s` }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-3xl">
 
-        {/* Page header */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Create New Project</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Enter project metadata to help AI generate accurate impact analysis
+            Enter project details — AI will generate an initial feature list for you
           </p>
         </div>
 
@@ -104,14 +144,12 @@ export function CreateProjectPage() {
           </div>
         )}
 
-        {/* Card */}
         <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
 
           <h2 className="mb-6 text-sm font-semibold text-gray-800">Project Metadata</h2>
 
           <div className="space-y-6">
 
-            {/* Row 1 — Project Name + Description */}
             <div className="grid grid-cols-2 gap-5">
               <div>
                 <label className={labelCls}>
@@ -137,7 +175,6 @@ export function CreateProjectPage() {
               </div>
             </div>
 
-            {/* Row 2 — Team Size + Dev Methodology + Technology Stack */}
             <div className="grid grid-cols-3 gap-5">
               <SelectField
                 label="Team Size"
@@ -159,13 +196,12 @@ export function CreateProjectPage() {
                   type="text"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
-                  placeholder="Enter technologies"
+                  placeholder="e.g. React, Node.js, PostgreSQL"
                   className={inputCls}
                 />
               </div>
             </div>
 
-            {/* Row 3 — Project Type + Team Experience Level + Project Deadline */}
             <div className="grid grid-cols-3 gap-5">
               <SelectField
                 label="Project Type"
@@ -192,7 +228,6 @@ export function CreateProjectPage() {
               </div>
             </div>
 
-            {/* Row 4 — Working Hours (single column, 1/3 width) */}
             <div className="grid grid-cols-3 gap-5">
               <div>
                 <label className={labelCls}>Working Hours / Day (per developer)</label>
@@ -210,7 +245,6 @@ export function CreateProjectPage() {
 
           </div>
 
-          {/* Buttons */}
           <div className="mt-8 flex justify-end gap-3 border-t border-gray-100 pt-6">
             <button
               onClick={() => navigate('/projects')}
@@ -220,10 +254,10 @@ export function CreateProjectPage() {
             </button>
             <button
               onClick={handleCreate}
-              disabled={!name.trim() || loading}
+              disabled={!name.trim()}
               className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
             >
-              {loading ? 'Creating…' : 'Next'}
+              Next →
             </button>
           </div>
 
