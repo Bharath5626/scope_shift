@@ -7,6 +7,42 @@ import prisma from "../../config/database";
 const router = Router({ mergeParams: true });
 
 router.post(
+  "/analyze",
+  asyncHandler(async (req: Request, res: Response) => {
+    const { projectId } = req.params;
+
+    const project = await getProjectById(projectId);
+    if (!project) {
+      return res.status(404).json({ success: false, message: "Project not found" });
+    }
+
+    const features = await prisma.feature.findMany({
+      where: { projectId, type: "original" },
+      orderBy: { order: "asc" },
+    });
+
+    const { analyzeProjectScope } = await import("./ai.service");
+    const result = await analyzeProjectScope(
+      { name: project.name, description: project.description, type: project.type },
+      features
+    );
+
+    await prisma.analysis.create({
+      data: {
+        projectId,
+        scopeIncreasePercent: result.scopeScore,
+        additionalHours: result.estimatedHours,
+        delayWeeks: result.estimatedWeeks,
+        riskLevel: result.riskLevel,
+        complexity: result.complexity.level,
+      },
+    });
+
+    res.status(201).json({ success: true, data: result });
+  })
+);
+
+router.post(
   "/generate-features",
   asyncHandler(async (req: Request, res: Response) => {
     const { projectId } = req.params;

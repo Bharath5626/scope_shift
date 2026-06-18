@@ -61,6 +61,159 @@ const FALLBACK_FEATURES: Record<string, GeneratedFeature[]> = {
   ],
 };
 
+export type ScopeAnalysisResult = {
+  scopeScore: number;
+  estimatedHours: number;
+  estimatedWeeks: number;
+  riskLevel: "Low" | "Medium" | "High";
+  effortBreakdown: {
+    development: number;
+    testing: number;
+    integration: number;
+    documentation: number;
+  };
+  complexity: {
+    level: "Low" | "Medium" | "High";
+    score: number;
+  };
+  riskFactors: string[];
+};
+
+type FeatureInput = {
+  title: string;
+  description?: string | null;
+  category: string;
+  priority: string;
+};
+
+const computeFallbackAnalysis = (
+  features: FeatureInput[]
+): ScopeAnalysisResult => {
+  const count = features.length;
+  const highPriority = features.filter((f) => f.priority === "high").length;
+  const totalHours = Math.round(count * 16);
+  const devHours = Math.round(totalHours * 0.6);
+  const testHours = Math.round(totalHours * 0.17);
+  const intHours = Math.round(totalHours * 0.13);
+  const docHours = totalHours - devHours - testHours - intHours;
+  const weeks = Math.max(1, Math.ceil(totalHours / 40));
+  const riskLevel: "Low" | "Medium" | "High" =
+    highPriority >= 3 || count >= 8 ? "High" : count >= 4 ? "Medium" : "Low";
+  const complexityScore = Math.min(95, 30 + count * 7);
+  const complexityLevel: "Low" | "Medium" | "High" =
+    complexityScore >= 70 ? "High" : complexityScore >= 45 ? "Medium" : "Low";
+  const scopeScore = Math.min(95, 20 + count * 9);
+
+  const riskFactorPool: Record<string, string[]> = {
+    authentication: ["Session management complexity", "Security compliance requirements"],
+    billing: ["Payment gateway integration", "Subscription state edge cases"],
+    integrations: ["External service reliability", "API rate limiting"],
+    general: ["Scope creep risk", "Dependency management", "Cross-browser compatibility"],
+    default: ["Timeline constraints", "Technical debt accumulation", "Change in user flow"],
+  };
+  const uniqueCategories = [...new Set(features.map((f) => f.category))];
+  const riskFactors: string[] = [];
+  for (const cat of uniqueCategories) {
+    const pool = riskFactorPool[cat] ?? riskFactorPool.general;
+    riskFactors.push(pool[0]);
+    if (riskFactors.length >= 4) break;
+  }
+  while (riskFactors.length < 4)
+    riskFactors.push(riskFactorPool.default[riskFactors.length % 3]);
+
+  return {
+    scopeScore,
+    estimatedHours: totalHours,
+    estimatedWeeks: weeks,
+    riskLevel,
+    effortBreakdown: {
+      development: devHours,
+      testing: testHours,
+      integration: intHours,
+      documentation: docHours,
+    },
+    complexity: { level: complexityLevel, score: complexityScore },
+    riskFactors: riskFactors.slice(0, 4),
+  };
+};
+
+export const analyzeProjectScope = async (
+  project: { name: string; description?: string | null; type: string },
+  features: FeatureInput[]
+): Promise<ScopeAnalysisResult> => {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (apiKey && features.length > 0) {
+    try {
+      const client = new GoogleGenAI({ apiKey });
+      const featureList = features
+        .map((f) => `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? `: ${f.description}` : ""}`)
+        .join("\n");
+
+      const prompt = `You are a senior software project estimator. Analyze this project and its features to produce effort estimates and risk analysis.
+
+Project: ${project.name}
+Description: ${project.description || "Not provided"}
+Type: ${project.type}
+
+Features (${features.length} total):
+${featureList}
+
+Based on these features, return ONLY valid JSON matching exactly this shape:
+{
+  "scopeScore": <integer 20-95, overall scope complexity score as a percentage>,
+  "estimatedHours": <integer, total estimated development hours>,
+  "estimatedWeeks": <integer, realistic calendar weeks to deliver>,
+  "riskLevel": "Low" | "Medium" | "High",
+  "effortBreakdown": {
+    "development": <integer hours>,
+    "testing": <integer hours>,
+    "integration": <integer hours>,
+    "documentation": <integer hours>
+  },
+  "complexity": {
+    "level": "Low" | "Medium" | "High",
+    "score": <integer 10-95, complexity score for visualization>
+  },
+  "riskFactors": [<4 concise risk factor strings specific to this project>]
+}
+
+Make all numbers realistic for a ${project.type} project with ${features.length} features.`;
+
+      const response = await client.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: { responseMimeType: "application/json", temperature: 0.2 },
+      });
+
+      const text = (response.text ?? "").trim().replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+      const parsed = JSON.parse(text);
+
+      return {
+        scopeScore: Number(parsed.scopeScore) || 60,
+        estimatedHours: Number(parsed.estimatedHours) || 80,
+        estimatedWeeks: Number(parsed.estimatedWeeks) || 2,
+        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel) ? parsed.riskLevel : "Medium") as "Low" | "Medium" | "High",
+        effortBreakdown: {
+          development: Number(parsed.effortBreakdown?.development) || 48,
+          testing: Number(parsed.effortBreakdown?.testing) || 16,
+          integration: Number(parsed.effortBreakdown?.integration) || 10,
+          documentation: Number(parsed.effortBreakdown?.documentation) || 6,
+        },
+        complexity: {
+          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level) ? parsed.complexity.level : "Medium") as "Low" | "Medium" | "High",
+          score: Number(parsed.complexity?.score) || 60,
+        },
+        riskFactors: Array.isArray(parsed.riskFactors) ? parsed.riskFactors.slice(0, 4).map(String) : [],
+      };
+    } catch (err) {
+      console.error("Gemini scope analysis failed, using fallback:", err);
+    }
+  }
+
+  return computeFallbackAnalysis(features);
+};
+
 export const generateProjectFeatures = async (
   input: GenerateFeaturesInput
 ): Promise<GeneratedFeature[]> => {

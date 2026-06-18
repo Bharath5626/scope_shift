@@ -8,6 +8,8 @@ import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { ScopeBuilder } from '../pages/ScopeBuilder'
 import { ProjectsPage } from '../pages/ProjectsPage'
 import { CreateProjectPage } from '../pages/CreateProjectPage'
+import { AnalyzingPage } from '../pages/AnalyzingPage'
+import { AnalysisResultsPage } from '../pages/AnalysisResultsPage'
 
 export function AppRouter() {
   const { isAuthenticated } = useAuth()
@@ -29,6 +31,8 @@ export function AppRouter() {
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/new" element={<CreateProjectPage />} />
         <Route path="/scope-builder" element={<ScopeBuilder />} />
+        <Route path="/analyzing" element={<AnalyzingPage />} />
+        <Route path="/analysis-results" element={<AnalysisResultsPage />} />
         <Route
           path="/analysis"
           element={<PlaceholderPage title="Analysis" subtitle="Run AI impact analysis on scope changes" />}

@@ -348,11 +348,11 @@ export function ScopeBuilder() {
               Back
             </button>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate(`/analyzing?project=${projectId}`)}
               disabled={features.length === 0}
               className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
             >
-              Save & Continue
+              Save & Continue →
             </button>
           </div>
 
