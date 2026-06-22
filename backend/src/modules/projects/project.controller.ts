@@ -3,8 +3,15 @@ import * as ProjectService from "./project.service";
 import { asyncHandler } from "../../utils/asyncHandler";
 
 export const createProject = asyncHandler(async (req: Request, res: Response) => {
-  const project = await ProjectService.createProject(req.body);
-  res.status(201).json({ success: true, data: project });
+  const project = await ProjectService.createProject(
+    req.body,
+    req.user!.id
+  );
+
+  res.status(201).json({
+    success: true,
+    data: project,
+  });
 });
 
 export const getProjects = asyncHandler(async (req: Request, res: Response) => {

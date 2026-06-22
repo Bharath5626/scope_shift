@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import "../routes/index"; // Ensure all route modules are imported
 import authRoutes from "../modules/auth/auth.routes";
 import projectRoutes from "../modules/projects/project.routes";
 import featureRoutes from "../modules/features/feature.routes";

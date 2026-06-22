@@ -18,20 +18,20 @@ export const getDashboard = async (
   const totalRuns = analysisRuns.length;
 
   const totalChanges = analysisRuns.reduce(
-    (sum, run) => sum + run.featureChanges.length,
+    (sum: any, run: { featureChanges: string | any[]; }) => sum + run.featureChanges.length,
     0
   );
 
   const totalRisks = analysisRuns.reduce(
-    (sum, run) => sum + run.risks.length,
+    (sum: any, run: { risks: string | any[]; }) => sum + run.risks.length,
     0
   );
 
   const highRisks = analysisRuns.reduce(
-    (sum, run) =>
+    (sum: any, run: { risks: { filter: (arg0: (risk: { severity: string; }) => boolean) => { (): any; new(): any; length: any; }; }; }) =>
       sum +
       run.risks.filter(
-        (risk) => risk.severity === "HIGH"
+        (risk: { severity: string; }) => risk.severity === "HIGH"
       ).length,
     0
   );

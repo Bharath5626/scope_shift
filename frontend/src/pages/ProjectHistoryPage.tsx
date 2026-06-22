@@ -123,9 +123,16 @@ function ProjectCard({
           <span className="text-xs font-medium text-gray-500">
             {PROJECT_TYPE_LABELS[project.type]}
           </span>
-          <span className="text-xs text-gray-400">
-            Updated {formatRelativeDate(project.updatedAt)}
-          </span>
+         <span className="text-xs text-gray-400">
+  Created{" "}
+  {new Date(project.createdAt).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })}
+  {" • By "}
+  {project.createdBy.name}
+</span>
         </div>
       </button>
     </div>

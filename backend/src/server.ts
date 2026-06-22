@@ -7,6 +7,7 @@ import app from "./app";
 import { env } from "./config/env";
 import prisma from "./config/database";
 
+
 async function startServer() {
   try {
     await prisma.$connect();

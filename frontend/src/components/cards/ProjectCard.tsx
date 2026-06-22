@@ -50,7 +50,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </span>
 
         <span className="text-xs text-gray-400">
-          Updated {formatRelativeDate(project.updatedAt)}
+         Created{" "}
+  {new Date(project.createdAt).toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+})}
         </span>
       </div>
     </Link>

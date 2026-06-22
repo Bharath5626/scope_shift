@@ -18,8 +18,11 @@ export interface Project {
   status: ProjectStatus
   createdAt: string
   updatedAt: string
-}
 
+  createdBy: {
+    name: string
+  }
+}
 export interface Feature {
   id: string
   projectId: string

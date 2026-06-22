@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { NAV_ITEMS } from '../../utils/constants'
 import { useAuth } from '../../context/AuthContext'
@@ -53,10 +54,16 @@ function NavIcon({ icon }: { icon: string }) {
 export function Sidebar() {
   const { user, logout } = useAuth()
   const { pathname } = useLocation()
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U'
+
+  const handleLogout = () => {
+    logout()
+    setShowLogoutConfirm(false)
+  }
 
   return (
     <aside className="fixed left-0 top-0 z-20 flex h-screen w-64 flex-col bg-gradient-to-b from-indigo-600 to-violet-700 text-white">
@@ -99,26 +106,52 @@ export function Sidebar() {
       </nav>
 
       {/* User + Logout */}
-      <div className="border-t border-white/10 p-4 space-y-2">
+      <div className="border-t border-white/10 p-4">
         <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-white">{user?.name ?? 'User'}</p>
-            <p className="truncate text-xs text-indigo-300">{user?.email ?? ''}</p>
+            <div className="flex items-center gap-2">
+              <p className="truncate text-xs text-indigo-300">{user?.email ?? ''}</p>
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="shrink-0 rounded-lg p-1.5 text-indigo-200 transition hover:bg-white/10 hover:text-white"
+                title="Sign out"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
-        <button
-          onClick={logout}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-sm text-indigo-200 transition hover:bg-white/10 hover:text-white"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Sign out
-        </button>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="rounded-2xl bg-white p-6 shadow-xl max-w-sm w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900">Sign out</h3>
+            <p className="mt-2 text-sm text-gray-500">Are you sure you want to sign out?</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="rounded-xl px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

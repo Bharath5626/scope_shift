@@ -28,6 +28,7 @@ router.post(
     ]);
 
     const { analyzeProjectScope } = await import("./ai.service");
+    const { createAnalysis } = await import("../analysis/analysis.service");
 
     const projectInfo = { name: project.name, description: project.description, type: project.type };
 
@@ -35,18 +36,13 @@ router.post(
       ? await analyzeProjectScope(projectInfo, originalFeatures, newFeatures)
       : await analyzeProjectScope(projectInfo, originalFeatures, []);
 
-    await prisma.analysis.create({
-      data: {
-        projectId,
-        scopeIncreasePercent: result.scopeScore,
-        additionalHours: result.estimatedHours,
-        delayWeeks: result.estimatedWeeks,
-        riskLevel: result.riskLevel,
-        complexity: result.complexity.level,
-        effortBreakdown: result.effortBreakdown,
-        riskFactors: result.riskFactors,
-        recommendations: result.recommendations,
-      },
+    await createAnalysis({
+      projectId,
+      scopeIncreasePercent: result.scopeScore,
+      additionalHours: result.estimatedHours,
+      delayWeeks: result.estimatedWeeks,
+      riskLevel: result.riskLevel,
+      complexity: result.complexity.level,
     });
 
     res.status(201).json({ success: true, data: result });

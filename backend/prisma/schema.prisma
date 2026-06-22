@@ -9,24 +9,31 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  password String
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+
+  projects  Project[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Project {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
-  description String? @db.Text
+  description String?  @db.Text
   type        String
-  status      String @default("draft")
+  status      String   @default("draft")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deadline    DateTime?
+
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   features Feature[]
   analyses Analysis[]

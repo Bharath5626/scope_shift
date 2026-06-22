@@ -34,10 +34,13 @@ export function DashboardPage() {
   const totalProjects = projects.length
   const activeProjects = projects.filter((p) => p.status === 'active').length
   const draftProjects = projects.filter((p) => p.status === 'draft').length
+  const completedProjects = projects.filter(
+  (p) => p.status === "completed"
+).length;
 
-  const sortedProjects = [...projects].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-  )
+const sortedProjects = [...projects].sort(
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+)
 
   return (
     <DashboardLayout
@@ -55,10 +58,16 @@ export function DashboardPage() {
         </Link>
       }
     >
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatsCard label="Total Projects" value={totalProjects} icon={<FolderIcon />} accent="primary" />
         <StatsCard label="Active Projects" value={activeProjects} icon={<ActiveIcon />} accent="success" />
         <StatsCard label="Draft Projects" value={draftProjects} icon={<DraftIcon />} accent="warning" />
+        <StatsCard
+label="Completed Projects"
+  value={completedProjects}
+  icon={<ActiveIcon />}
+  accent="success"
+/>
       </div>
 
       <section className="mt-8">

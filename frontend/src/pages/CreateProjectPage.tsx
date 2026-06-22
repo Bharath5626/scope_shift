@@ -76,7 +76,16 @@ export function CreateProjectPage() {
   const [error, setError] = useState('')
   const [showOptional, setShowOptional] = useState(false)
   const handleCreate = async () => {
-    if (!name.trim() || !description.trim()) return
+  if (
+  !name.trim() ||
+  !description.trim() ||
+  !teamSize ||
+  !experienceLevel ||
+  !deadline
+) {
+  setError("Please fill all required fields")
+  return
+}
 
     setStep('generating')
     setError('')
@@ -86,6 +95,7 @@ export function CreateProjectPage() {
         name,
         description,
         type: TYPE_MAP[projectType] ?? 'saas',
+        deadline,
       })
 
       await api.post(`/projects/${project.id}/generate-features`, {
@@ -216,28 +226,24 @@ export function CreateProjectPage() {
               </div>
 
               <div>
-                <label className={labelCls}>Team Size</label>
-                <select
-                  className={selectCls}
-                  value={teamSize}
-                  onChange={(e) => setTeamSize(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  <option value="1-2">1-2</option>
-                  <option value="3-5">3-5</option>
-                  <option value="6-10">6-10</option>
-                  <option value="10+">10+</option>
-                </select>
+                <label className={labelCls}>Team Size <span className="text-red-500">*</span></label>
+                <input
+  type="text"
+  className={inputCls}
+  value={teamSize}
+  onChange={(e) => setTeamSize(e.target.value)}
+  placeholder="e.g. 3, 5-10, 12+"
+/>
               </div>
 
               <div>
-                <label className={labelCls}>Experience Level</label>
+                <label className={labelCls}>Experience Level <span className="text-red-500">*</span></label>
                 <select
                   className={selectCls}
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
                 >
-                  <option value="">Select</option>
+                  <option value="" disabled>Select </option>
                   <option value="junior">Junior</option>
                   <option value="mid">Mid</option>
                   <option value="senior">Senior</option>
@@ -245,13 +251,14 @@ export function CreateProjectPage() {
               </div>
 
               <div>
-                <label className={labelCls}>Deadline</label>
+                <label className={labelCls}>Deadline <span className="text-red-500">*</span></label>
                 <input
-                  type="date"
-                  className={inputCls}
-                  value={deadline}
-                  onChange={(e) => setDeadline(e.target.value)}
-                />
+  type="date"
+  className={inputCls}
+  value={deadline}
+  onChange={(e) => setDeadline(e.target.value)}
+  min={new Date().toISOString().split("T")[0]}
+/>
               </div>
 
             </div>
@@ -264,13 +271,9 @@ export function CreateProjectPage() {
 >
   <div className="group relative">
 
-    {/* hint (always visible) */}
-    <p className="text-xs text-gray-400 mb-3">
-      Hover to configure optional settings
-    </p>
-
+   
     {/* hidden until hover */}
-    <div className="grid gap-5 sm:grid-cols-3 opacity-0 max-h-0 overflow-hidden transition-all duration-300 group-hover:opacity-100 group-hover:max-h-96">
+    <div className="grid gap-5 sm:grid-cols-3 transition-all duration-300">
 
       <div>
         <label className={labelCls}>Project Type</label>
@@ -341,7 +344,13 @@ export function CreateProjectPage() {
 
             <button
               onClick={handleCreate}
-              disabled={!name.trim()}
+             disabled={
+  !name.trim() ||
+  !description.trim() ||
+  !teamSize ||
+  !experienceLevel ||
+  !deadline
+}
               className="flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
             >
               Generate Features & Continue
