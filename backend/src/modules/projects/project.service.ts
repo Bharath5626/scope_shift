@@ -27,11 +27,12 @@ export const createProject = async (
     throw new Error("Missing required fields");
   }
 
-  if (data.deadline) {
-    const deadlineDate = new Date(data.deadline);
-    const today = new Date();
+  let deadlineDate: Date | undefined = undefined;
 
-    // reset time for fair comparison
+  if (data.deadline) {
+    deadlineDate = new Date(data.deadline);
+
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     if (deadlineDate < today) {
@@ -41,7 +42,10 @@ export const createProject = async (
 
   return prisma.project.create({
     data: {
-      ...data,
+      name: data.name,
+      description: data.description,
+      type: data.type,
+      deadline: deadlineDate, // ✅ FIXED
       createdById: userId,
     },
   });

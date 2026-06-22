@@ -69,13 +69,20 @@ export function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-5xl">
+  <div className="mx-auto max-w-5xl">
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Analysis Reports</h1>
-          <p className="mt-1 text-sm text-gray-500">View AI-generated scope analysis reports for your projects</p>
-        </div>
+    {/* Header */}
+    <div className="py-6 border-b border-gray-200 mb-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Analysis Reports</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          View AI-generated scope analysis reports for your projects
+        </p>
+      </div>
+    </div>
+
+    {/* Content starts here */}
+       
 
         {/* Empty state */}
         {projects.length === 0 ? (

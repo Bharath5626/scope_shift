@@ -55,6 +55,7 @@ export interface CreateProjectInput {
   name: string
   description: string
   type: ProjectType
+  deadline: string
 }
 
 export interface CreateFeatureInput {

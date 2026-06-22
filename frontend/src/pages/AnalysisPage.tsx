@@ -13,6 +13,7 @@ const statusStyles: Record<Project['status'], string> = {
   at_risk:   'bg-red-50 text-red-600',
 }
 
+
 const RISK_COLORS: Record<string, { badge: string; text: string; bar: string }> = {
   Low:    { badge: 'bg-green-100 text-green-700',  text: 'text-green-700',  bar: 'bg-green-400' },
   Medium: { badge: 'bg-amber-100 text-amber-700',  text: 'text-amber-700',  bar: 'bg-amber-400' },
@@ -187,26 +188,42 @@ export function AnalysisPage() {
                   : `${projects.length} project${projects.length === 1 ? '' : 's'} — no analysis run yet`}
             </p>
           </div>
-          {projects.length > 0 && (
+          {/* {projects.length > 0 && (
             <Link
               to="/projects/new"
               className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
             >
               New Project
             </Link>
-          )}
+          )} */}
         </div>
-
+          
         {/* How it works */}
         <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50/60 px-8 py-6">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-indigo-600">How it works</p>
-          <div className="grid gap-5 sm:grid-cols-3">
-            <Step number={1} title="Define your scope" desc="Add original and new features in the Scope Builder." />
-            <Step number={2} title="Run AI analysis" desc="Gemini analyses effort, risk, complexity, and timeline." />
-            <Step number={3} title="Review results" desc="Get hours, delay, risk factors, and recommendations." />
-          </div>
-        </div>
+  <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+    How it works
+  </p>
 
+  <div className="grid gap-5 sm:grid-cols-3">
+    <Step
+      number={1}
+      title="Define your scope"
+      desc="Structure your project scope by adding features, changes, and requirements."
+    />
+
+    <Step
+      number={2}
+      title="Run AI analysis"
+      desc="AI-powered analysis evaluates effort, complexity, risk, and timeline."
+    />
+
+    <Step
+      number={3}
+      title="Review insights"
+      desc="Get structured estimates, risk signals, and actionable recommendations."
+    />
+  </div>
+</div>
         {/* Content */}
         <div className="mt-10">
 

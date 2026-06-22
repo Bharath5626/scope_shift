@@ -49,3 +49,4 @@ prisma/migrations/
 # Optional: lockfiles (uncomment to ignore)
 # package-lock.json
 # yarn.lock
+.aider*
