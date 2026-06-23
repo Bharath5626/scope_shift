@@ -16,7 +16,7 @@ export const getDashboard = async (
     });
 
   const totalRuns = analysisRuns.length;
-
+const errorCount = analysisRuns.filter(run => run.error).length;
   const totalChanges = analysisRuns.reduce(
     (sum: any, run: { featureChanges: string | any[]; }) => sum + run.featureChanges.length,
     0
