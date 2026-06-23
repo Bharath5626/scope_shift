@@ -1,6 +1,6 @@
 # ScopeAI — Scope Creep Analyzer
 
-AI-powered project scope management tool that detects scope creep before it derails your timeline. Define your project scope, track feature additions, and get real-time risk analysis powered by Google Gemini AI.
+AI-powered project scope management tool that detects scope creep before it derails your timeline. Define your project scope, track feature additions, and get real-time risk analysis powered by AI.
 
 ## Features
 
@@ -214,7 +214,7 @@ Interactive docs: `http://localhost:3000/api-docs`
 ### Prerequisites
 - Node.js 18+
 - MySQL database
-- Google Gemini API key
+- AI API key
 
 ### Environment Variables
 
@@ -274,7 +274,7 @@ npx prisma studio
 - **JSON fields in Analysis** — Effort breakdown, risk factors, and recommendations stored as JSON for flexibility.
 - **Cascade deletes** — Deleting a project automatically removes all its features and analyses via Prisma's `onDelete: Cascade`.
 - **Cron job for status sync** — A background job runs every 10 minutes to update project statuses based on deadlines.
-- **AI integration** — Google Gemini AI provides intelligent scope analysis and feature generation.
+- **AI integration** —  AI provides intelligent scope analysis and feature generation.
 - **PDF/Excel export** — jsPDF and xlsx libraries enable report generation and data export.
 
 ## License
