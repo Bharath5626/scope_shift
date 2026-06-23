@@ -4,7 +4,10 @@ import { useProjects } from '../context/ProjectContext'
 import { PROJECT_TYPE_LABELS, PROJECT_STATUS_LABELS } from '../utils/constants'
 import { formatRelativeDate } from '../utils/formatters'
 import { api } from '../services/api'
-import type { Project } from '../types'
+import type { Project, ProjectStatus, ProjectType } from '../types'
+
+
+
 
 const statusStyles: Record<Project['status'], string> = {
   draft:     'bg-gray-100 text-gray-600',
@@ -155,6 +158,23 @@ export function AnalysisPage() {
   const { projects, loading: projectsLoading } = useProjects()
   const [analysisMap, setAnalysisMap] = useState<Record<string, AnalysisRow | null>>({})
   const [analysisLoading, setAnalysisLoading] = useState(true)
+  const ALL = 'all'
+
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<ProjectStatus | typeof ALL>(ALL)
+  const [typeFilter, setTypeFilter] = useState<ProjectType | typeof ALL>(ALL)
+  const filteredProjects = projects.filter((p) => {
+  const matchesSearch =
+    search.trim() === '' ||
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    (p.description ?? '').toLowerCase().includes(search.toLowerCase())
+
+  const matchesStatus = statusFilter === ALL || p.status === statusFilter
+  const matchesType = typeFilter === ALL || p.type === typeFilter
+
+  return matchesSearch && matchesStatus && matchesType
+})
+
 
   useEffect(() => {
     api.get<AnalyzedProject[]>('/projects/analyzed')
@@ -173,30 +193,88 @@ export function AnalysisPage() {
   const analyzedCount = Object.values(analysisMap).filter(Boolean).length
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-8 py-10">
+    <div className="h-screen bg-gray-50 flex flex-col">
+  <div className="w-full px-8 pt-10 pb-4">
 
-        {/* Page header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">AI Impact Analysis</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {projects.length === 0
-                ? 'Create a project to get started'
-                : analyzedCount > 0
-                  ? `${analyzedCount} of ${projects.length} project${projects.length === 1 ? '' : 's'} analysed`
-                  : `${projects.length} project${projects.length === 1 ? '' : 's'} — no analysis run yet`}
-            </p>
-          </div>
-          {/* {projects.length > 0 && (
-            <Link
-              to="/projects/new"
-              className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-            >
-              New Project
-            </Link>
-          )} */}
-        </div>
+<div className="sticky top-0 z-30 bg-gray-50 py-4 flex items-start justify-between gap-4 border-b border-gray-100">
+  
+  {/* LEFT SIDE */}
+  <div>
+    <h1 className="text-2xl font-semibold text-gray-900">
+      AI Impact Analysis
+    </h1>
+    <p className="mt-1 text-sm text-gray-500">
+      {projects.length === 0
+        ? 'Create a project to get started'
+        : analyzedCount > 0
+          ? `${analyzedCount} of ${projects.length} project${projects.length === 1 ? '' : 's'} analysed`
+          : `${projects.length} project${projects.length === 1 ? '' : 's'} — no analysis run yet`}
+    </p>
+  </div>
+
+  {/* RIGHT SIDE — SAME FILTER UI */}
+  <div className="flex flex-wrap items-center justify-end gap-3 min-w-[420px]">
+
+    {/* SEARCH (slightly wider + left spacing fix) */}
+    <div className="relative flex-1 min-w-56">
+      <svg
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+      </svg>
+
+      <input
+        type="text"
+        placeholder="Search projects…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+      />
+    </div>
+
+    {/* STATUS */}
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value as any)}
+      className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+    >
+      <option value={ALL}>All Statuses</option>
+      {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
+        <option key={value} value={value}>{label}</option>
+      ))}
+    </select>
+
+    {/* TYPE */}
+    <select
+      value={typeFilter}
+      onChange={(e) => setTypeFilter(e.target.value as any)}
+      className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+    >
+      <option value={ALL}>All Types</option>
+      {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
+        <option key={value} value={value}>{label}</option>
+      ))}
+    </select>
+
+    {/* CLEAR (only if needed) */}
+    {(search || statusFilter !== ALL || typeFilter !== ALL) && (
+      <button
+        onClick={() => {
+          setSearch('')
+          setStatusFilter(ALL)
+          setTypeFilter(ALL)
+        }}
+        className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-500 shadow-sm transition hover:bg-gray-50 hover:text-gray-700"
+      >
+        Clear
+      </button>
+    )}
+  </div>
+</div>
           
         {/* How it works */}
         <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50/60 px-8 py-6">
@@ -287,7 +365,7 @@ export function AnalysisPage() {
                   : 'Click "Run AI Analysis" on any project to get started'}
               </p>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {projects.map((project) => (
+                {filteredProjects.map((project) => (
                   <AnalysisProjectCard
                     key={project.id}
                     project={project}

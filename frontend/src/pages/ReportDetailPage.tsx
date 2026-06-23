@@ -283,7 +283,9 @@ export function ReportDetailPage() {
         theme: 'striped',
         headStyles: { fillColor: [79, 70, 229] },
         didDrawPage: (data) => {
-          currentY = data.cursor.y
+          if (data.cursor) {
+            currentY = data.cursor.y
+          }
         },
       })
 
@@ -302,7 +304,9 @@ export function ReportDetailPage() {
           theme: 'striped',
           headStyles: { fillColor: [79, 70, 229] },
           didDrawPage: (data) => {
-            currentY = data.cursor.y
+            if (data.cursor) {
+              currentY = data.cursor.y
+            }
           },
         })
       }
@@ -316,7 +320,9 @@ export function ReportDetailPage() {
           theme: 'striped',
           headStyles: { fillColor: [239, 68, 68] },
           didDrawPage: (data) => {
-            currentY = data.cursor.y
+            if (data.cursor) {
+              currentY = data.cursor.y
+            }
           },
         })
       }

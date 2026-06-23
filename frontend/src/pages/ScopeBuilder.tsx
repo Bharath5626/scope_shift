@@ -49,6 +49,7 @@ function FeatureForm({
   saving: boolean
   tabType: ScopeTab
 }) {
+  
   const [title, setTitle] = useState(initial?.title ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
 
@@ -117,7 +118,7 @@ interface FeatureListProps {
   tabType: ScopeTab
   projectId: string
   onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onRequestDelete: (id: string) => void
   onReorder: (ids: string[]) => void
   editingId: string | null
   onSaveEdit: (feature: Feature, data: FeatureFormData) => Promise<void>
@@ -130,7 +131,7 @@ function FeatureList({
   features,
   tabType,
   onEdit,
-  onDelete,
+  onRequestDelete,
   onReorder,
   editingId,
   onSaveEdit,
@@ -172,6 +173,8 @@ function FeatureList({
       </div>
     )
   }
+
+
 
   return (
     <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 overflow-hidden">
@@ -230,13 +233,13 @@ function FeatureList({
                   <PencilIcon />
                 </button>
                 <button
-                  onClick={() => onDelete(feature.id)}
-                  disabled={deletingId === feature.id}
-                  className="rounded-md p-1.5 text-red-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
-                  title="Delete"
-                >
-                  <TrashIcon />
-                </button>
+  onClick={() => onRequestDelete(feature.id)}
+  disabled={deletingId === feature.id}
+  className="rounded-md p-1.5 text-red-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+  title="Delete"
+>
+  <TrashIcon />
+</button>
               </div>
             </div>
           )}
@@ -250,6 +253,7 @@ export function ScopeBuilder() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('project') ?? ''
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const {
     projects,
@@ -514,7 +518,7 @@ export function ScopeBuilder() {
               tabType={activeTab}
               projectId={projectId}
               onEdit={(id) => { setEditingId(id); setShowAddForm(false) }}
-              onDelete={handleDelete}
+              onRequestDelete={(id) => setConfirmDeleteId(id)}
               onReorder={handleReorder}
               editingId={editingId}
               onSaveEdit={handleEdit}
@@ -557,6 +561,41 @@ export function ScopeBuilder() {
         </div>
 
       </div>
+      {confirmDeleteId && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+      <h2 className="text-lg font-semibold text-gray-900">
+        Delete Feature?
+      </h2>
+
+      <p className="mt-2 text-sm text-gray-500">
+        This action cannot be undone.
+      </p>
+
+      <div className="mt-6 flex justify-end gap-3">
+        <button
+          onClick={() => setConfirmDeleteId(null)}
+          className="rounded-lg border border-gray-200 px-4 py-2 text-sm"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={async () => {
+            await handleDelete(confirmDeleteId)
+            setConfirmDeleteId(null)
+          }}
+          className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white"
+        >
+          Delete
+        </button>
+      </div>
+
     </div>
+  </div>
+)}
+    </div>
+    
   )
 }

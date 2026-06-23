@@ -55,7 +55,8 @@ export function Sidebar() {
   const { user, logout } = useAuth()
   const { pathname } = useLocation()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-
+  const [collapsed, setCollapsed] = useState(false)
+  
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U'
@@ -66,17 +67,48 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-20 flex h-screen w-64 flex-col bg-gradient-to-b from-indigo-600 to-violet-700 text-white">
-      {/* Header */}
-      <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 font-bold text-white">
-          S
-        </div>
-        <div>
-          <p className="text-base font-semibold text-white">ScopeAI</p>
-          <p className="text-xs text-indigo-100">Scope Creep Analyzer</p>
-        </div>
+    <aside
+  className={`fixed left-0 top-0 z-20 flex h-screen flex-col bg-gradient-to-b from-indigo-600 to-violet-700 text-white transition-all duration-300 ${
+    collapsed ? 'w-20' : 'w-64'
+  }`}
+>
+     {/* Header */}
+<div className="flex items-center justify-between border-b border-white/10 px-4 py-5">
+  <div className="flex items-center gap-3">
+  {!collapsed && (
+    <>
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 font-bold text-white">
+        S
       </div>
+
+      <div>
+        <p className="text-base font-semibold text-white">ScopeAI</p>
+        <p className="text-xs text-indigo-100">Scope Creep Analyzer</p>
+      </div>
+    </>
+  )}
+</div>
+
+  <button
+    onClick={() => setCollapsed((prev) => !prev)}
+    className="rounded-lg p-2 text-indigo-100 hover:bg-white/10 hover:text-white"
+    title="Toggle sidebar"
+  >
+    <svg
+  className="h-6 w-6"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  strokeWidth={2}
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M3 6h18M3 12h18M3 18h18"
+  />
+</svg>
+  </button>
+</div>
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
@@ -85,48 +117,66 @@ export function Sidebar() {
           const isExtraActive = extraPaths.some((p) => pathname.startsWith(p))
 
           return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              className={({ isActive }) => {
-                const active = isActive || isExtraActive
-                return `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? 'bg-white text-indigo-700 shadow-lg'
-                    : 'text-indigo-100 hover:bg-white/10 hover:text-white'
-                }`
-              }}
-            >
-              <NavIcon icon={item.icon} />
-              {item.label}
-            </NavLink>
+<NavLink
+  key={item.path}
+  to={item.path}
+  end={item.path === '/'}
+  title={collapsed ? item.label : undefined}
+  className={({ isActive }) => {
+    const active = isActive || isExtraActive
+    return `relative flex items-center ${
+      collapsed ? 'justify-center' : 'gap-3'
+    } rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+      active
+        ? 'bg-white text-indigo-700 shadow-lg'
+        : 'text-indigo-100 hover:bg-white/10 hover:text-white'
+    } group`
+  }}
+>
+  <NavIcon icon={item.icon} />
+  {!collapsed && item.label}
+
+  {/* Tooltip (only when collapsed) */}
+  {collapsed && (
+    <div className="absolute left-full ml-3 hidden group-hover:block whitespace-nowrap rounded-md bg-black/80 px-2 py-1 text-xs text-white shadow-lg">
+      {item.label}
+    </div>
+  )}
+</NavLink>
           )
         })}
       </nav>
       {/* User + Logout */}
-      <div className="border-t border-white/10 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
-              {initials}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-white">{user?.name ?? 'User'}</p>
-              <p className="truncate text-xs text-indigo-300">{user?.email ?? ''}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowLogoutConfirm(true)}
-            className="shrink-0 rounded-xl p-2.5 text-indigo-200 transition hover:bg-white/10 hover:text-white"
-            title="Sign out"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-          </button>
+{!collapsed && (
+  <div className="border-t border-white/10 p-4">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3 rounded-xl px-2 py-1.5">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
+          {initials}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-white">
+            {user?.name ?? 'User'}
+          </p>
+          <p className="truncate text-xs text-indigo-300">
+            {user?.email ?? ''}
+          </p>
         </div>
       </div>
+
+      <button
+        onClick={() => setShowLogoutConfirm(true)}
+        className="shrink-0 rounded-xl p-2.5 text-indigo-200 transition hover:bg-white/10 hover:text-white"
+        title="Sign out"
+      >
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </button>
+    </div>
+  </div>
+)}
 
       {/* Logout Confirmation Modal */}
       {showLogoutConfirm && (

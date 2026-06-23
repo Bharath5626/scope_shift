@@ -184,7 +184,7 @@ export function ProjectHistoryPage() {
       )}
 
       <div className="sticky top-0 z-30">
-    <div className="mx-auto max-w-6xl px-8 bg-gray-50">
+    <div className="w-full px-8 bg-gray-50">
        <div className="py-6 border-b border-gray-200">
           {/* Header */}
           <div className="flex items-start justify-between">
