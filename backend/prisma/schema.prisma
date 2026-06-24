@@ -21,24 +21,31 @@ model User {
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  name        String
-  description String?  @db.Text
-  type        String
-  status      String   @default("draft")
+  id            String   @id @default(uuid())
 
-  deadline    DateTime?
+  name          String
+  description   String?  @db.Text
+  type          String
+  status        String   @default("draft")
 
-  createdById String
-  createdBy   User @relation(fields: [createdById], references: [id])
+  startDate     DateTime?
+  deadline      DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  teamSize      Int?
+  techStack     String?  @db.Text
+  projectType   String?
+  methodology   String?
+  workingHours  Int?
 
-  features Feature[]
-  analyses Analysis[]
+  createdById   String
+  createdBy     User @relation(fields: [createdById], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  features      Feature[]
+  analyses      Analysis[]
 }
-
 model Feature {
   id          String @id @default(uuid())
   projectId   String

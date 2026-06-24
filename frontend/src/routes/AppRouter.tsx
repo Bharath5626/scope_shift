@@ -4,7 +4,6 @@ import { AppLayout } from '../components/layout/AppLayout'
 import { LoginPage } from '../pages/LoginPage'
 import { SignupPage } from '../pages/SignupPage'
 import { DashboardPage } from '../pages/DashboardPage'
-import { PlaceholderPage } from '../pages/PlaceholderPage'
 import { ScopeBuilder } from '../pages/ScopeBuilder'
 import { ProjectsPage } from '../pages/ProjectsPage'
 import { CreateProjectPage } from '../pages/CreateProjectPage'
@@ -14,6 +13,7 @@ import { ReportsPage } from '../pages/ReportsPage'
 import { ReportDetailPage } from '../pages/ReportDetailPage'
 import { ProjectHistoryPage } from '../pages/ProjectHistoryPage'
 import { AnalysisPage } from '../pages/AnalysisPage'
+import { UpcomingDeadlinesPage } from '../pages/UpcomingDeadlinesPage'
 
 export function AppRouter() {
   const { isAuthenticated } = useAuth()
@@ -42,6 +42,10 @@ export function AppRouter() {
         <Route path="/reports/:projectId" element={<ReportDetailPage />} />
         <Route path="/history" element={<ProjectHistoryPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+  path="/upcoming-deadlines"
+  element={<UpcomingDeadlinesPage />}
+/>
       </Routes>
     </AppLayout>
   )

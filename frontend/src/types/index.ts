@@ -11,6 +11,7 @@ export type RiskLevel = 'low' | 'medium' | 'high'
 export type ComplexityLevel = 'low' | 'medium' | 'high'
 
 export interface Project {
+  deadline: string | null
   id: string
   name: string
   description: string
@@ -53,9 +54,19 @@ export interface AppState {
 
 export interface CreateProjectInput {
   name: string
-  description: string
-  type: ProjectType
+  description?: string | null
+
+  techStack: string
+
+  teamSize: number
+  startDate: string
   deadline: string
+
+  type: ProjectType
+  projectType?: string | null
+
+  methodology?: string | null
+  workingHours?: number | null
 }
 
 export interface CreateFeatureInput {

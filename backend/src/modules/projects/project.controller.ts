@@ -3,10 +3,34 @@ import * as ProjectService from "./project.service";
 import { asyncHandler } from "../../utils/asyncHandler";
 
 export const createProject = asyncHandler(async (req: Request, res: Response) => {
-  const project = await ProjectService.createProject(
-    req.body,
-    req.user!.id
-  );
+ const {
+  name,
+  description,
+  type,
+  projectType,
+  startDate,
+  deadline,
+  teamSize,
+  techStack,
+  methodology,
+  workingHours,
+} = req.body;
+
+ const project =await ProjectService.createProject(
+  {
+    name,
+    description,
+    type,
+    projectType,
+    startDate,
+    deadline,
+    teamSize,
+    techStack,
+    methodology,
+    workingHours,
+  },
+  req.user!.id
+);
 
   res.status(201).json({
     success: true,

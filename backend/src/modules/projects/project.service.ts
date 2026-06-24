@@ -17,9 +17,17 @@ const syncProjectStatus = async (project: any) => {
 export const createProject = async (
   data: {
     name: string;
-    description?: string;
+    description?: string | null;
     type: string;
+
+    startDate?: string;
     deadline?: string;
+
+    teamSize: number;
+    techStack?: string | null;
+     projectType?: string | null;
+    methodology?: string | null;
+    workingHours?: number | null;
   },
   userId: string
 ) => {
@@ -27,28 +35,51 @@ export const createProject = async (
     throw new Error("Missing required fields");
   }
 
-  let deadlineDate: Date | undefined = undefined;
+let startDate: Date | undefined = undefined;
+let deadlineDate: Date | undefined = undefined;
 
-  if (data.deadline) {
-    deadlineDate = new Date(data.deadline);
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+if (data.startDate) {
+  startDate = new Date(data.startDate);
 
-    if (deadlineDate < today) {
-      throw new Error("Deadline cannot be in the past");
-    }
+  if (startDate < today) {
+    throw new Error("Start date cannot be in the past");
+  }
+}
+
+if (data.deadline) {
+  deadlineDate = new Date(data.deadline);
+
+  if (deadlineDate < today) {
+    throw new Error("Deadline cannot be in the past");
   }
 
-  return prisma.project.create({
-    data: {
-      name: data.name,
-      description: data.description,
-      type: data.type,
-      deadline: deadlineDate, // ✅ FIXED
-      createdById: userId,
-    },
-  });
+  if (startDate && deadlineDate < startDate) {
+    throw new Error("Deadline cannot be earlier than start date");
+  }
+}
+
+return prisma.project.create({
+  data: {
+    name: data.name,
+    description: data.description,
+    type: data.type,
+
+    startDate,
+    deadline: deadlineDate,
+
+    teamSize: data.teamSize,
+    techStack: data.techStack,
+     projectType: data.projectType, 
+    
+    methodology: data.methodology,
+    workingHours: data.workingHours,
+
+    createdById: userId,
+  },
+});
 };
 
 export const getProjects = async () => {
@@ -84,7 +115,7 @@ export const getProjectById = async (id: string) => {
 
 export const updateProject = async (
   id: string,
-  data: Partial<{ name: string; description: string; type: string; status: string }>
+  data: Partial<{ name: string; description: string; type: string; status: string;  startDate: Date;deadline: Date; }>
 ) => {
   return prisma.project.update({ where: { id }, data });
 };
