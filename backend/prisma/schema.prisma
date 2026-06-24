@@ -36,6 +36,7 @@ model Project {
   projectType   String?
   methodology   String?
   workingHours  Int?
+  logo          String?  @db.Text
 
   createdById   String
   createdBy     User @relation(fields: [createdById], references: [id])

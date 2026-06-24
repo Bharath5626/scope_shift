@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../services/api'
 import { PROJECT_TYPE_LABELS } from '../utils/constants'
+import { useAuth } from '../context/AuthContext'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -33,6 +34,19 @@ interface Project {
   description: string | null
   type: string
   status: string
+  startDate: string | null
+  deadline: string | null
+  teamSize: number | null
+  techStack: string | null
+  projectType: string | null
+  methodology: string | null
+  workingHours: number | null
+  createdBy: {
+    id: string
+    name: string
+  }
+  createdAt: string
+  updatedAt: string
 }
 
 const RISK_COLORS: Record<string, { bg: string; text: string; badge: string; border: string }> = {
@@ -45,7 +59,7 @@ const COMPLEXITY_STROKE: Record<string, string> = {
   Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444',
 }
 
-const TABS = ['Summary', 'Effort Breakdown', 'Risk Analysis', 'Recommendations'] as const
+const TABS = ['Summary', 'Effort Breakdown', 'Risk Analysis', 'Recommendations', 'Project Details'] as const
 type Tab = typeof TABS[number]
 
 function DonutChart({ level, score }: { level: string; score: number }) {
@@ -226,6 +240,122 @@ function RecommendationsTab({ recommendations }: { recommendations: string[] | n
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function ProjectDetailsTab({ project }: { project: Project }) {
+  const { user } = useAuth()
+  const isCreator = user?.id === project.createdBy.id
+  const createdBy = isCreator ? 'you' : project.createdBy.name
+
+  return (
+    <div className="space-y-6">
+      {/* Basic Info */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">Project Information</h3>
+        <div className="space-y-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Project Name</p>
+            <p className="mt-1 text-sm font-semibold text-gray-900">{project.name}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Description</p>
+            <p className="mt-1 text-sm text-gray-700">{project.description || 'No description provided'}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Type</p>
+              <p className="mt-1 text-sm text-gray-700">{PROJECT_TYPE_LABELS[project.type] ?? project.type}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Status</p>
+              <p className="mt-1 text-sm text-gray-700 capitalize">{project.status.replace('_', ' ')}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Technical Details */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">Technical Configuration</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Project Type</p>
+            <p className="mt-1 text-sm text-gray-700">{project.projectType || 'Not specified'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Team Size</p>
+            <p className="mt-1 text-sm text-gray-700">{project.teamSize ? `${project.teamSize} members` : 'Not specified'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Methodology</p>
+            <p className="mt-1 text-sm text-gray-700">{project.methodology || 'Not specified'}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Working Hours</p>
+            <p className="mt-1 text-sm text-gray-700">{project.workingHours ? `${project.workingHours} hrs/day` : 'Not specified'}</p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Tech Stack</p>
+          <p className="mt-1 text-sm text-gray-700">{project.techStack || 'Not specified'}</p>
+        </div>
+      </div>
+
+      {/* Timeline */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">Timeline</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Start Date</p>
+            <p className="mt-1 text-sm text-gray-700">
+              {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Deadline</p>
+            <p className="mt-1 text-sm text-gray-700">
+              {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not specified'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Audit Log */}
+      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-sm font-semibold text-gray-700">Audit Log</h3>
+        <div className="space-y-3">
+          <div className="flex items-start gap-3 rounded-lg bg-gray-50 px-4 py-3">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xs font-semibold">
+              {createdBy.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">
+                Project created by <span className="text-indigo-600">{createdBy}</span>
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date(project.createdAt).toLocaleString()}
+              </p>
+            </div>
+          </div>
+          {project.updatedAt !== project.createdAt && (
+            <div className="flex items-start gap-3 rounded-lg bg-gray-50 px-4 py-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-xs font-semibold">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Project last modified</p>
+                <p className="text-xs text-gray-500">
+                  {new Date(project.updatedAt).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -422,6 +552,28 @@ export function ReportDetailPage() {
               {PROJECT_TYPE_LABELS[project.type] ?? project.type} · Detailed Analysis Report
             </p>
           </div>
+          <button
+            onClick={handleExportPDF}
+            disabled={exporting}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-700 hover:to-violet-800 disabled:opacity-50"
+          >
+            {exporting ? (
+              <>
+                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export PDF
+              </>
+            )}
+          </button>
         </div>
 
         {/* Tabs */}
@@ -459,31 +611,41 @@ export function ReportDetailPage() {
           {activeTab === 'Recommendations' && (
             <RecommendationsTab recommendations={analysis.recommendations as string[] | null} />
           )}
+          {activeTab === 'Project Details' && <ProjectDetailsTab project={project} />}
         </div>
 
-        {/* Export button at bottom right */}
-        <div className="flex justify-end">
+        {/* Navigation buttons */}
+        <div className="flex items-center justify-between">
           <button
-            onClick={handleExportPDF}
-            disabled={exporting}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:from-indigo-700 hover:to-violet-800 disabled:opacity-50"
+            onClick={() => {
+              const currentIndex = TABS.indexOf(activeTab)
+              if (currentIndex > 0) {
+                setActiveTab(TABS[currentIndex - 1])
+              }
+            }}
+            disabled={TABS.indexOf(activeTab) === 0}
+            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {exporting ? (
-              <>
-                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Exporting...
-              </>
-            ) : (
-              <>
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export PDF
-              </>
-            )}
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Previous
+          </button>
+
+          <button
+            onClick={() => {
+              const currentIndex = TABS.indexOf(activeTab)
+              if (currentIndex < TABS.length - 1) {
+                setActiveTab(TABS[currentIndex + 1])
+              }
+            }}
+            disabled={TABS.indexOf(activeTab) === TABS.length - 1}
+            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
 

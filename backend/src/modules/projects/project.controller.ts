@@ -14,6 +14,7 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
   techStack,
   methodology,
   workingHours,
+  logo,
 } = req.body;
 
  const project =await ProjectService.createProject(
@@ -28,6 +29,7 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
     techStack,
     methodology,
     workingHours,
+    logo,
   },
   req.user!.id
 );

@@ -219,6 +219,12 @@ const matchesRisk =
                     </div>
                   </div>
                 )}
+
+                <div className="mt-4 flex items-center justify-between pt-4 border-t border-gray-100">
+                  <p className="text-xs text-gray-400">
+                    Report created on {formatDate(analysis?.createdAt || project.createdAt)}
+                  </p>
+                </div>
               </div>
             )
           })}

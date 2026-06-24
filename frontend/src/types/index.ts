@@ -19,6 +19,7 @@ export interface Project {
   status: ProjectStatus
   createdAt: string
   updatedAt: string
+  logo?: string | null
 
   createdBy: {
     id: string
@@ -68,6 +69,7 @@ export interface CreateProjectInput {
 
   methodology?: string | null
   workingHours?: number | null
+  logo?: string | null
 }
 
 export interface CreateFeatureInput {

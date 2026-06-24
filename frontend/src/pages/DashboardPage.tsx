@@ -89,17 +89,17 @@ const sortedProjects = dashboardStats?.recentProjects ?? [...projects]
     <DashboardLayout
       title="Dashboard"
       subtitle="Overview of all your projects and scope health"
-      action={
-        <Link
-          to="/projects/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          New Project
-        </Link>
-      }
+      // action={
+      //   <Link
+      //     to="/projects/new"
+      //     className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+      //   >
+      //     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      //       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+      //     </svg>
+      //     New Project
+      //   </Link>
+      // }
     >
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatsCard label="Total Projects" value={totalProjects} icon={<FolderIcon />} accent="primary" />

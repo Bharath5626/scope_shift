@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
@@ -102,6 +102,8 @@ export function CreateProjectPage() {
 
   const [techStackInput, setTechStackInput] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [projectLogo, setProjectLogo] = useState<File | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const navigate = useNavigate()
   const { createProject } = useProjects()
 
@@ -110,7 +112,6 @@ export function CreateProjectPage() {
   const [description, setDescription] = useState('')
 
   // ⚙️ CONTEXT
-  
   const [teamSize, setTeamSize] = useState('')
   const [deadline, setDeadline] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -123,19 +124,115 @@ export function CreateProjectPage() {
   const [step, setStep] = useState<Step>('form')
   const [error, setError] = useState('')
   const [showOptional, setShowOptional] = useState(false)
-const handleCreate = async () => {
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string
+    techStack?: string
+  }>({})
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
 
+  // Track unsaved changes
+  const handleFieldChange = (field?: string) => {
+    if (!hasUnsavedChanges) {
+      setHasUnsavedChanges(true)
+    }
+    if (field) {
+      setTouchedFields(prev => new Set([...prev, field]))
+      setFieldErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+  }
 
-if (
-  !name.trim() ||
-  !teamSize ||
-  !startDate ||
-  !deadline ||
-  selectedSkills.length === 0
-) {
-  setError("Please fill all required fields")
-  return
+  // Real-time validation using useEffect (only after user interaction)
+  useEffect(() => {
+    const errors: { name?: string; techStack?: string } = {}
+
+    // Validate project name (only if user has interacted with name field)
+    if (touchedFields.has('name')) {
+      if (name.trim() && name.trim().length < 3) {
+        errors.name = 'Project name must be at least 3 characters'
+      }
+    }
+
+    // Validate tech stack (only if user has interacted with tech stack field)
+if (touchedFields.has('techStack')) {
+  if (
+    techStackInput.trim() &&
+    selectedSkills.length === 0
+  ) {
+    errors.techStack = 'Please add at least one tech skill'
+  }
 }
+
+    setFieldErrors(errors)
+  }, [name, selectedSkills, touchedFields])
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      setShowCancelConfirm(true)
+    } else {
+      navigate('/projects')
+    }
+  }
+
+  const confirmCancel = () => {
+    setShowCancelConfirm(false)
+    navigate('/projects')
+  }
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Limit file size to 500KB (base64 encoding adds ~33% overhead)
+      const maxSizeKB = 500
+      const fileSizeKB = file.size / 1024
+      console.log('File size:', fileSizeKB.toFixed(2), 'KB')
+      if (fileSizeKB > maxSizeKB) {
+        alert(`Logo file is too large (${fileSizeKB.toFixed(0)}KB). Please upload an image smaller than ${maxSizeKB}KB.`)
+        return
+      }
+
+      setProjectLogo(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string)
+        console.log('Base64 length:', (reader.result as string).length, 'characters')
+      }
+      reader.readAsDataURL(file)
+      handleFieldChange()
+    }
+  }
+
+  const handleLogoRemove = () => {
+    setProjectLogo(null)
+    setLogoPreview(null)
+  }
+const handleCreate = async () => {
+  const errors: { name?: string; techStack?: string } = {}
+
+  // Validate project name
+  if (!name.trim()) {
+    errors.name = 'Project name is required'
+  } else if (name.trim().length < 3) {
+    errors.name = 'Project name must be at least 3 characters'
+  }
+
+  // Validate tech stack
+  if (selectedSkills.length === 0) {
+    errors.techStack = 'Please add at least one tech skill'
+  }
+
+  // Validate other required fields
+  if (!teamSize || !startDate || !deadline) {
+    setError("Please fill all required fields")
+    setFieldErrors(errors)
+    return
+  }
+
+  if (Object.keys(errors).length > 0) {
+    setFieldErrors(errors)
+    return
+  }
 
   if (Number(teamSize) > 500) {
     setError("Team size cannot exceed 500")
@@ -144,8 +241,10 @@ if (
 
   setStep('generating')
   setError('')
+  setFieldErrors({})
 
   try {
+    console.log('Creating project with logo:', logoPreview ? 'Yes' : 'No', logoPreview?.substring(0, 50) + '...')
 const project = await createProject({
   name,
   description: description.trim() || null,
@@ -166,6 +265,7 @@ const project = await createProject({
     workingHours
       ? Number(workingHours)
       : null,
+  logo: logoPreview,
 })
 
     await api.post(`/projects/${project.id}/generate-features`, {
@@ -234,13 +334,6 @@ const filteredSkills = SKILLS.filter(
               Fill in the details — AI will generate features based on structured inputs
             </p>
           </div>
-
-          <button
-            onClick={() => navigate('/projects')}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition hover:bg-gray-50"
-          >
-            Cancel
-          </button>
         </div>
 
         {error && (
@@ -264,10 +357,17 @@ const filteredSkills = SKILLS.filter(
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    handleFieldChange('name')
+                  }}
+                  onBlur={() => handleFieldChange('name')}
                   placeholder="e.g. Customer Portal MVP"
-                  className={inputCls}
+                  className={`${inputCls} ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
                 />
+                {fieldErrors.name && (
+                  <p className="mt-1.5 text-xs text-red-600">{fieldErrors.name}</p>
+                )}
               </div>
 
               <div>
@@ -275,10 +375,65 @@ const filteredSkills = SKILLS.filter(
                 <textarea
                   rows={3}
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={(e) => {
+                    setDescription(e.target.value)
+                    handleFieldChange()
+                  }}
                   placeholder="Describe what this project does..."
                   className={`${inputCls} resize-none`}
                 />
+              </div>
+            </div>
+
+            {/* Logo Upload */}
+            <div className="mt-5">
+              <label className={labelCls}>Project Logo (Optional)</label>
+              <div className="flex items-start gap-4">
+                {logoPreview ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                    <img
+                      src={logoPreview}
+                      alt="Project logo preview"
+                      className="h-full w-full object-contain"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleLogoRemove}
+                      className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition hover:bg-red-600"
+                    >
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="h-20 w-20 shrink-0 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                    <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    id="logo-upload"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="logo-upload"
+                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                  </label>
+                  <p className="mt-1.5 text-xs text-gray-500">
+                    Upload a logo or image for your project reference. PNG, JPG, or SVG up to 500KB.
+                  </p>
+                </div>
               </div>
             </div>
           </SectionCard>
@@ -294,7 +449,7 @@ const filteredSkills = SKILLS.filter(
   <label className={labelCls}>Tech Stack <span className="text-red-500">*</span></label>
 
   <div className="relative">
-    <div className="flex flex-wrap gap-2 rounded-xl border border-gray-200 p-3 min-h-[52px]">
+    <div className={`flex flex-wrap gap-2 rounded-xl border p-3 min-h-[52px] ${fieldErrors.techStack ? 'border-red-500 ' : 'border-gray-200'}`}>
       
       {selectedSkills.map((skill) => (
         <span
@@ -305,11 +460,12 @@ const filteredSkills = SKILLS.filter(
 
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
               setSelectedSkills(
                 selectedSkills.filter((s) => s !== skill)
               )
-            }
+              handleFieldChange('techStack')
+            }}
           >
             ×
           </button>
@@ -318,7 +474,10 @@ const filteredSkills = SKILLS.filter(
 
       <input
         value={techStackInput}
-        onChange={(e) => setTechStackInput(e.target.value)}
+        onChange={(e) => {
+          setTechStackInput(e.target.value)
+          handleFieldChange('techStack')
+        }}
         placeholder={
   selectedSkills.length
     ? ''
@@ -338,10 +497,14 @@ const filteredSkills = SKILLS.filter(
     ])
 
     setTechStackInput('')
+    handleFieldChange('techStack')
   }
 }}
       />
     </div>
+    {fieldErrors.techStack && (
+      <p className="mt-1.5 text-xs text-red-600">{fieldErrors.techStack}</p>
+    )}
 
     {techStackInput && filteredSkills.length > 0 && (
       <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg">
@@ -377,6 +540,7 @@ const filteredSkills = SKILLS.filter(
           const value = Number(e.target.value)
           if (value <= 500 || e.target.value === '') {
             setTeamSize(e.target.value)
+            handleFieldChange()
           }
         }}
         placeholder="Max 500"
@@ -393,7 +557,10 @@ const filteredSkills = SKILLS.filter(
         type="date"
         className={inputCls}
         value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
+        onChange={(e) => {
+          setStartDate(e.target.value)
+          handleFieldChange()
+        }}
         min={new Date().toISOString().split('T')[0]}
       />
     </div>
@@ -406,7 +573,10 @@ const filteredSkills = SKILLS.filter(
         type="date"
         className={inputCls}
         value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
+        onChange={(e) => {
+          setDeadline(e.target.value)
+          handleFieldChange()
+        }}
         min={startDate || new Date().toISOString().split('T')[0]}
       />
     </div>
@@ -434,7 +604,10 @@ const filteredSkills = SKILLS.filter(
         className={`${inputCls} pr-10`}
         placeholder="Enter project type"
         value={projectType}
-        onChange={(e) => setProjectType(e.target.value)}
+        onChange={(e) => {
+          setProjectType(e.target.value)
+          handleFieldChange()
+        }}
       />
 
       <button
@@ -459,6 +632,7 @@ const filteredSkills = SKILLS.filter(
             setIsCustomProjectType(true)
           } else {
             setProjectType(e.target.value)
+            handleFieldChange()
           }
         }}
       >
@@ -485,7 +659,10 @@ const filteredSkills = SKILLS.filter(
         className={`${inputCls} pr-10`}
         placeholder="Enter methodology"
         value={methodology}
-        onChange={(e) => setMethodology(e.target.value)}
+        onChange={(e) => {
+          setMethodology(e.target.value)
+          handleFieldChange()
+        }}
       />
 
       <button
@@ -510,6 +687,7 @@ const filteredSkills = SKILLS.filter(
             setIsCustomMethodology(true)
           } else {
             setMethodology(e.target.value)
+            handleFieldChange()
           }
         }}
       >
@@ -537,6 +715,7 @@ const filteredSkills = SKILLS.filter(
 
     if (value <= 24 || e.target.value === '') {
       setWorkingHours(e.target.value)
+      handleFieldChange()
     }
   }}
   placeholder="Hours per day"
@@ -556,12 +735,14 @@ const filteredSkills = SKILLS.filter(
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate(-1)}
-              className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-            >
-              Back
-            </button>
+            {hasUnsavedChanges && (
+              <button
+                onClick={handleCancel}
+                className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            )}
 
             <button
               onClick={handleCreate}
@@ -580,6 +761,44 @@ const filteredSkills = SKILLS.filter(
         </div>
 
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            onClick={() => setShowCancelConfirm(false)}
+          />
+          {/* Dialog */}
+          <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-8 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+              <svg className="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Unsaved Changes</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              You have unsaved changes. Are you sure you want to cancel?
+            </p>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Keep Editing
+              </button>
+              <button
+                onClick={confirmCancel}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600"
+              >
+                Cancel Project
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     
   )

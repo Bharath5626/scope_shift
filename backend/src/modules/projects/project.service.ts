@@ -28,6 +28,7 @@ export const createProject = async (
      projectType?: string | null;
     methodology?: string | null;
     workingHours?: number | null;
+    logo?: string | null;
   },
   userId: string
 ) => {
@@ -72,10 +73,11 @@ return prisma.project.create({
 
     teamSize: data.teamSize,
     techStack: data.techStack,
-     projectType: data.projectType, 
-    
+     projectType: data.projectType,
+
     methodology: data.methodology,
     workingHours: data.workingHours,
+    logo: data.logo,
 
     createdById: userId,
   },
