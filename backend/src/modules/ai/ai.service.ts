@@ -18,6 +18,8 @@ type GenerateFeaturesInput = {
   experienceLevel?: string;
   deadline?: string;
   workingHours?: string;
+  startDate?: string;
+  projectType?: string;
 };
 
 const FALLBACK_FEATURES: Record<string, GeneratedFeature[]> = {
@@ -327,7 +329,18 @@ const computeFallbackAnalysis = (
 };
 
 export const analyzeProjectScope = async (
-project: { name: string; description?: string | null; type: string; }, features: FeatureInput[], newFeatures: { projectId: string; id: string; description: string | null; type: string; title: string; category: string; priority: string; order: number; }[],
+project: {
+  name: string;
+  description?: string | null;
+  type: string;
+  techStack?: string;
+  teamSize?: string;
+  methodology?: string;
+  startDate?: string;
+  deadline?: string;
+  workingHours?: string;
+  projectType?: string;
+}, features: FeatureInput[], newFeatures: { projectId: string; id: string; description: string | null; type: string; title: string; category: string; priority: string; order: number; }[],
 ): Promise<ScopeAnalysisResult> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -351,6 +364,13 @@ project: { name: string; description?: string | null; type: string; }, features:
       - Name: ${project.name}
       - Description: ${project.description || "Not provided"}
       - Type: ${project.type}
+      - Project Type: ${project.projectType || "Not specified"}
+      - Tech Stack: ${project.techStack || "Not specified"}
+      - Team Size: ${project.teamSize || "Not specified"}
+      - Methodology: ${project.methodology || "Not specified"}
+      - Start Date: ${project.startDate || "Not specified"}
+      - Deadline: ${project.deadline || "Not specified"}
+      - Working Hours: ${project.workingHours || "Not specified"}
 
       ## Feature Set
       You are estimating effort for the following features (${features.length} total):
@@ -555,11 +575,14 @@ Your task is to design a feature set that is realistic, implementation-ready, an
 - Name: ${input.name}
 - Description: ${input.description || "Not provided"}
 - Type: ${input.type || "Web application"}
+- Project Type: ${input.projectType || "Not specified"}
 - Tech Stack: ${input.techStack || "Not specified"}
 - Team Size: ${input.teamSize || "Not specified"}
 - Methodology: ${input.methodology || "Not specified"}
 - Experience Level: ${input.experienceLevel || "Not specified"}
+- Start Date: ${input.startDate || "Not specified"}
 - Deadline Constraint: ${input.deadline ? `Must deliver by ${input.deadline}` : "No deadline constraint"}
+- Working Hours: ${input.workingHours || "Not specified"}
 
 ---
 

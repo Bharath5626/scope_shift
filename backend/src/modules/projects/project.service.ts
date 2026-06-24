@@ -86,7 +86,7 @@ export const getProjects = async () => {
   const projects = await prisma.project.findMany({
     include: {
       createdBy: {
-        select: { name: true },
+        select: { id: true, name: true },
       },
     },
     orderBy: {
@@ -100,7 +100,7 @@ export const getProjectById = async (id: string) => {
   const project = await prisma.project.findUnique({
     where: { id },
     include: {
-      createdBy: { select: { name: true } },
+      createdBy: { select: { id: true, name: true } },
       features: true,
       analyses: {
         orderBy: { createdAt: "desc" },

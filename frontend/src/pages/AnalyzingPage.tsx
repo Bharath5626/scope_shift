@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../services/api'
+import { useProjects } from '../context/ProjectContext'
 
 const MESSAGES = [
   'Analyzing features, complexity, dependencies…',
@@ -41,17 +42,21 @@ export function AnalyzingPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('project') ?? ''
+  const { projects } = useProjects()
 
+  const project = projects.find(p => p.id === projectId)
+
+  const [countdown, setCountdown] = useState(5)
+  const [analysisStarted, setAnalysisStarted] = useState(false)
   const [progress, setProgress] = useState(0)
   const [msgIndex, setMsgIndex] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const doneRef = useRef(false)
 
-  useEffect(() => {
-    if (!projectId) {
-      navigate('/')
-      return
-    }
+  const startAnalysis = () => {
+    setAnalysisStarted(true)
+    if (countdownRef.current) clearInterval(countdownRef.current)
 
     // Animate progress bar to ~88% while waiting for API
     intervalRef.current = setInterval(() => {
@@ -79,9 +84,35 @@ export function AnalyzingPage() {
         if (intervalRef.current) clearInterval(intervalRef.current)
         navigate(`/scope-builder?project=${projectId}`)
       })
+  }
+
+  const handleCancel = () => {
+    if (countdownRef.current) clearInterval(countdownRef.current)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    navigate(`/scope-builder?project=${projectId}`)
+  }
+
+  useEffect(() => {
+    if (!projectId) {
+      navigate('/')
+      return
+    }
+
+    // Start countdown
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownRef.current!)
+          startAnalysis()
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
+      if (countdownRef.current) clearInterval(countdownRef.current)
     }
   }, [projectId])
 
@@ -92,31 +123,81 @@ export function AnalyzingPage() {
         {/* Decorative left accent */}
         <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-indigo-400 to-violet-600 rounded-l-2xl" />
 
-        <h2 className="text-xl font-semibold text-gray-900">Analyzing Scope</h2>
-        <p className="mt-1.5 text-sm text-gray-500">
-          Please wait while our AI analyzes the impact…
-        </p>
+        {!analysisStarted ? (
+          <>
+            <h2 className="text-xl font-semibold text-gray-900">Ready to Analyze</h2>
+            <p className="mt-1.5 text-sm text-gray-500">
+              Review project details before starting analysis
+            </p>
 
-        {/* Brain icon */}
-        <div className="mx-auto my-8 h-28 w-28">
-          <BrainIcon />
-        </div>
+            {/* Project Details */}
+            {project && (
+              <div className="mt-6 rounded-xl bg-gray-50 p-4 text-left">
+                <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                  {project.description || 'No description provided'}
+                </p>
+                <div className="mt-3 flex gap-2 text-xs text-gray-400">
+                  <span>{project.type}</span>
+                  {project.deadline && (
+                    <span>• Due {new Date(project.deadline).toLocaleDateString()}</span>
+                  )}
+                </div>
+              </div>
+            )}
 
-        {/* Progress bar */}
-        <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500 ease-out"
-            style={{ width: `${Math.min(100, progress)}%` }}
-          />
-        </div>
+            {/* Countdown Timer */}
+            <div className="mt-6">
+              <p className="text-sm text-gray-500">
+                Auto-analyzing in <span className="font-semibold text-indigo-600">{countdown}s</span>
+              </p>
+            </div>
 
-        {/* Status line */}
-        <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
-          <span className="truncate">{MESSAGES[msgIndex]}</span>
-          <span className="ml-3 shrink-0 font-medium text-indigo-500">
-            {Math.round(Math.min(100, progress))}%
-          </span>
-        </div>
+            {/* Action Buttons */}
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={handleCancel}
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={startAnalysis}
+                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700"
+              >
+                Analyze Now
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-xl font-semibold text-gray-900">Analyzing Scope</h2>
+            <p className="mt-1.5 text-sm text-gray-500">
+              Please wait while our AI analyzes the impact…
+            </p>
+
+            {/* Brain icon */}
+            <div className="mx-auto my-8 h-28 w-28">
+              <BrainIcon />
+            </div>
+
+            {/* Progress bar */}
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500 ease-out"
+                style={{ width: `${Math.min(100, progress)}%` }}
+              />
+            </div>
+
+            {/* Status line */}
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+              <span className="truncate">{MESSAGES[msgIndex]}</span>
+              <span className="ml-3 shrink-0 font-medium text-indigo-500">
+                {Math.round(Math.min(100, progress))}%
+              </span>
+            </div>
+          </>
+        )}
 
       </div>
     </div>

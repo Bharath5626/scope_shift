@@ -21,6 +21,7 @@ export interface Project {
   updatedAt: string
 
   createdBy: {
+    id: string
     name: string
   }
 }

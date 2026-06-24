@@ -3,6 +3,7 @@ import { ProjectCard } from '../components/cards/ProjectCard'
 import { StatsCard } from '../components/cards/StatsCard'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { useProjects } from '../context/ProjectContext'
+import { useDashboard } from '../context/DashboardContext'
 
 function FolderIcon() {
   return (
@@ -11,11 +12,15 @@ function FolderIcon() {
     </svg>
   )
 }
-function getDaysLeft(deadline: string) {
+function getDaysLeft(deadline: string | Date, startDate?: string | Date | null) {
   const today = new Date()
   const dueDate = new Date(deadline)
 
-  const diffTime = dueDate.getTime() - today.getTime()
+  // If project has started, calculate from today
+  // If project hasn't started, calculate from start date
+  const baseDate = startDate && new Date(startDate) > today ? new Date(startDate) : today
+
+  const diffTime = dueDate.getTime() - baseDate.getTime()
 
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 }
@@ -55,39 +60,31 @@ function RiskIcon() {
 export function DashboardPage() {
   
   const { projects } = useProjects()
-  const upcomingProjects = [...projects]
+  const { dashboardStats } = useDashboard()
+  const upcomingProjects = dashboardStats?.upcomingDeadlines ?? [...projects]
   .filter((p) => p.deadline && p.status !== "completed")
   .sort(
     (a, b) =>
       new Date(a.deadline!).getTime() -
       new Date(b.deadline!).getTime()
-      
+
   )
   .slice(0, 3)
-  const totalProjects = projects.length
-  const activeProjects = projects.filter((p) => p.status === 'active').length
-  const draftProjects = projects.filter((p) => p.status === 'draft').length
-  const riskStats = {
-  low: 0,
-  medium: 0,
-  high: 0,
-  critical: 0,
-}
+  const totalProjects = dashboardStats?.stats.totalProjects ?? projects.length
+  const activeProjects = dashboardStats?.stats.activeProjects ?? projects.filter((p) => p.status === 'active').length
+  const draftProjects = dashboardStats?.stats.draftProjects ?? projects.filter((p) => p.status === 'draft').length
   const completedProjects = projects.filter(
   (p) => p.status === "completed"
-).length;
-const atRiskProjects = projects.filter(
-  (p) => p.status === "at_risk"
 ).length
-const sortedProjects = [...projects]
+  const atRiskProjects = dashboardStats?.stats.atRiskProjects ?? projects.filter(
+    (p) => p.status === "at_risk"
+  ).length
+const sortedProjects = dashboardStats?.recentProjects ?? [...projects]
   .sort(
     (a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
   .slice(0, 3) // Only keep the latest 3 projects
-  console.log(
-  projects.filter((p) => p.deadline !== null)
-)
   return (
     <DashboardLayout
       title="Dashboard"
@@ -158,143 +155,142 @@ label="Completed Projects"
         )}
       </section>
      <section className="mt-8">
-  <div className="mb-6 flex items-center justify-between">
-    <h2 className="text-lg font-semibold text-gray-900">
-      Scope Health Analytics
-    </h2>
-
-    <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-      AI Insights
-    </span>
-  </div>
+  <h2 className="mb-6 text-lg font-semibold text-gray-900">
+    Scope Health Analytics
+  </h2>
 
   <div className="grid gap-6 lg:grid-cols-2">
     {/* Health Score */}
-    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Scope Health Score</h3>
-
-          <span className="rounded-full bg-white/20 px-3 py-1 text-xs">
-            Healthy
-          </span>
-        </div>
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="font-semibold text-gray-900">Scope Health Score</h3>
+        <span className={`rounded-full px-3 py-1 text-xs font-medium ${
+          (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
+            ? 'bg-green-100 text-green-700'
+            : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
+            ? 'bg-yellow-100 text-yellow-700'
+            : 'bg-red-100 text-red-700'
+        }`}>
+          {(dashboardStats?.scopeHealth.healthScore ?? 78) >= 70 ? 'Healthy' : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40 ? 'Warning' : 'Critical'}
+        </span>
       </div>
 
-      <div className="p-8">
-        <div className="flex justify-center">
-          <div className="relative">
-            <div className="flex h-44 w-44 items-center justify-center rounded-full border-[16px] border-indigo-100">
-              <div className="text-center">
-                <p className="text-5xl font-bold text-gray-900">78%</p>
-                <p className="mt-2 text-sm text-gray-500">
-                  Scope Stability
-                </p>
-              </div>
-            </div>
-
-            <div className="absolute -right-1 top-3 h-4 w-4 animate-pulse rounded-full bg-green-500" />
-          </div>
+      <div className="flex items-center gap-6">
+        <div className="relative flex h-32 w-32 items-center justify-center">
+          <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+            <path
+              className="text-gray-100"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+            />
+            <path
+              className={`transition-all duration-500 ${
+                (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
+                  ? 'text-green-500'
+                  : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
+                  ? 'text-yellow-500'
+                  : 'text-red-500'
+              }`}
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeDasharray={`${dashboardStats?.scopeHealth.healthScore ?? 78}, 100`}
+            />
+          </svg>
+          <span className="absolute text-2xl font-bold text-gray-900">{dashboardStats?.scopeHealth.healthScore ?? 78}%</span>
         </div>
 
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+        <div className="flex-1 space-y-3">
           <div>
-            <p className="text-2xl font-bold text-gray-900">12</p>
-            <p className="text-xs text-gray-500">Analyses</p>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-500">Analyses</span>
+              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.totalAnalyses ?? 0}</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full rounded-full bg-indigo-500" style={{ width: '100%' }} />
+            </div>
           </div>
-
           <div>
-            <p className="text-2xl font-bold text-gray-900">3</p>
-            <p className="text-xs text-gray-500">Warnings</p>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-500">Warnings</span>
+              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.warnings ?? 0}</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full rounded-full bg-orange-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.warnings / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
+            </div>
           </div>
-
           <div>
-            <p className="text-2xl font-bold text-gray-900">8</p>
-            <p className="text-xs text-gray-500">Healthy</p>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-500">Healthy</span>
+              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.healthy ?? 0}</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+              <div className="h-full rounded-full bg-green-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.healthy / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     {/* Risk Distribution */}
-    <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-md">
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-6 text-white">
-        <h3 className="font-semibold">Risk Distribution</h3>
-      </div>
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      <h3 className="mb-4 font-semibold text-gray-900">Risk Distribution</h3>
 
-<div className="grid gap-4">
+{!dashboardStats || dashboardStats.riskDistribution.total === 0 ? (
+  <div className="flex h-40 items-center justify-center">
+    <p className="text-sm text-gray-500">
+      No analysis data available. Run scope analysis on your projects to see risk distribution.
+    </p>
+  </div>
+) : (
+<div className="space-y-3">
   {[
     {
       label: 'Low',
-      value: 12,
-      percentage: 60,
-      color: 'from-green-400 to-green-600',
-      // bg: 'bg-green-50',
-      text: 'text-green-700',
+      value: dashboardStats.riskDistribution.low,
+      percentage: Math.round((dashboardStats.riskDistribution.low / dashboardStats.riskDistribution.total) * 100),
+      color: 'bg-green-500',
     },
     {
       label: 'Medium',
-      value: 5,
-      percentage: 25,
-      color: 'from-yellow-400 to-yellow-500',
-      // bg: 'bg-yellow-50',
-      text: 'text-yellow-700',
+      value: dashboardStats.riskDistribution.medium,
+      percentage: Math.round((dashboardStats.riskDistribution.medium / dashboardStats.riskDistribution.total) * 100),
+      color: 'bg-yellow-500',
     },
     {
       label: 'High',
-      value: 2,
-      percentage: 10,
-      color: 'from-orange-400 to-orange-600',
-      // bg: 'bg-orange-50',
-      text: 'text-orange-700',
+      value: dashboardStats.riskDistribution.high,
+      percentage: Math.round((dashboardStats.riskDistribution.high / dashboardStats.riskDistribution.total) * 100),
+      color: 'bg-orange-500',
     },
     {
       label: 'Critical',
-      value: 1,
-      percentage: 5,
-      color: 'from-red-500 to-red-700',
-      // bg: 'bg-red-50',
-      text: 'text-red-700',
+      value: dashboardStats.riskDistribution.critical,
+      percentage: Math.round((dashboardStats.riskDistribution.critical / dashboardStats.riskDistribution.total) * 100),
+      color: 'bg-red-500',
     },
   ].map((risk) => (
-    <div
-      key={risk.label}
-      className={`rounded-2xl border border-gray-100 p-4 ${risk}`}
-    >
-      <div className="mb-3 flex items-center justify-between">
-        <div>
-          <p className={`font-semibold ${risk.text}`}>
-            {risk.label} Risk
-          </p>
-
-          <p className="text-xs text-gray-500">
-            {risk.percentage}% of projects
-          </p>
+    <div key={risk.label} className="flex items-center gap-3">
+      <div className="flex-1">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">{risk.label} Risk</span>
+          <span className="text-sm font-semibold text-gray-900">{risk.value}</span>
         </div>
-
-        <div className="text-right">
-          <p className="text-2xl font-bold text-gray-900">
-            {risk.value}
-          </p>
+        <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${risk.color}`}
+            style={{ width: `${risk.percentage}%` }}
+          />
         </div>
       </div>
-
-      <div className="relative h-3 overflow-hidden rounded-full bg-white/80">
-        <div
-          className={`h-full rounded-full bg-gradient-to-r ${risk.color} shadow-lg transition-all duration-1000`}
-          style={{ width: `${risk.percentage}%` }}
-        />
-
-        <div
-          className="absolute top-0 h-full w-8 animate-pulse bg-white/30 blur-sm"
-          style={{
-            left: `calc(${risk.percentage}% - 1rem)`,
-          }}
-        />
-      </div>
+      <span className="text-xs text-gray-500 w-12 text-right">{risk.percentage}%</span>
     </div>
   ))}
 </div>
+)}
     </div>
   </div>
 </section>
@@ -321,7 +317,8 @@ label="Completed Projects"
     ) : (
       <div className="space-y-4">
         {upcomingProjects.map((project) => {
-          const daysLeft = getDaysLeft(project.deadline!)
+          const daysLeft = getDaysLeft(project.deadline!, project.startDate)
+          const hasStarted = project.startDate ? new Date(project.startDate) <= new Date() : true
 
           return (
             <div
@@ -339,16 +336,23 @@ label="Completed Projects"
                 </p>
               </div>
 
-              <div
-                className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  daysLeft <= 3
-                    ? "bg-red-100 text-red-700"
-                    : daysLeft <= 7
+              <div className="flex items-center gap-2">
+                {!hasStarted && project.startDate && (
+                  <span className="text-xs text-gray-500">
+                    Starts {new Date(project.startDate).toLocaleDateString()}
+                  </span>
+                )}
+                <div
+                  className={`rounded-full px-3 py-1 text-xs font-medium ${
+                    daysLeft <= 3
+                      ? "bg-red-100 text-red-700"
+                      : daysLeft <= 7
                     ? "bg-yellow-100 text-yellow-700"
                     : "bg-green-100 text-green-700"
                 }`}
               >
                 {daysLeft} days left
+              </div>
               </div>
             </div>
           )

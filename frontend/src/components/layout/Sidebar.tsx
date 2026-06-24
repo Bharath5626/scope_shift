@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { NavLink, useLocation } from 'react-router-dom'
 import { NAV_ITEMS } from '../../utils/constants'
 import { useAuth } from '../../context/AuthContext'
@@ -179,8 +180,8 @@ export function Sidebar() {
 )}
 
       {/* Logout Confirmation Modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      {showLogoutConfirm && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
           <div className="rounded-2xl bg-white p-6 shadow-xl max-w-sm w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900">Sign out</h3>
             <p className="mt-2 text-sm text-gray-500">Are you sure you want to sign out?</p>
@@ -199,7 +200,8 @@ export function Sidebar() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </aside>
   )

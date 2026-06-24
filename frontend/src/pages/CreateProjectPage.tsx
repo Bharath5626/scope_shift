@@ -124,13 +124,6 @@ export function CreateProjectPage() {
   const [error, setError] = useState('')
   const [showOptional, setShowOptional] = useState(false)
 const handleCreate = async () => {
-  const payload = {
-  name,
-  description,
-  type: TYPE_MAP[projectType] ?? "saas",
-  startDate,
-  deadline,
-}
 
 
 if (

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
+import { useAuth } from '../context/AuthContext'
 import { PROJECT_STATUS_LABELS, PROJECT_TYPE_LABELS } from '../utils/constants'
-import { formatRelativeDate } from '../utils/formatters'
 import type { Project, ProjectStatus, ProjectType } from '../types'
 
 const ALL = 'all'
@@ -82,6 +82,7 @@ function ProjectCard({
   onDeleteClick: (project: Project) => void
 }) {
   const { setActiveProjectId } = useProjects()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   const handleOpen = () => {
@@ -89,15 +90,28 @@ function ProjectCard({
     navigate(`/scope-builder?project=${project.id}`)
   }
 
+  const createdBy = user?.id === project.createdBy.id ? 'you' : project.createdBy.name
+
   return (
     <div className="group relative flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
 
       {/* Delete button — appears on hover */}
       <button
-        onClick={(e) => { e.stopPropagation(); onDeleteClick(project) }}
-        title="Delete project"
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-lg text-gray-300 opacity-0 transition-all duration-150 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100"
-      >
+  onClick={(e) => {
+    e.stopPropagation()
+    onDeleteClick(project)
+  }}
+  title="Delete project"
+  className="
+  absolute right-3 top-3 z-10
+  flex h-8 w-8 items-center justify-center
+  rounded-lg text-gray-300
+  opacity-0 transition-all duration-150
+  hover:bg-red-50 hover:text-red-500
+  group-hover:opacity-100
+  cursor-pointer
+"
+>
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
@@ -105,7 +119,7 @@ function ProjectCard({
 
       {/* Clickable card body */}
       <button onClick={handleOpen} className="w-full p-6 text-left flex-1">
-        <div className="flex items-start justify-between gap-4 pr-4">
+        <div className="flex items-start justify-between gap-4 pr-10">
           <div className="min-w-0 flex-1">
             <h3 className="truncate text-base font-semibold text-gray-900 transition group-hover:text-indigo-600">
               {project.name}
@@ -131,7 +145,7 @@ function ProjectCard({
     year: "numeric",
   })}
   {" • By "}
-  {project.createdBy.name}
+  {createdBy}
 </span>
         </div>
       </button>

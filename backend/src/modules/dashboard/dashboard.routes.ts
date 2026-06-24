@@ -8,4 +8,9 @@ router.get(
   controller.getDashboard
 );
 
+router.get(
+  "/stats/overall",
+  controller.getOverallDashboardStats
+);
+
 export default router;

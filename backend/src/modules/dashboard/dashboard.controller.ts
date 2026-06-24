@@ -14,3 +14,15 @@ export const getDashboard = async (
     data,
   });
 };
+
+export const getOverallDashboardStats = async (
+  req: Request,
+  res: Response
+) => {
+  const data = await service.getOverallDashboardStats();
+
+  res.json({
+    success: true,
+    data,
+  });
+};

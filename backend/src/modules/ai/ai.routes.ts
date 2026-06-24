@@ -30,7 +30,19 @@ router.post(
     const { analyzeProjectScope } = await import("./ai.service");
     const { createAnalysis } = await import("../analysis/analysis.service");
 
-    const projectInfo = { name: project.name, description: project.description, type: project.type };
+    // Use all project details from database for analysis
+    const projectInfo = {
+      name: project.name,
+      description: project.description,
+      type: project.type,
+      techStack: project.techStack ?? undefined,
+      teamSize: project.teamSize ? String(project.teamSize) : undefined,
+      methodology: project.methodology ?? undefined,
+      startDate: project.startDate ? project.startDate.toISOString().split('T')[0] : undefined,
+      deadline: project.deadline ? project.deadline.toISOString().split('T')[0] : undefined,
+      workingHours: project.workingHours ? String(project.workingHours) : undefined,
+      projectType: project.projectType ?? undefined,
+    };
 
     const result = newFeatures.length > 0
       ? await analyzeProjectScope(projectInfo, originalFeatures, newFeatures)
@@ -59,18 +71,19 @@ router.post(
       return res.status(404).json({ success: false, message: "Project not found" });
     }
 
-    const { techStack, teamSize, methodology, experienceLevel, deadline, workingHours } = req.body;
-
+    // Use all project details from database
     const suggestions = await generateProjectFeatures({
       name: project.name,
       description: project.description ?? undefined,
       type: project.type,
-      techStack,
-      teamSize,
-      methodology,
-      experienceLevel,
-      deadline,
-      workingHours,
+      techStack: project.techStack ?? undefined,
+      teamSize: project.teamSize ? String(project.teamSize) : undefined,
+      methodology: project.methodology ?? undefined,
+      experienceLevel: undefined, // Not stored in DB
+      deadline: project.deadline ? project.deadline.toISOString().split('T')[0] : undefined,
+      workingHours: project.workingHours ? String(project.workingHours) : undefined,
+      startDate: project.startDate ? project.startDate.toISOString().split('T')[0] : undefined,
+      projectType: project.projectType ?? undefined,
     });
 
     const existingCount = await prisma.feature.count({ where: { projectId } });
