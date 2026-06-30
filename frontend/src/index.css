@@ -3,16 +3,13 @@
 @theme {
   --color-primary: #4f46e5;
   --color-primary-hover: #4338ca;
-  /* --color-bg: #f8fafc; */
-  /* --color-card: #ffffff; */
   --color-border: #e5e7eb;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
-  /* --color-text-primary: #0f172a; */
-  /* --color-text-secondary: #64748b; */
   --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
   --radius-card: 14px;
+  --color-mode: class;
 }
 
 * {
@@ -29,33 +26,76 @@ body {
     'Segoe UI',
     Roboto,
     sans-serif;
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100vh;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-body {
-  @apply bg-gray-50 text-gray-800;
+/* Global dark mode overrides for class-based dark mode */
+.dark body {
+  background-color: #111827;
+  color: #f3f4f6;
 }
 
-/* Card style */
-.card {
-  @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+.dark .bg-white {
+  background-color: #1f2937;
 }
 
-/* Primary button */
-.btn-primary {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700 transition;
+.dark .bg-gray-50 {
+  background-color: #111827;
 }
 
-/* Secondary button */
-.btn-secondary {
-  @apply border border-gray-200 bg-white hover:bg-gray-100;
+.dark .bg-gray-100 {
+  background-color: #374151;
+}
+
+.dark .text-gray-900 {
+  color: #f3f4f6;
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+.dark .text-gray-400 {
+  color: #9ca3af;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }

@@ -1,5 +1,25 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { GoogleGenAI } from "@google/genai";
+import {
+  calculateCapacityMetricsNew,
+  deriveConfidence,
+} from "./scope-calculations";
+import {
+  safeParseJson,
+  validateFeatureEstimateResponse,
+  withTimeout,
+  withRetry,
+  AIValidationError,
+  AITimeoutError,
+  AIRateLimitError,
+  AIResponseError,
+  handleAIError,
+  logAIError,
+  logAISuccess,
+  createAIFallbackResponse,
+  type GeminiScopeResponse,
+  type FeatureEstimate,
+} from "./ai-utils";
 
 export type GeneratedFeature = {
   title: string;
@@ -201,11 +221,63 @@ const FALLBACK_FEATURES: Record<string, GeneratedFeature[]> = {
   ],
 };
 
+/**
+ * Calculate working days between two dates, excluding weekends.
+ * Includes both start and end dates.
+ * Returns at least 1 day when startDate === deadline (if weekday).
+ * Throws error if deadline < startDate.
+ * Throws error if same-day project falls on weekend (no working days available).
+ */
+export function calculateWorkingDays(startDate: Date, endDate: Date): number {
+  if (endDate < startDate) {
+    throw new Error("Deadline must be on or after start date");
+  }
+
+  // If same day, return 1 (inclusive) for weekday, reject for weekend
+  if (startDate.getTime() === endDate.getTime()) {
+    const dayOfWeek = startDate.getDay();
+    // If it's a weekend (0=Sunday, 6=Saturday), reject as invalid
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      throw new Error("Same-day project cannot be scheduled on a weekend");
+    }
+    return 1;
+  }
+
+  let workingDays = 0;
+  let currentDate = new Date(startDate);
+  const endDateCopy = new Date(endDate);
+
+  // Include both start and end dates
+  while (currentDate <= endDateCopy) {
+    const dayOfWeek = currentDate.getDay();
+    // 0 = Sunday, 6 = Saturday
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      workingDays++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // If no working days found (e.g., entire range is weekends), reject
+  if (workingDays === 0) {
+    throw new Error("Project range must include at least one working day");
+  }
+
+  return workingDays;
+}
+
 export type ScopeAnalysisResult = {
   scopeScore: number;
   estimatedHours: number;
+  availableHours: number;
+  effectiveAvailableHours: number;
   estimatedWeeks: number;
+  deadlineFeasible: boolean;
+  capacityUtilization: number;
+  capacityBuffer: number;
+  capacityBufferPercent: number;
+  confidence: number;
   riskLevel: "Low" | "Medium" | "High";
+  projectHealth: "Healthy" | "Manageable" | "Tight" | "At Risk";
   effortBreakdown: {
     development: number;
     testing: number;
@@ -314,8 +386,16 @@ const computeFallbackAnalysis = (
   return {
     scopeScore,
     estimatedHours: totalHours,
+    availableHours: 0,
+    effectiveAvailableHours: 0,
     estimatedWeeks: weeks,
+    deadlineFeasible: true,
+    capacityUtilization: 0,
+    capacityBuffer: 0,
+    capacityBufferPercent: 0,
+    confidence: 60,
     riskLevel,
+    projectHealth: "Healthy",
     effortBreakdown: {
       development: devHours,
       testing: testHours,
@@ -344,217 +424,371 @@ project: {
 ): Promise<ScopeAnalysisResult> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (apiKey && features.length > 0) {
-    try {
-      const client = new GoogleGenAI({ apiKey });
-      const featureList = features
-        .map(
-          (f) =>
-            `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? `: ${f.description}` : ""}`,
-        )
-        .join("\n");
-
-      const prompt = `You are a Principal Software Engineering Manager and Estimation Lead responsible for delivering realistic project timelines used for client commitments and sprint planning.
-
-      You must produce disciplined, conservative engineering estimates based on the provided scope. Avoid optimism bias.
-
-      ---
-
-      ## Project Context
-      - Name: ${project.name}
-      - Description: ${project.description || "Not provided"}
-      - Type: ${project.type}
-      - Project Type: ${project.projectType || "Not specified"}
-      - Tech Stack: ${project.techStack || "Not specified"}
-      - Team Size: ${project.teamSize || "Not specified"}
-      - Methodology: ${project.methodology || "Not specified"}
-      - Start Date: ${project.startDate || "Not specified"}
-      - Deadline: ${project.deadline || "Not specified"}
-      - Working Hours: ${project.workingHours || "Not specified"}
-
-      ## Feature Set
-      You are estimating effort for the following features (${features.length} total):
-
-      ${featureList}
-
-      ---
-
-      ## Estimation Rules (CRITICAL)
-
-      You must treat each feature as a production-grade requirement unless explicitly trivial.
-
-      Follow this estimation approach:
-
-      ---
-
-      ### 1. Feature Effort Estimation
-      Assign each feature an internal complexity weight:
-
-      - Simple: 8–16 hours
-      - Medium: 16–40 hours
-      - Complex: 40–80 hours
-      - Very Complex: 80–160 hours
-
-      ---
-
-      ### 2. Mandatory Overhead Application
-      After summing all feature efforts, apply:
-
-      - Integration overhead: +15–25%
-      - Testing & QA: +20–30%
-      - Coordination / planning: +10–15%
-      - Rework buffer: +10–20%
-
-      These must be included in final estimatedHours.
-
-      ---
-
-      ### 3. TEAM-BASED CALENDAR MODEL (CRITICAL)
-
-      You MUST use the provided implicit team context.
-
-      If team size is NOT explicitly provided, assume:
-      - Default team size = 3 developers
-
-      Rules:
-
-      - 1 developer = 35 productive hours/week
-      - Total team capacity = teamSize × 35 hours/week
-      - Work is parallelized BUT NOT perfectly
-
-      Parallel efficiency rules:
-      - Small dependencies → 75% efficiency
-      - Medium complexity systems → 65% efficiency
-      - High integration systems → 50–60% efficiency
-
-      FINAL RULE:
-      - estimatedWeeks = ceil( estimatedHours / (teamSize × 35 × efficiency) )
-
-      You MUST NOT default to single-developer timeline.
-
-      ---
-
-      ### 4. Critical Path Rule
-      Identify that not all work is parallel.
-
-      At least 30–50% of work is sequential due to:
-      - backend dependencies
-      - API contracts
-      - shared components
-      - integration/testing bottlenecks
-
-      This must influence timeline, not just hours.
-
-      ---
-
-      ### 5. Complexity Scoring Rules
-      - Must scale proportionally with estimatedHours + integration complexity
-      - Do NOT inflate scopeScore arbitrarily
-      - Higher integration → higher complexity score
-
-      ---
-
-      ## Output Constraints (STRICT)
-
-      Return ONLY valid JSON. No markdown, no commentary.
-
-      ---
-
-      ## Output Schema
-
-      {
-        "scopeScore": <integer 20–95>,
-        "estimatedHours": <integer>,
-        "estimatedWeeks": <integer>,
-        "riskLevel": "Low" | "Medium" | "High",
-
-        "effortBreakdown": {
-          "development": <integer>,
-          "testing": <integer>,
-          "integration": <integer>,
-          "documentation": <integer>
-        },
-
-        "complexity": {
-          "level": "Low" | "Medium" | "High",
-          "score": <integer 10–95>
-        },
-
-        "riskFactors": [
-          "<4 specific risks tied to architecture, dependencies, or system scaling>"
-        ],
-
-        "recommendations": [
-          "<4 actionable engineering strategies to reduce timeline or risk>"
-        ]
-      }
-
-      ---
-
-      ## Validation Rules (must satisfy internally before responding)
-
-      - estimatedHours MUST equal sum of effortBreakdown values ±5%
-      - estimatedWeeks MUST be computed using team-based formula above
-      - riskLevel must match complexity.score:
-        - 10–40 = Low
-        - 41–70 = Medium
-        - 71–95 = High
-      - riskFactors must be feature-specific (no generic risks)
-      - recommendations must be execution-level actions, not advice
-
-      ---
-
-      ## Final Instruction
-
-      Be conservative.
-      Prefer overestimation in ambiguity.
-      Always assume real-world engineering constraints and partial parallelization limits.`;
-
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json", temperature: 0.2 },
-      });
-
-      const text = (response.text ?? "")
-        .trim()
-        .replace(/^```(?:json)?/i, "")
-        .replace(/```$/i, "")
-        .trim();
-      const parsed = JSON.parse(text);
-
-      return {
-        scopeScore: Number(parsed.scopeScore) || 60,
-        estimatedHours: Number(parsed.estimatedHours) || 80,
-        estimatedWeeks: Number(parsed.estimatedWeeks) || 2,
-        riskLevel: (["Low", "Medium", "High"].includes(parsed.riskLevel)
-          ? parsed.riskLevel
-          : "Medium") as "Low" | "Medium" | "High",
-        effortBreakdown: {
-          development: Number(parsed.effortBreakdown?.development) || 48,
-          testing: Number(parsed.effortBreakdown?.testing) || 16,
-          integration: Number(parsed.effortBreakdown?.integration) || 10,
-          documentation: Number(parsed.effortBreakdown?.documentation) || 6,
-        },
-        complexity: {
-          level: (["Low", "Medium", "High"].includes(parsed.complexity?.level)
-            ? parsed.complexity.level
-            : "Medium") as "Low" | "Medium" | "High",
-          score: Number(parsed.complexity?.score) || 60,
-        },
-        riskFactors: Array.isArray(parsed.riskFactors)
-          ? parsed.riskFactors.slice(0, 4).map(String)
-          : [],
-        recommendations: Array.isArray(parsed.recommendations)
-          ? parsed.recommendations.slice(0, 4).map(String)
-          : [],
-      };
-    } catch (err) {
-      console.error("Gemini scope analysis failed, using fallback:", err);
-    }
+  if (!apiKey) {
+    throw new Error("AI service is not configured. Please contact support.");
   }
 
-  return computeFallbackAnalysis(features);
+  if (features.length === 0) {
+    throw new Error("No features to analyze. Please add features first.");
+  }
+
+  try {
+    const client = new GoogleGenAI({ apiKey });
+    const featureList = features
+      .map(
+        (f) =>
+          `- ${f.title} [${f.category}, ${f.priority} priority]${f.description ? `: ${f.description}` : ""}`,
+      )
+      .join("\n");
+
+    const prompt = `You are a Principal Software Engineering Manager and Estimation Lead responsible for delivering realistic engineering effort estimates.
+
+Your responsibility is to analyze the COMPLETE project context and feature scope to estimate engineering effort, complexity, risks, and provide recommendations.
+
+You MUST use ALL provided project inputs when estimating effort, complexity, and risks.
+
+Do NOT estimate based only on feature count.
+
+You must consider:
+
+- Business requirements
+- Project domain
+- Technical complexity
+- Development methodology
+- Working hours available
+- Technology stack limitations
+- Generated feature scope
+
+The final analysis must reflect both PROJECT CONTEXT and FEATURE COMPLEXITY.
+
+---
+
+## IMPORTANT: YOUR RESPONSIBILITIES
+
+You are NOT responsible for project timeline calculations.
+
+You are NOT responsible for estimated weeks.
+
+You are NOT responsible for team capacity calculations.
+
+You are NOT responsible for delivery forecasting.
+
+You are ONLY responsible for:
+
+1. Estimating complexity of individual features
+2. Estimating development effort of individual features
+3. Identifying technical risks
+4. Providing engineering recommendations
+
+The backend system will calculate all project-level metrics including:
+- Total project hours (sum of feature estimates)
+- Estimated weeks (based on team capacity)
+- Risk level (based on capacity utilization)
+- Scope score (based on feature complexity)
+- Effort breakdown (derived from feature estimates)
+- Project health, confidence, and utilization
+
+DO NOT provide project-level estimates. Focus ONLY on feature-level engineering judgment.
+
+---
+
+## Project Context
+
+### Core Project Information
+
+- Name: ${project.name}
+- Description: ${project.description || "Not provided"}
+- Type: ${project.type}
+- Project Type: ${project.projectType || "Not specified"}
+
+### Team & Delivery Constraints
+
+- Team Size: ${project.teamSize || "Not specified"}
+- Methodology: ${project.methodology || "Not specified"}
+- Start Date: ${project.startDate || "Not specified"}
+- Deadline: ${project.deadline || "Not specified"}
+- Working Hours Per Day: ${project.workingHours || "Not specified"}
+
+### Technical Context
+
+- Tech Stack: ${project.techStack || "Not specified"}
+
+---
+
+## Generated Feature Scope
+
+Total Features: ${features.length}
+
+${featureList}
+
+---
+
+## IMPORTANT ANALYSIS REQUIREMENTS
+
+You MUST consider:
+
+### Project Description
+Use the project description to understand:
+- business domain
+- user workflows
+- external integrations
+- data complexity
+
+### Tech Stack
+Use the tech stack to evaluate:
+- implementation complexity
+- integration effort
+- deployment effort
+- testing effort
+
+### Team Size
+Use team size to understand parallel development capabilities.
+
+### Methodology
+Adjust effort estimates based on delivery model:
+
+- Agile → sprint overhead + iterative delivery
+- Scrum → planning/review overhead
+- Kanban → reduced planning overhead
+- Waterfall → higher upfront design effort
+
+### Working Hours
+Use working hours to understand daily throughput capacity.
+
+### Start Date and Deadline
+Use these to understand timeline pressure.
+
+If timeline appears tight:
+- increase complexity estimates
+- include timeline-related risk factors
+
+### Generated Features
+Analyze:
+- feature count
+- feature dependencies
+- integration points
+- workflow complexity
+- priority distribution
+
+Do NOT estimate purely from number of features.
+Consider actual implementation complexity.
+
+---
+
+## Output Constraints (STRICT)
+
+Return ONLY valid JSON. No markdown, no commentary.
+
+---
+
+## Output Schema
+
+{
+  "featureEstimates": [
+    {
+      "feature": "<exact feature title from the list above>",
+      "complexity": "Simple" | "Medium" | "Complex" | "Very Complex",
+      "estimatedHours": <integer hours for this specific feature>
+    }
+  ],
+  "riskFactors": [
+    "<4 specific risks tied to architecture, dependencies, or system scaling>"
+  ],
+  "recommendations": [
+    "<4 actionable engineering strategies to reduce timeline or risk>"
+  ]
+}
+
+---
+
+## Validation Rules (must satisfy internally before responding)
+
+- You MUST provide an estimate for EVERY feature in the list above
+- Use the EXACT feature title from the provided list
+- estimatedHours should be realistic for a single feature (typically 4-80 hours)
+- complexity should reflect implementation difficulty
+- riskFactors must be feature-specific (no generic risks)
+- recommendations must be execution-level actions, not advice
+- DO NOT include any project-level metrics (total hours, weeks, risk level, etc.)`;
+
+    const response = await withRetry(
+      () => withTimeout(
+        client.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: { responseMimeType: "application/json", temperature: 0.2 },
+        }),
+        30000 // 30 second timeout
+      ),
+      {
+        maxRetries: 3,
+        retryableErrors: ['timeout', '429', '500', '503', 'ECONNRESET', 'ETIMEDOUT'],
+        delays: [1000, 2000],
+      }
+    );
+
+    const text = response.text ?? "";
+    
+    // Use safe JSON parsing
+    const parseResult = safeParseJson(text);
+    if (!parseResult.success) {
+      logAIError({
+        operation: 'analyzeProjectScope',
+        errorType: 'ParseError',
+        errorMessage: parseResult.error,
+        timestamp: new Date().toISOString(),
+      });
+      throw new AIResponseError('Failed to parse AI response', new Error(parseResult.error));
+    }
+
+    // Validate response structure
+    const validationResult = validateFeatureEstimateResponse(parseResult.data, features.length);
+    if (!validationResult.valid) {
+      logAIError({
+        operation: 'analyzeProjectScope',
+        errorType: 'ValidationError',
+        errorMessage: 'AI response validation failed',
+        validationErrors: validationResult.errors,
+        timestamp: new Date().toISOString(),
+      });
+      throw new AIValidationError('AI returned invalid data', validationResult.errors);
+    }
+
+    const parsed = parseResult.data as GeminiScopeResponse;
+
+    // Validate inputs
+    const teamSize = Number(project.teamSize);
+    if (!teamSize || teamSize <= 0) {
+      throw new Error("Team size must be a positive number");
+    }
+
+    const workingHoursPerDay = Number(project.workingHours) || 8; // Default to 8 hours if not set
+    if (workingHoursPerDay <= 0) {
+      throw new Error("Working hours per day must be a positive number");
+    }
+
+    const startDate = project.startDate ? new Date(project.startDate) : null;
+    const deadline = project.deadline ? new Date(project.deadline) : null;
+
+    // Validate dates
+    if (!startDate || isNaN(startDate.getTime())) {
+      throw new Error("Start date is required for analysis");
+    }
+
+    if (!deadline || isNaN(deadline.getTime())) {
+      throw new Error("Deadline is required for analysis");
+    }
+
+    // Use new capacity calculation engine (deterministic, no AI involvement)
+    const capacityMetrics = calculateCapacityMetricsNew({
+      teamSize,
+      workingHoursPerDay,
+      startDate,
+      deadline,
+      featureEstimates: parsed.featureEstimates,
+    });
+
+    // Derive complexity from total estimated hours (deterministic)
+    let complexityLevel: "Low" | "Medium" | "High";
+    let complexityScore: number;
+    if (capacityMetrics.estimatedHours < 100) {
+      complexityLevel = "Low";
+      complexityScore = 30;
+    } else if (capacityMetrics.estimatedHours <= 300) {
+      complexityLevel = "Medium";
+      complexityScore = 55;
+    } else {
+      complexityLevel = "High";
+      complexityScore = 80;
+    }
+
+    // Derive risk level from capacity utilization (deterministic)
+    let riskLevel: "Low" | "Medium" | "High";
+    if (capacityMetrics.capacityUtilization < 70) {
+      riskLevel = "Low";
+    } else if (capacityMetrics.capacityUtilization <= 90) {
+      riskLevel = "Medium";
+    } else {
+      riskLevel = "High";
+    }
+
+    // Derive confidence using pure function
+    const riskFactorCount = Array.isArray(parsed.riskFactors) ? parsed.riskFactors.length : 0;
+    const confidence = deriveConfidence({
+      complexityScore,
+      riskFactorCount,
+    });
+
+    // Derive project health from buffer percent
+    let projectHealth: "Healthy" | "Manageable" | "Tight" | "At Risk";
+    if (capacityMetrics.bufferPercent > 20) {
+      projectHealth = "Healthy";
+    } else if (capacityMetrics.bufferPercent >= 10) {
+      projectHealth = "Manageable";
+    } else if (capacityMetrics.bufferPercent >= 0) {
+      projectHealth = "Tight";
+    } else {
+      projectHealth = "At Risk";
+    }
+
+    // Use capacity engine effort breakdown directly
+    const effortBreakdown = {
+      development: capacityMetrics.rawDevelopmentHours,
+      testing: capacityMetrics.testingHours,
+      integration: capacityMetrics.integrationHours,
+      documentation: capacityMetrics.documentationHours,
+    };
+
+    // Calculate scope score from utilization (deterministic)
+    const scopeScore = Math.min(95, Math.round((capacityMetrics.estimatedHours / capacityMetrics.productiveHours) * 100));
+
+    // Log successful AI operation
+    logAISuccess({
+      operation: 'analyzeProjectScope',
+      timestamp: new Date().toISOString(),
+    });
+
+    return {
+      scopeScore,
+      estimatedHours: capacityMetrics.estimatedHours,
+      availableHours: capacityMetrics.availableHours,
+      effectiveAvailableHours: capacityMetrics.productiveHours,
+      estimatedWeeks: capacityMetrics.estimatedWeeks,
+      deadlineFeasible: capacityMetrics.timelineFit !== "OVER_CAPACITY",
+      capacityUtilization: capacityMetrics.capacityUtilization,
+      capacityBuffer: capacityMetrics.bufferHours,
+      capacityBufferPercent: capacityMetrics.bufferPercent,
+      confidence,
+      riskLevel,
+      projectHealth,
+      effortBreakdown,
+      complexity: {
+        level: complexityScore >= 70 ? "High" : complexityScore >= 45 ? "Medium" : "Low",
+        score: complexityScore,
+      },
+      riskFactors: Array.isArray(parsed.riskFactors)
+        ? parsed.riskFactors.slice(0, 4).map(String)
+        : [],
+      recommendations: Array.isArray(parsed.recommendations)
+        ? parsed.recommendations.slice(0, 4).map(String)
+        : [],
+    };
+  } catch (err: unknown) {
+    console.error("========== RAW GEMINI ERROR (analyzeProjectScope) ==========");
+    console.error(err);
+    console.error("==========================================================");
+
+    const userMessage = handleAIError(err);
+    
+    logAIError({
+      operation: 'analyzeProjectScope',
+      errorType: err instanceof Error ? err.constructor.name : 'Unknown',
+      errorMessage: err instanceof Error ? err.message : String(err),
+      timestamp: new Date().toISOString(),
+    });
+    
+    throw new Error(userMessage);
+  }
 };
 
 export const generateProjectFeatures = async (
@@ -562,146 +796,411 @@ export const generateProjectFeatures = async (
 ): Promise<GeneratedFeature[]> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (apiKey) {
-    try {
-      const client = new GoogleGenAI({ apiKey });
-      const prompt = `You are a Principal Software Architect with 15+ years of experience designing scalable, production-grade systems for startups and enterprise platforms.
+  if (!apiKey) {
+    throw new Error("AI service is not configured. Please contact support.");
+  }
 
-Your task is to design a feature set that is realistic, implementation-ready, and aligned with real-world engineering constraints.
+  try {
+    const client = new GoogleGenAI({ apiKey });
+    const prompt = `You are a Principal Software Architect with 15+ years of experience designing scalable, production-grade software systems for startups, SaaS platforms, internal business tools, mobile applications, and enterprise products.
+
+Your task is to generate a realistic, implementation-ready feature set based on the project details provided.
+
+The generated features will be used as the initial project scope for planning, estimation, and development.
 
 ---
 
 ## Project Context
-- Name: ${input.name}
-- Description: ${input.description || "Not provided"}
-- Type: ${input.type || "Web application"}
-- Project Type: ${input.projectType || "Not specified"}
-- Tech Stack: ${input.techStack || "Not specified"}
-- Team Size: ${input.teamSize || "Not specified"}
-- Methodology: ${input.methodology || "Not specified"}
-- Experience Level: ${input.experienceLevel || "Not specified"}
-- Start Date: ${input.startDate || "Not specified"}
-- Deadline Constraint: ${input.deadline ? `Must deliver by ${input.deadline}` : "No deadline constraint"}
-- Working Hours: ${input.workingHours || "Not specified"}
+
+### Required Inputs
+
+* Name: ${input.name}
+* Tech Stack: ${input.techStack}
+* Team Size: ${input.teamSize}
+* Start Date: ${input.startDate}
+* Deadline: ${input.deadline}
+
+### Additional Context
+
+* Description: ${input.description || "Not provided"}
+* Project Type: ${input.projectType || "Not specified"}
+* Methodology: ${input.methodology || "Not specified"}
+* Working Hours Per Day: ${input.workingHours || "Not specified"}
 
 ---
 
-## 🧠 FEATURE GENERATION ENGINE (STRICT WORKFLOW MODEL)
+## FEATURE GENERATION WORKFLOW
 
-You MUST think in USER WORKFLOWS, NOT software modules.
+You MUST think in terms of USER WORKFLOWS, BUSINESS GOALS, and REAL-WORLD PRODUCT BEHAVIOR.
 
----
-
-### STEP 1: Identify Actors
-Identify real users (customer, admin, staff, external system).
+Do NOT think in terms of pages, screens, components, dashboards, or generic software modules.
 
 ---
 
-### STEP 2: Identify Goals
-Define what each actor is trying to achieve.
+### Step 1: Identify Primary Actors
+
+Determine the real users involved in the system.
+
+Examples:
+
+* Customer
+* Admin
+* Employee
+* Manager
+* Vendor
+* Student
+* Teacher
+* Doctor
+* Patient
+* Delivery Partner
+* External System
 
 ---
 
-### STEP 3: Convert Goals → Workflows
-Workflows must include real actions, not UI screens.
+### Step 2: Identify User Goals
+
+Determine what each actor is trying to accomplish.
+
+Examples:
+
+Food Delivery App:
+
+* Browse restaurants
+* Place orders
+* Track deliveries
+
+Hospital System:
+
+* Book appointments
+* Manage patient records
+* View prescriptions
+
+Learning Platform:
+
+* Browse courses
+* Enroll in courses
+* Track progress
+
+---
+
+### Step 3: Convert Goals Into Workflows
+
+Identify the complete workflow users follow.
 
 Example:
-Customer → search → select → book → confirm → track status
+
+Customer
+→ Search Product
+→ View Details
+→ Add To Cart
+→ Checkout
+→ Pay
+→ Track Order
+
+Each meaningful workflow step can become a feature.
 
 ---
 
-### STEP 4: Convert Workflows → Features
-Each feature MUST represent a workflow step or outcome.
+### Step 4: Generate Features
 
-NOT allowed:
-- dashboard
-- login
-- signup
-- RBAC (unless explicitly required)
-- notifications (unless required by workflow)
+Generate features based on workflows.
 
----
+Each feature must:
 
-### STEP 5: System Features ONLY if required
-Only include system-level features if workflows depend on them.
+* Represent a real business capability
+* Deliver user value
+* Be implementable as a backlog item
+* Contribute to the product's core purpose
+
+Features should describe WHAT the system does, not HOW it is implemented.
 
 ---
 
-## ❌ QUALITY FILTER (MANDATORY)
+## REQUIRED FEATURE DISTRIBUTION
 
-Reject features if:
-- they are generic SaaS modules
-- they are not user-action based
-- they duplicate another feature
-- they are UI-only concepts
+Generate between 8 and 12 features.
 
-Replace them with workflow-based features.
+Prioritize:
 
----
+### Core Workflow Features (60-70%)
 
-## OUTPUT NORMALIZATION RULES
+Essential capabilities required for the product to function.
 
-- title = action-based (verb + object preferred)
-- description = user-focused outcome
-- category = domain action (not generic "ui/system")
-- priority:
-  - high → required for core workflow
-  - medium → supports workflow
-  - low → enhancement
+### Supporting Workflow Features (20-30%)
+
+Features that help users complete tasks efficiently.
+
+### Administrative / Management Features (10-20%)
+
+Features needed for monitoring, management, or operational control.
 
 ---
 
-## FINAL PRIORITY RULE
+## TECH STACK AWARENESS
 
-If conflict exists:
-👉 ALWAYS prefer workflow-based feature over SaaS template feature.
+Use the provided tech stack when deciding feature feasibility.
+
+Examples:
+
+React Native:
+
+* Mobile-first workflows
+
+Node.js:
+
+* API-driven workflows
+
+PostgreSQL:
+
+* Structured data management
+
+MongoDB:
+
+* Flexible document workflows
+
+AWS:
+
+* Scalable cloud-based features
+
+Do NOT generate features requiring technology that conflicts with the supplied stack unless absolutely necessary.
+
+---
+
+## DELIVERY CONSTRAINT AWARENESS
+
+Consider:
+
+* Team Size
+* Start Date
+* Deadline
+* Working Hours
+
+If the timeline appears tight:
+
+* Prefer MVP-focused features
+* Avoid excessive enterprise functionality
+* Focus on core workflows first
+
+If the timeline appears generous:
+
+* Include additional supporting features
+* Include operational and reporting capabilities where relevant
+
+---
+
+## QUALITY FILTER (MANDATORY)
+
+Reject any feature that is:
+
+* Generic SaaS boilerplate
+* A page or screen name
+* A UI element
+* A technical implementation detail
+* A duplicate of another feature
+* Meaningless without user interaction
+
+---
+
+## AVOID GENERATING THESE UNLESS CLEARLY REQUIRED
+
+* Dashboard
+* Admin Dashboard
+* Login
+* Signup
+* Authentication
+* Role-Based Access Control
+* Notifications
+* Analytics
+* Reports
+* Settings
+* Profile Management
+
+Only include these if the project description explicitly requires them or the workflow cannot function without them.
+
+---
+
+## FEATURE TITLE RULES
+
+Titles must:
+
+* Be action-oriented
+* Be concise
+* Contain 3–6 words
+* Prefer verb + object structure
+
+Good:
+
+* Search Available Mentors
+* Schedule Consultation Session
+* Submit Service Request
+* Track Delivery Status
+
+Bad:
+
+* Dashboard
+* User Management
+* Settings Page
+* Authentication Module
+
+---
+
+## DESCRIPTION RULES
+
+Descriptions must:
+
+* Be one sentence
+* Focus on user value
+* Explain the outcome
+
+Good:
+"Customers can track the real-time status of their orders."
+
+Bad:
+"Uses WebSockets and Redis for tracking."
+
+---
+
+## CATEGORY RULES
+
+Use domain-focused categories.
+
+Examples:
+
+* ordering
+* booking
+* scheduling
+* inventory
+* payments
+* communication
+* tracking
+* enrollment
+* delivery
+* consultation
+
+Avoid:
+
+* ui
+* frontend
+* backend
+* system
+* page
+
+---
+
+## PRIORITY RULES
+
+high
+
+* Essential for the product's primary workflow
+
+medium
+
+* Supports or improves primary workflows
+
+low
+
+* Nice-to-have enhancements
 
 ---
 
 ## OUTPUT FORMAT (STRICT)
 
-Return ONLY JSON array:
+Return ONLY a valid JSON array.
 
 [
-  {
-    "title": "3–6 word feature name",
-    "description": "single sentence user value",
-    "category": "lowercase-slug",
-    "priority": "high | medium | low"
-  }
+{
+"title": "Search Available Mentors",
+"description": "Users can discover mentors based on expertise and availability.",
+"category": "search",
+"priority": "high"
+}
 ]
+
+Do not include markdown.
+
+Do not include explanations.
+
+Do not include any text outside the JSON array.
+
 `;
-      const response = await client.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: { responseMimeType: "application/json", temperature: 0.3 },
-      });
 
-      const text = (response.text ?? "")
-        .trim()
-        .replace(/^```(?:json)?/i, "")
-        .replace(/```$/i, "")
-        .trim();
-      const parsed = JSON.parse(text);
-
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((f: any) => ({
-          title: String(f.title ?? "Untitled Feature"),
-          description: String(f.description ?? ""),
-          category: String(f.category ?? "general"),
-          priority: (["low", "medium", "high"].includes(f.priority)
-            ? f.priority
-            : "medium") as "low" | "medium" | "high",
-        }));
+    const response = await withRetry(
+      () => withTimeout(
+        client.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: { responseMimeType: "application/json", temperature: 0.3 },
+        }),
+        30000 // 30 second timeout
+      ),
+      {
+        maxRetries: 3,
+        retryableErrors: ['timeout', '429', '500', '503', 'ECONNRESET', 'ETIMEDOUT'],
+        delays: [1000, 2000],
       }
-    } catch (err) {
-      console.error("Gemini feature generation failed, using fallback:", err);
-    }
-  }
+    );
 
-  // Smart fallback based on project type
-  const key = (input.type ?? "saas") as keyof typeof FALLBACK_FEATURES;
-  return FALLBACK_FEATURES[key] ?? FALLBACK_FEATURES.saas;
+    const text = (response.text ?? "")
+      .trim()
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/i, "")
+      .trim();
+    
+    // Use safe JSON parsing
+    const parseResult = safeParseJson(text);
+    if (!parseResult.success) {
+      logAIError({
+        operation: 'generateProjectFeatures',
+        errorType: 'ParseError',
+        errorMessage: parseResult.error,
+        timestamp: new Date().toISOString(),
+      });
+      throw new AIResponseError('Failed to parse AI response', new Error(parseResult.error));
+    }
+
+    const parsed = parseResult.data;
+
+    // Validate response is an array
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      logAIError({
+        operation: 'generateProjectFeatures',
+        errorType: 'ValidationError',
+        errorMessage: 'AI response must be a non-empty array',
+        timestamp: new Date().toISOString(),
+      });
+      throw new AIValidationError('AI returned invalid feature data', ['Response must be a non-empty array']);
+    }
+
+    // Log successful AI operation
+    logAISuccess({
+      operation: 'generateProjectFeatures',
+      timestamp: new Date().toISOString(),
+    });
+
+    return parsed.map((f: any) => ({
+        title: String(f.title ?? "Untitled Feature"),
+        description: String(f.description ?? ""),
+        category: String(f.category ?? "general"),
+        priority: (["low", "medium", "high"].includes(f.priority)
+          ? f.priority
+          : "medium") as "low" | "medium" | "high",
+      }));
+  } catch (err: unknown) {
+  console.error("========== RAW GEMINI ERROR ==========");
+  console.error(err);
+  console.error("======================================");
+
+  const userMessage = handleAIError(err);
+
+  logAIError({
+    operation: 'analyzeProjectScope',
+    errorType: err instanceof Error ? err.constructor.name : 'Unknown',
+    errorMessage: err instanceof Error ? err.message : String(err),
+    timestamp: new Date().toISOString(),
+  });
+
+  throw new Error(userMessage);
+}
 };
 
 type AnalyzeScopeChangesInput = {

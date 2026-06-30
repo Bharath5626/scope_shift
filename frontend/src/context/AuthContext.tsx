@@ -12,6 +12,8 @@ interface AuthUser {
   id: string
   name: string
   email: string
+  profileImage?: string | null
+  createdAt?: string | null
 }
 
 interface AuthContextValue {
@@ -21,13 +23,20 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
+  updateUser: (userData: Partial<AuthUser>) => void
 }
 
 function decodeToken(token: string): AuthUser | null {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
     if (payload.exp * 1000 < Date.now()) return null
-    return { id: payload.id, name: payload.name, email: payload.email }
+    return { 
+      id: payload.id, 
+      name: payload.name, 
+      email: payload.email,
+      profileImage: payload.profileImage,
+      createdAt: payload.createdAt
+    }
   } catch {
     return null
   }
@@ -77,9 +86,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
   }, [])
 
+  const updateUser = useCallback((userData: Partial<AuthUser>) => {
+    setUser(prev => prev ? { ...prev, ...userData } : null)
+  }, [])
+
   const value = useMemo<AuthContextValue>(
-    () => ({ user, token, isAuthenticated: !!user, login, register, logout }),
-    [user, token, login, register, logout]
+    () => ({ user, token, isAuthenticated: !!user, login, register, logout, updateUser }),
+    [user, token, login, register, logout, updateUser]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

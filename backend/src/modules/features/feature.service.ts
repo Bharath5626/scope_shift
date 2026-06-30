@@ -1,10 +1,20 @@
 import prisma from "../../config/database";
+import { handleDatabaseError } from "../../utils/database-errors";
+import {
+  logDatabaseTransactionStart,
+  logDatabaseTransactionSuccess,
+  logDatabaseTransactionRollback,
+} from "../../utils/database-logging";
 
 export const getFeaturesByProject = async (projectId: string, type?: string) => {
-  return prisma.feature.findMany({
-    where: { projectId, ...(type ? { type } : {}) },
-    orderBy: { order: "asc" },
-  });
+  try {
+    return prisma.feature.findMany({
+      where: { projectId, ...(type ? { type } : {}) },
+      orderBy: { order: "asc" },
+    });
+  } catch (error) {
+    throw handleDatabaseError(error);
+  }
 };
 
 export const addFeature = async (
@@ -18,18 +28,22 @@ export const addFeature = async (
     order?: number;
   }
 ) => {
-  const count = await prisma.feature.count({ where: { projectId } });
-  return prisma.feature.create({
-    data: {
-      projectId,
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      priority: data.priority,
-      type: data.type ?? "original",
-      order: data.order ?? count,
-    },
-  });
+  try {
+    const count = await prisma.feature.count({ where: { projectId } });
+    return prisma.feature.create({
+      data: {
+        projectId,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: data.priority,
+        type: data.type ?? "original",
+        order: data.order ?? count,
+      },
+    });
+  } catch (error) {
+    throw handleDatabaseError(error);
+  }
 };
 
 export const updateFeature = async (
@@ -43,16 +57,39 @@ export const updateFeature = async (
     order: number;
   }>
 ) => {
-  return prisma.feature.update({ where: { id }, data });
+  try {
+    return prisma.feature.update({ where: { id }, data });
+  } catch (error) {
+    throw handleDatabaseError(error);
+  }
 };
 
 export const deleteFeature = async (id: string) => {
-  return prisma.feature.delete({ where: { id } });
+  try {
+    return prisma.feature.delete({ where: { id } });
+  } catch (error) {
+    throw handleDatabaseError(error);
+  }
 };
 
 export const reorderFeatures = async (projectId: string, orderedIds: string[]) => {
-  const updates = orderedIds.map((id, index) =>
-    prisma.feature.update({ where: { id }, data: { order: index } })
-  );
-  return prisma.$transaction(updates);
+  const startTime = Date.now();
+  logDatabaseTransactionStart('reorderFeatures', projectId);
+
+  try {
+    const updates = orderedIds.map((id, index) =>
+      prisma.feature.update({ where: { id }, data: { order: index } })
+    );
+    
+    const result = await prisma.$transaction(updates);
+    
+    const duration = Date.now() - startTime;
+    logDatabaseTransactionSuccess('reorderFeatures', projectId, duration);
+    
+    return result;
+  } catch (error) {
+    const dbError = handleDatabaseError(error);
+    logDatabaseTransactionRollback('reorderFeatures', projectId, dbError.originalCode, dbError.originalMessage);
+    throw dbError;
+  }
 };

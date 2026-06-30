@@ -59,6 +59,7 @@ export const login = async (data: LoginInput) => {
       name: true,
       email: true,
       password: true,
+      profileImage: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -82,6 +83,8 @@ if (!isPasswordValid) {
       id: user.id,
       email: user.email,
       name: user.name,
+      profileImage: user.profileImage,
+      createdAt: user.createdAt,
     },
     env.JWT_SECRET,
     {

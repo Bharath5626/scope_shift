@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
+import { EmptyState } from '../components/EmptyState'
+import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } from '../utils/designSystem'
 import type { Feature } from '../types'
 
 type ScopeTab = 'original' | 'new'
@@ -52,14 +54,39 @@ function FeatureForm({
   
   const [title, setTitle] = useState(initial?.title ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
+  const [titleError, setTitleError] = useState('')
+  const [descriptionError, setDescriptionError] = useState('')
+
+  const validateForm = (): boolean => {
+    let isValid = true
+    
+    if (!title.trim()) {
+      setTitleError('Feature title is required')
+      isValid = false
+    } else if (title.length > 100) {
+      setTitleError('Title must be less than 100 characters')
+      isValid = false
+    } else {
+      setTitleError('')
+    }
+    
+    if (description.length > 200) {
+      setDescriptionError('Description must be less than 200 characters')
+      isValid = false
+    } else {
+      setDescriptionError('')
+    }
+    
+    return isValid
+  }
 
   const handleSave = async () => {
-    if (!title.trim()) return
+    if (!validateForm()) return
     await onSave({ title: title.trim(), description: description.trim() })
   }
 
   const inputCls =
-    'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+    'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500'
 
   const accentBg = tabType === 'new' ? 'bg-emerald-50/50 border-emerald-200' : 'bg-indigo-50/40 border-indigo-200'
 
@@ -74,22 +101,38 @@ function FeatureForm({
             autoFocus
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value)
+              if (titleError) setTitleError('')
+            }}
             placeholder={tabType === 'new' ? 'e.g. Multi-language support' : 'e.g. User Registration'}
-            className={inputCls}
+            className={`${inputCls} ${titleError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
+            aria-invalid={!!titleError}
+            aria-describedby={titleError ? 'title-error' : undefined}
           />
+          {titleError && (
+            <p id="title-error" className="mt-1 text-xs text-red-600">{titleError}</p>
+          )}
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-gray-600">Description</label>
           <input
             type="text"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value)
+              if (descriptionError) setDescriptionError('')
+            }}
             placeholder="Brief description of this feature"
-            className={inputCls}
+            className={`${inputCls} ${descriptionError ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSave() }}
+            aria-invalid={!!descriptionError}
+            aria-describedby={descriptionError ? 'description-error' : undefined}
           />
+          {descriptionError && (
+            <p id="description-error" className="mt-1 text-xs text-red-600">{descriptionError}</p>
+          )}
         </div>
       </div>
       <div className="flex justify-end gap-2">
@@ -158,26 +201,23 @@ function FeatureList({
 
   if (features.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-200 py-14 text-center">
-        <div className={`mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full ${tabType === 'new' ? 'bg-emerald-50 text-emerald-400' : 'bg-indigo-50 text-indigo-400'}`}>
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-        </div>
-        <p className="text-sm font-medium text-gray-600">No features yet</p>
-        <p className="mt-1 text-xs text-gray-400">
-          {tabType === 'new'
+      <EmptyState
+        title="No features yet"
+        description={
+          tabType === 'new'
             ? 'Add features the client requested after the original scope was agreed'
-            : 'Add the features that are included in the original agreed scope'}
-        </p>
-      </div>
+            : 'Add the features that are included in the original agreed scope'
+        }
+        size="sm"
+        className={`${BORDER_RADIUS.card} border border-dashed border-gray-200`}
+      />
     )
   }
 
 
 
   return (
-    <div className="divide-y divide-gray-100 rounded-xl border border-gray-200 overflow-hidden">
+    <div className={`divide-y divide-gray-100 ${BORDER_RADIUS.card} border border-gray-200 overflow-hidden`}>
       {features.map((feature, index) => (
         <div
           key={feature.id}
@@ -187,7 +227,7 @@ function FeatureList({
           className={`transition-colors ${dragOverId === feature.id && dragId !== feature.id ? 'bg-indigo-50 border-l-2 border-l-indigo-400' : ''}`}
         >
           {editingId === feature.id ? (
-            <div className="p-4">
+            <div className={SPACING.card.compactPadding}>
               <FeatureForm
                 initial={{ title: feature.title, description: feature.description }}
                 onSave={(data) => onSaveEdit(feature, data)}
@@ -201,7 +241,7 @@ function FeatureList({
               draggable
               onDragStart={() => setDragId(feature.id)}
               onDragEnd={() => { setDragId(null); setDragOverId(null) }}
-              className={`flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/60 transition ${dragId === feature.id ? 'opacity-40' : ''}`}
+              className={`flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
             >
               {/* Drag handle */}
               <div className="cursor-grab text-gray-300 hover:text-gray-400 shrink-0 active:cursor-grabbing">
@@ -209,7 +249,7 @@ function FeatureList({
               </div>
 
               {/* Number badge */}
-              <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+              <div className={`flex ${ICON_SIZE.button} shrink-0 items-center justify-center ${BORDER_RADIUS.tag} ${TYPOGRAPHY.caption} font-semibold ${
                 tabType === 'new' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'
               }`}>
                 {index + 1}
@@ -217,9 +257,9 @@ function FeatureList({
 
               {/* Title + description */}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-gray-900">{feature.title}</p>
+                <p className={`truncate ${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>{feature.title}</p>
                 {feature.description && (
-                  <p className="mt-0.5 truncate text-xs text-gray-500">{feature.description}</p>
+                  <p className={`mt-0.5 truncate ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>{feature.description}</p>
                 )}
               </div>
 
@@ -227,7 +267,7 @@ function FeatureList({
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   onClick={() => onEdit(feature.id)}
-                  className="rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                  className={`${BORDER_RADIUS.small} p-1.5 text-gray-400 ${TRANSITION} hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300`}
                   title="Edit"
                 >
                   <PencilIcon />
@@ -235,7 +275,7 @@ function FeatureList({
                 <button
   onClick={() => onRequestDelete(feature.id)}
   disabled={deletingId === feature.id}
-  className="rounded-md p-1.5 text-red-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
+  className="rounded-md p-1.5 text-red-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-900/30 dark:hover:text-red-300"
   title="Delete"
 >
   <TrashIcon />
@@ -254,9 +294,9 @@ export function ScopeBuilder() {
   const [searchParams] = useSearchParams()
   const projectId = searchParams.get('project') ?? ''
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   const {
-    projects,
     getProject,
     getProjectFeatures,
     addFeature,
@@ -284,9 +324,18 @@ export function ScopeBuilder() {
 
   const activeFeatures = activeTab === 'original' ? originalFeatures : newFeatures
 
+  // Autosave indicator reset
+  useEffect(() => {
+    if (autosaveStatus === 'saved') {
+      const timer = setTimeout(() => setAutosaveStatus('idle'), 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [autosaveStatus])
+
   const handleAdd = async (data: FeatureFormData) => {
     if (!projectId) return
     setSavingAdd(true)
+    setAutosaveStatus('saving')
     setAddError('')
     try {
       await addFeature(projectId, {
@@ -297,8 +346,10 @@ export function ScopeBuilder() {
         type: activeTab,
       })
       setShowAddForm(false)
+      setAutosaveStatus('saved')
     } catch (err: any) {
       setAddError(err.message ?? 'Failed to save feature. Please try again.')
+      setAutosaveStatus('error')
     } finally {
       setSavingAdd(false)
     }
@@ -306,10 +357,13 @@ export function ScopeBuilder() {
 
   const handleEdit = async (feature: Feature, data: FeatureFormData) => {
     setSavingEdit(true)
+    setAutosaveStatus('saving')
     try {
       await updateFeature(feature.id, { title: data.title, description: data.description })
       setEditingId(null)
+      setAutosaveStatus('saved')
     } catch {
+      setAutosaveStatus('error')
       // silently keep form open
     } finally {
       setSavingEdit(false)
@@ -318,8 +372,12 @@ export function ScopeBuilder() {
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
+    setAutosaveStatus('saving')
     try {
       await deleteFeature(id)
+      setAutosaveStatus('saved')
+    } catch {
+      setAutosaveStatus('error')
     } finally {
       setDeletingId(null)
     }
@@ -339,107 +397,120 @@ export function ScopeBuilder() {
 
   if (!projectId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-        <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm max-w-md w-full">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-gray-900">No project selected</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Open a project from the dashboard or projects page to start building its scope.
-          </p>
-          <div className="mt-6 flex justify-center gap-3">
-            <Link to="/" className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
-              Dashboard
-            </Link>
-            <Link to="/projects" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition">
-              View Projects
-            </Link>
-          </div>
-          {projects.length > 0 && (
-            <div className="mt-6 border-t border-gray-100 pt-6">
-              <p className="mb-3 text-xs font-medium text-gray-500">Or jump to a project:</p>
-              <div className="space-y-2">
-                {projects.slice(0, 4).map((p) => (
-                  <Link
-                    key={p.id}
-                    to={`/scope-builder?project=${p.id}`}
-                    className="block rounded-lg border border-gray-200 px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:border-indigo-300 hover:text-indigo-600 transition"
-                  >
-                    {p.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
+        <EmptyState
+          title="No project selected"
+          description="Open a project from the dashboard or projects page to start building its scope."
+          action={{
+            label: 'View Projects',
+            onClick: () => navigate('/projects'),
+          }}
+          secondaryAction={{
+            label: 'Dashboard',
+            onClick: () => navigate('/'),
+          }}
+          size="md"
+          className="max-w-md w-full"
+        />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className={`min-h-screen bg-gray-50 ${SPACING.page.padding} dark:bg-gray-900`}>
       <div className="mx-auto max-w-3xl">
 
         {/* Page header */}
-        <div className="mb-6 flex items-start justify-between">
+        <div className={`mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4`}>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Scope Builder</h1>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>Scope Builder</h1>
             {project && (
-              <p className="mt-1 text-sm text-gray-500">
-                <span className="font-medium text-gray-700">{project.name}</span> — define original scope and client additions
+              <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+                <span className="font-medium text-gray-700 dark:text-gray-300">{project.name}</span> — define original scope and client additions
               </p>
             )}
           </div>
-          <button
-            onClick={() => navigate(`/analyzing?project=${projectId}`)}
-            disabled={originalFeatures.length === 0}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-40"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            Run Analysis
-          </button>
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Autosave indicator */}
+            {autosaveStatus !== 'idle' && (
+              <div className={`flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
+                {autosaveStatus === 'saving' && (
+                  <>
+                    <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
+                    <span className="text-gray-500 dark:text-gray-400">Saving...</span>
+                  </>
+                )}
+                {autosaveStatus === 'saved' && (
+                  <>
+                    <svg className={`${ICON_SIZE.button} text-green-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-green-600 dark:text-green-400">Saved</span>
+                  </>
+                )}
+                {autosaveStatus === 'error' && (
+                  <>
+                    <svg className={`${ICON_SIZE.button} text-red-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span className="text-red-600 dark:text-red-400">Error saving</span>
+                  </>
+                )}
+              </div>
+            )}
+            <button
+              onClick={() => navigate(`/analyzing?project=${projectId}`)}
+              disabled={originalFeatures.length === 0}
+              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-40`}
+            >
+              <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              <span className="hidden sm:inline">Run Analysis</span>
+              <span className="sm:hidden">Analyze</span>
+            </button>
+          </div>
         </div>
 
         {/* Tab bar */}
-        <div className="mb-6 flex gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
+        <div className={`mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-gray-200 bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <button
             onClick={() => handleTabSwitch('original')}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+            className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'original'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
+            aria-pressed={activeTab === 'original'}
+            role="tab"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Original Scope
-            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-              activeTab === 'original' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700'
+            <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-bold ${
+              activeTab === 'original' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
             }`}>
               {originalFeatures.length}
             </span>
           </button>
           <button
             onClick={() => handleTabSwitch('new')}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+            className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'new'
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
+            aria-pressed={activeTab === 'new'}
+            role="tab"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             New Client Additions
             {newFeatures.length > 0 && (
-              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'
+              <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-bold ${
+                activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
               }`}>
                 {newFeatures.length}
               </span>
@@ -449,26 +520,26 @@ export function ScopeBuilder() {
 
         {/* Context hint */}
         {activeTab === 'new' && (
-          <div className="mb-4 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-            <svg className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className={`mb-4 flex items-start gap-3 ${BORDER_RADIUS.card} border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-900/20`}>
+            <svg className={`${ICON_SIZE.button} mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-emerald-800">
+            <p className={`${TYPOGRAPHY.caption} text-emerald-800 dark:text-emerald-200`}>
               <span className="font-semibold">Scope Creep Analysis:</span> Features added here represent what the client requested <em>after</em> the original scope was agreed. Running the analysis will calculate the exact hours, delay weeks, and risk these additions introduce.
             </p>
           </div>
         )}
 
         {/* Main card */}
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
 
           {/* Card header */}
-          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <div className={`flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700`}>
             <div>
-              <h2 className="text-sm font-semibold text-gray-900">
+              <h2 className={`${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>
                 {activeTab === 'original' ? 'Original Scope Features' : 'Client-Requested Additions'}
               </h2>
-              <p className="mt-0.5 text-xs text-gray-500">
+              <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>
                 {activeTab === 'original'
                   ? 'Features agreed in the initial project contract'
                   : 'New features added after original scope was locked'}
@@ -476,11 +547,11 @@ export function ScopeBuilder() {
             </div>
             <button
               onClick={() => { setShowAddForm(true); setEditingId(null); setAddError('') }}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white shadow-sm transition ${
+              className={`flex items-center gap-2 ${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} ${
                 activeTab === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'
               }`}
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
               </svg>
               Add Feature
@@ -488,7 +559,7 @@ export function ScopeBuilder() {
           </div>
 
           {/* Body */}
-          <div className="px-6 py-5 space-y-4">
+          <div className={`px-6 py-5 space-y-4 ${SPACING.section.gap}`}>
 
             {/* Inline add form */}
             {showAddForm && (
@@ -500,7 +571,7 @@ export function ScopeBuilder() {
                   tabType={activeTab}
                 />
                 {addError && (
-                  <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                  <div className={`${BORDER_RADIUS.small} border border-red-200 bg-red-50 px-4 py-2.5 ${TYPOGRAPHY.body} text-red-600`}>
                     {addError}
                   </div>
                 )}
@@ -563,20 +634,20 @@ export function ScopeBuilder() {
       </div>
       {confirmDeleteId && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800 dark:shadow-gray-900/20">
 
-      <h2 className="text-lg font-semibold text-gray-900">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
         Delete Feature?
       </h2>
 
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
         This action cannot be undone.
       </p>
 
       <div className="mt-6 flex justify-end gap-3">
         <button
           onClick={() => setConfirmDeleteId(null)}
-          className="rounded-lg border border-gray-200 px-4 py-2 text-sm"
+          className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
         >
           Cancel
         </button>
@@ -586,7 +657,7 @@ export function ScopeBuilder() {
             await handleDelete(confirmDeleteId)
             setConfirmDeleteId(null)
           }}
-          className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white"
+          className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
         >
           Delete
         </button>

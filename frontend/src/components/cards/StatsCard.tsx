@@ -8,10 +8,10 @@ interface StatsCardProps {
 }
 
 const accentStyles = {
-  primary: 'bg-indigo-50 text-indigo-600',
-  success: 'bg-green-50 text-green-600',
-  warning: 'bg-yellow-50 text-yellow-600',
-  danger: 'bg-red-50 text-red-600',
+  primary: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
+  success: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+  warning: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
+  danger: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
 }
 
 export function StatsCard({
@@ -21,11 +21,11 @@ export function StatsCard({
   accent = 'primary',
 }: StatsCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
+          <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
         </div>
 
         <div

@@ -11,7 +11,7 @@ export const getDashboard = async (
 
   const totalRuns = analyses.length;
   const totalChanges = analyses.length;
-  const totalRisks = analyses.filter((a) => a.riskLevel === 'high' || a.riskLevel === 'critical').length;
+  const totalRisks = analyses.filter((a) => a.riskLevel && (a.riskLevel === 'high' || a.riskLevel === 'critical')).length;
   const highRisks = analyses.filter((a) => a.riskLevel === 'high').length;
 
   const latestRun = analyses[0];
@@ -52,7 +52,7 @@ export const getOverallDashboardStats = async () => {
     // Factor 2: High or critical risk from latest analysis
     if (p.analyses.length > 0) {
       const latestAnalysis = p.analyses[0];
-      if (latestAnalysis.riskLevel.toLowerCase() === 'high' || latestAnalysis.riskLevel.toLowerCase() === 'critical') return true;
+      if (latestAnalysis.riskLevel && (latestAnalysis.riskLevel.toLowerCase() === 'high' || latestAnalysis.riskLevel.toLowerCase() === 'critical')) return true;
     }
 
     // Factor 3: High scope increase (more than 30%)
@@ -69,10 +69,10 @@ export const getOverallDashboardStats = async () => {
   const totalAnalyses = allAnalyses.length;
 
   const riskDistribution = {
-    low: allAnalyses.filter((a) => a.riskLevel.toLowerCase() === 'low').length,
-    medium: allAnalyses.filter((a) => a.riskLevel.toLowerCase() === 'medium').length,
-    high: allAnalyses.filter((a) => a.riskLevel.toLowerCase() === 'high').length,
-    critical: allAnalyses.filter((a) => a.riskLevel.toLowerCase() === 'critical').length,
+    low: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'low').length,
+    medium: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'medium').length,
+    high: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'high').length,
+    critical: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'critical').length,
   };
 
   // Calculate scope health score

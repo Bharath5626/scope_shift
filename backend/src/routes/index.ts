@@ -6,10 +6,12 @@ import featureRoutes from "../modules/features/feature.routes";
 import analysisRoutes from "../modules/analysis/analysis.routes";
 import aiRoutes from "../modules/ai/ai.routes";
 import dashboardRoutes from "../modules/dashboard/dashboard.routes";
+import userRoutes from "../modules/users/user.routes";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
 router.use("/projects", projectRoutes);
 router.use("/projects/:projectId/features", featureRoutes);
 router.use("/projects/:projectId/analyses", analysisRoutes);

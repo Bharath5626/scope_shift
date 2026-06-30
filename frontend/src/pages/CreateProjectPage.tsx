@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
+import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION } from '../utils/designSystem'
 
 const SectionCard = ({
   title,
@@ -13,10 +14,10 @@ const SectionCard = ({
   children: React.ReactNode
 }) => {
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        {description && <p className="mt-1 text-xs text-gray-500">{description}</p>}
+        <h3 className={`${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>{title}</h3>
+        {description && <p className={`mt-1 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>{description}</p>}
       </div>
       {children}
     </div>
@@ -24,12 +25,12 @@ const SectionCard = ({
 }
 
 const inputCls =
-  'w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition'
+  `w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white px-4 py-3 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
 
 const selectCls =
-  'w-full rounded-xl border border-gray-200 bg-white px-4 py-3  pr-10 text-sm text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 appearance-none cursor-pointer transition'
+  `w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white px-4 py-3  pr-10 ${TYPOGRAPHY.body} text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 appearance-none cursor-pointer ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
 
-const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5'
+const labelCls = `block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`
 
 const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'> = {
   'Web App': 'saas',
@@ -75,7 +76,7 @@ const SelectWrapper = ({ children }: { children: React.ReactNode }) => (
     {children}
 
     <svg
-      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -121,6 +122,45 @@ export function CreateProjectPage() {
   const [methodology, setMethodology] = useState('')
   const [workingHours, setWorkingHours] = useState('')
 
+  // Load saved form data from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('createProjectDraft')
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData)
+        if (data.name) setName(data.name)
+        if (data.description) setDescription(data.description)
+        if (data.teamSize) setTeamSize(data.teamSize)
+        if (data.deadline) setDeadline(data.deadline)
+        if (data.startDate) setStartDate(data.startDate)
+        if (data.projectType) setProjectType(data.projectType)
+        if (data.methodology) setMethodology(data.methodology)
+        if (data.workingHours) setWorkingHours(data.workingHours)
+        if (data.selectedSkills) setSelectedSkills(data.selectedSkills)
+        if (data.logoPreview) setLogoPreview(data.logoPreview)
+      } catch (e) {
+        console.error('Failed to load saved form data:', e)
+      }
+    }
+  }, [])
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    const formData = {
+      name,
+      description,
+      teamSize,
+      deadline,
+      startDate,
+      projectType,
+      methodology,
+      workingHours,
+      selectedSkills,
+      logoPreview
+    }
+    localStorage.setItem('createProjectDraft', JSON.stringify(formData))
+  }, [name, description, teamSize, deadline, startDate, projectType, methodology, workingHours, selectedSkills, logoPreview])
+
   const [step, setStep] = useState<Step>('form')
   const [error, setError] = useState('')
   const [showOptional, setShowOptional] = useState(false)
@@ -131,6 +171,7 @@ export function CreateProjectPage() {
     techStack?: string
   }>({})
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+  const techStackInputRef = useRef<HTMLInputElement>(null)
 
   // Track unsaved changes
   const handleFieldChange = (field?: string) => {
@@ -177,6 +218,7 @@ if (touchedFields.has('techStack')) {
 
   const confirmCancel = () => {
     setShowCancelConfirm(false)
+    localStorage.removeItem('createProjectDraft')
     navigate('/projects')
   }
 
@@ -243,6 +285,9 @@ const handleCreate = async () => {
   setError('')
   setFieldErrors({})
 
+  // Clear saved draft data
+  localStorage.removeItem('createProjectDraft')
+
   try {
     console.log('Creating project with logo:', logoPreview ? 'Yes' : 'No', logoPreview?.substring(0, 50) + '...')
 const project = await createProject({
@@ -288,7 +333,8 @@ const project = await createProject({
 
     navigate(`/scope-builder?project=${project.id}`)
   } catch (err: any) {
-    setError(err.message ?? 'Something went wrong. Please try again.')
+    const errorMessage = err?.response?.data?.message || err?.message || 'Failed to generate features. Please try again later.'
+    setError(errorMessage)
     setStep('form')
   }
 }
@@ -300,19 +346,19 @@ const filteredSkills = SKILLS.filter(
 
   if (step === 'generating') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-        <div className="rounded-2xl border border-gray-200 bg-white p-14 text-center shadow-sm max-w-sm w-full">
-          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
-            <svg className="h-8 w-8 animate-spin text-indigo-600" fill="none" viewBox="0 0 24 24">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
+        <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+          <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-50 dark:bg-indigo-900/30`}>
+            <svg className={`h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
           </div>
 
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>
             Generating features with AI
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
             Analysing your project details and building the initial feature list…
           </p>
         </div>
@@ -321,35 +367,35 @@ const filteredSkills = SKILLS.filter(
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl px-8 py-10">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className={`mx-auto max-w-5xl ${SPACING.page.padding} py-10`}>
 
         {/* Header */}
-        <div className="mb-8 flex items-start justify-between">
+        <div className={`mb-8 flex items-start justify-between`}>
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
               Create New Project
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
               Fill in the details — AI will generate features based on structured inputs
             </p>
           </div>
         </div>
 
         {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className={`mb-6 flex items-center gap-3 ${BORDER_RADIUS.card} border border-red-200 bg-red-50 px-5 py-4 dark:border-red-800 dark:bg-red-900/30`}>
+            <p className={`${TYPOGRAPHY.body} text-red-700 dark:text-red-400`}>{error}</p>
           </div>
         )}
 
-        <div className="space-y-5">
+        <div className={`space-y-5 ${SPACING.section.gap}`}>
 
           {/* CORE */}
           <SectionCard
             title="Project Identity"
             description="Core inputs drive AI feature generation quality."
           >
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className={`grid gap-5 sm:grid-cols-2 ${SPACING.section.gap}`}>
               <div>
                 <label className={labelCls}>
                   Project Name <span className="text-red-500">*</span>
@@ -366,7 +412,7 @@ const filteredSkills = SKILLS.filter(
                   className={`${inputCls} ${fieldErrors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
                 />
                 {fieldErrors.name && (
-                  <p className="mt-1.5 text-xs text-red-600">{fieldErrors.name}</p>
+                  <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-red-600 dark:text-red-400`}>{fieldErrors.name}</p>
                 )}
               </div>
 
@@ -390,7 +436,7 @@ const filteredSkills = SKILLS.filter(
               <label className={labelCls}>Project Logo (Optional)</label>
               <div className="flex items-start gap-4">
                 {logoPreview ? (
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+                  <div className={`relative h-20 w-20 shrink-0 overflow-hidden ${BORDER_RADIUS.card} border border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700`}>
                     <img
                       src={logoPreview}
                       alt="Project logo preview"
@@ -399,7 +445,7 @@ const filteredSkills = SKILLS.filter(
                     <button
                       type="button"
                       onClick={handleLogoRemove}
-                      className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md transition hover:bg-red-600"
+                      className={`absolute right-1 top-1 flex h-6 w-6 items-center justify-center ${BORDER_RADIUS.tag} bg-red-500 text-white shadow-md ${TRANSITION} hover:bg-red-600`}
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -407,8 +453,8 @@ const filteredSkills = SKILLS.filter(
                     </button>
                   </div>
                 ) : (
-                  <div className="h-20 w-20 shrink-0 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
-                    <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="h-20 w-20 shrink-0 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center dark:border-gray-600 dark:bg-gray-700">
+                    <svg className="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -423,14 +469,14 @@ const filteredSkills = SKILLS.filter(
                   />
                   <label
                     htmlFor="logo-upload"
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                    className={`inline-flex cursor-pointer items-center gap-2 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
                   >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className={`h-4 w-4`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     {logoPreview ? 'Change Logo' : 'Upload Logo'}
                   </label>
-                  <p className="mt-1.5 text-xs text-gray-500">
+                  <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>
                     Upload a logo or image for your project reference. PNG, JPG, or SVG up to 500KB.
                   </p>
                 </div>
@@ -443,18 +489,18 @@ const filteredSkills = SKILLS.filter(
   title="Team & Context"
   description="Helps AI understand constraints and complexity."
 >
-  <div className="grid gap-5 sm:grid-cols-3">
+  <div className={`grid gap-5 sm:grid-cols-3 ${SPACING.section.gap}`}>
 
    <div>
   <label className={labelCls}>Tech Stack <span className="text-red-500">*</span></label>
 
   <div className="relative">
-    <div className={`flex flex-wrap gap-2 rounded-xl border p-3 min-h-[52px] ${fieldErrors.techStack ? 'border-red-500 ' : 'border-gray-200'}`}>
+    <div className={`flex flex-wrap gap-2 ${BORDER_RADIUS.input} border p-3 min-h-[52px] ${fieldErrors.techStack ? 'border-red-500 ' : 'border-gray-200 dark:border-gray-600'}`}>
       
       {selectedSkills.map((skill) => (
         <span
           key={skill}
-          className="flex items-center gap-1 rounded-full bg-indigo-100 px-3 py-1 text-sm text-indigo-700"
+          className={`flex items-center gap-1 ${BORDER_RADIUS.tag} bg-indigo-100 px-3 py-1 ${TYPOGRAPHY.body} text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400`}
         >
           {skill}
 
@@ -473,16 +519,31 @@ const filteredSkills = SKILLS.filter(
       ))}
 
       <input
+        ref={techStackInputRef}
         value={techStackInput}
         onChange={(e) => {
-          setTechStackInput(e.target.value)
+          const value = e.target.value
+          setTechStackInput(value)
           handleFieldChange('techStack')
+
+          // Check if input contains comma (paste of comma-separated list)
+          if (value.includes(',')) {
+            const newSkills = value
+              .split(',')
+              .map(s => s.trim())
+              .filter(s => s && !selectedSkills.includes(s))
+
+            if (newSkills.length > 0) {
+              setSelectedSkills([...selectedSkills, ...newSkills])
+              setTechStackInput('')
+            }
+          }
         }}
         placeholder={
   selectedSkills.length
     ? ''
     : 'Search or type a skill...'}
-        className="flex-1 min-w-[120px] outline-none"
+        className={`flex-1 min-w-[120px] outline-none ${TYPOGRAPHY.body}`}
         onKeyDown={(e) => {
   if (
     e.key === 'Enter' &&
@@ -498,16 +559,21 @@ const filteredSkills = SKILLS.filter(
 
     setTechStackInput('')
     handleFieldChange('techStack')
+
+    // Keep focus on input after adding skill
+    setTimeout(() => {
+      techStackInputRef.current?.focus()
+    }, 0)
   }
 }}
       />
     </div>
     {fieldErrors.techStack && (
-      <p className="mt-1.5 text-xs text-red-600">{fieldErrors.techStack}</p>
+      <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-red-600 dark:text-red-400`}>{fieldErrors.techStack}</p>
     )}
 
     {techStackInput && filteredSkills.length > 0 && (
-      <div className="absolute z-10 mt-1 w-full rounded-xl border border-gray-200 bg-white shadow-lg">
+      <div className={`absolute z-10 mt-1 w-full ${BORDER_RADIUS.card} border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:shadow-gray-900/30`}>
         {filteredSkills.slice(0, 8).map((skill) => (
           <button
             key={skill}
@@ -515,8 +581,11 @@ const filteredSkills = SKILLS.filter(
             onClick={() => {
               setSelectedSkills([...selectedSkills, skill])
               setTechStackInput('')
+              setTimeout(() => {
+                techStackInputRef.current?.focus()
+              }, 0)
             }}
-            className="block w-full px-4 py-2 text-left hover:bg-gray-50"
+            className={`block w-full px-4 py-2 text-left ${TYPOGRAPHY.body} hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200`}
           >
             {skill}
           </button>
@@ -593,7 +662,7 @@ const filteredSkills = SKILLS.filter(
 
    
     {/* hidden until hover */}
-    <div className="grid gap-5 sm:grid-cols-3 transition-all duration-300">
+    <div className={`grid gap-5 sm:grid-cols-3 ${TRANSITION} duration-300 ${SPACING.section.gap}`}>
 
 <div>
   <label className={labelCls}>Project Type</label>
@@ -616,7 +685,7 @@ const filteredSkills = SKILLS.filter(
           setProjectType('')
           setIsCustomProjectType(false)
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
       >
         ✕
       </button>
@@ -671,7 +740,7 @@ const filteredSkills = SKILLS.filter(
           setMethodology('')
           setIsCustomMethodology(false)
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
       >
         ✕
       </button>
@@ -729,8 +798,8 @@ const filteredSkills = SKILLS.filter(
         </div>
 
         {/* Footer */}
-        <div className="mt-8 flex items-center justify-between rounded-2xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className={`mt-8 flex items-center justify-between ${BORDER_RADIUS.card} border border-gray-200 bg-white px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+          <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
             AI will generate 6–10 features based on your inputs
           </div>
 
@@ -738,7 +807,7 @@ const filteredSkills = SKILLS.filter(
             {hasUnsavedChanges && (
               <button
                 onClick={handleCancel}
-                className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className={`${BORDER_RADIUS.button} border border-gray-200 bg-white px-5 py-2.5 ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Cancel
               </button>
@@ -753,7 +822,7 @@ const filteredSkills = SKILLS.filter(
   !deadline ||
   selectedSkills.length === 0
 }
-              className="flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
+              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-50`}
             >
               Generate Features & Continue
             </button>
@@ -771,27 +840,27 @@ const filteredSkills = SKILLS.filter(
             onClick={() => setShowCancelConfirm(false)}
           />
           {/* Dialog */}
-          <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
-              <svg className="h-7 w-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className={`relative w-full max-w-md mx-auto ${BORDER_RADIUS.modal} bg-white ${SHADOW.modal} ${SPACING.card.padding} text-center dark:bg-gray-800 dark:shadow-gray-900/30`}>
+            <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center ${BORDER_RADIUS.tag} bg-amber-50 dark:bg-amber-900/30`}>
+              <svg className={`h-7 w-7 text-amber-500 dark:text-amber-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Unsaved Changes</h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Unsaved Changes</h2>
+            <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
               You have unsaved changes. Are you sure you want to cancel?
             </p>
 
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className={`flex-1 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Keep Editing
               </button>
               <button
                 onClick={confirmCancel}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600"
+                className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-red-500 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-white ${TRANSITION} hover:bg-red-600`}
               >
                 Cancel Project
               </button>

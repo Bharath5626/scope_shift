@@ -1,0 +1,78 @@
+/**
+ * Design System Constants
+ * Centralized design tokens for consistent UI across the application
+ */
+
+// Border Radius
+export const BORDER_RADIUS = {
+  card: 'rounded-2xl',
+  button: 'rounded-xl',
+  input: 'rounded-xl',
+  modal: 'rounded-2xl',
+  tag: 'rounded-full',
+  small: 'rounded-lg',
+} as const
+
+// Spacing
+export const SPACING = {
+  page: {
+    padding: 'px-8 py-10',
+    headerPadding: 'px-8 py-6',
+  },
+  section: {
+    gap: 'gap-6',
+    marginTop: 'mt-8',
+  },
+  card: {
+    padding: 'p-6',
+    compactPadding: 'p-5',
+  },
+  button: {
+    primary: 'px-5 py-2.5',
+    secondary: 'px-4 py-2.5',
+    small: 'px-3 py-2',
+  },
+} as const
+
+// Typography
+export const TYPOGRAPHY = {
+  pageTitle: 'text-2xl font-semibold',
+  sectionHeader: 'text-lg font-semibold',
+  cardTitle: 'text-base font-semibold',
+  body: 'text-sm',
+  label: 'text-sm font-medium',
+  caption: 'text-xs',
+  heading: 'text-xl font-semibold',
+} as const
+
+// Shadows
+export const SHADOW = {
+  card: 'shadow-sm',
+  cardHover: 'shadow-md',
+  modal: 'shadow-2xl',
+  button: 'shadow-sm',
+} as const
+
+// Icon Sizes
+export const ICON_SIZE = {
+  navigation: 'h-5 w-5',
+  button: 'h-4 w-4',
+  card: 'h-5 w-5',
+  hero: 'h-6 w-6',
+  large: 'h-8 w-8',
+} as const
+
+// Button Variants
+export const BUTTON_VARIANTS = {
+  primary: 'bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white',
+  secondary: 'border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
+  danger: 'bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white',
+  ghost: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
+  success: 'bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white',
+} as const
+
+// Focus Ring
+export const FOCUS_RING = 'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400'
+
+// Transition
+export const TRANSITION = 'transition-all duration-200'

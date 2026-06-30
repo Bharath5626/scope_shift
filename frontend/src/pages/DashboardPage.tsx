@@ -58,7 +58,6 @@ function RiskIcon() {
 }
 
 export function DashboardPage() {
-  
   const { projects } = useProjects()
   const { dashboardStats } = useDashboard()
   const upcomingProjects = dashboardStats?.upcomingDeadlines ?? [...projects]

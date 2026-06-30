@@ -1,17 +1,20 @@
 import { useState, useMemo } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { useAuth } from '../context/AuthContext'
 import { PROJECT_STATUS_LABELS, PROJECT_TYPE_LABELS } from '../utils/constants'
+import { EmptyState } from '../components/EmptyState'
+import { CardSkeleton } from '../components/LoadingSkeleton'
+import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } from '../utils/designSystem'
 import type { Project, ProjectStatus, ProjectType } from '../types'
 
 const ALL = 'all'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft:     'bg-gray-100 text-gray-600',
-  active:    'bg-green-50 text-green-700',
-  completed: 'bg-indigo-50 text-indigo-700',
-  at_risk:   'bg-red-50 text-red-700',
+  draft:     'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+  active:    'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  at_risk:   'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 }
 
 function DeleteModal({
@@ -33,25 +36,25 @@ function DeleteModal({
         onClick={onCancel}
       />
       {/* Dialog */}
-      <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-8 text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-          <svg className="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-8 text-center dark:bg-gray-800 dark:shadow-gray-900/30">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/30">
+          <svg className="h-7 w-7 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-gray-900">Delete Project?</h2>
-        <p className="mt-2 text-sm text-gray-500">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Delete Project?</h2>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           You're about to permanently delete{' '}
-          <span className="font-semibold text-gray-800">"{project.name}"</span>.
+          <span className="font-semibold text-gray-800 dark:text-gray-200">"{project.name}"</span>.
           This will remove all its features, analyses, and reports.
         </p>
-        <p className="mt-1 text-xs font-medium text-red-500">This action cannot be undone.</p>
+        <p className="mt-1 text-xs font-medium text-red-500 dark:text-red-400">This action cannot be undone.</p>
 
         <div className="mt-6 flex gap-3">
           <button
             onClick={onCancel}
             disabled={deleting}
-            className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Cancel
           </button>
@@ -93,7 +96,7 @@ function ProjectCard({
   const createdBy = project.createdBy && user?.id === project.createdBy.id ? 'you' : project.createdBy?.name || 'Unknown'
 
   return (
-    <div className="group relative flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md">
+    <div className="group relative flex flex-col rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30">
 
       {/* Delete button — appears on hover */}
       <button
@@ -110,6 +113,7 @@ function ProjectCard({
   hover:bg-red-50 hover:text-red-500
   group-hover:opacity-100
   cursor-pointer
+  dark:hover:bg-red-900/30 dark:hover:text-red-400
 "
 >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -122,7 +126,7 @@ function ProjectCard({
         <div className="flex items-start gap-4">
           {/* Project Logo */}
           {project.logo ? (
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
               <img
                 src={project.logo}
                 alt={`${project.name} logo`}
@@ -130,7 +134,7 @@ function ProjectCard({
               />
             </div>
           ) : (
-            <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+            <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -140,23 +144,23 @@ function ProjectCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4 pr-10">
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-base font-semibold text-gray-900 transition group-hover:text-indigo-600">
+                <h3 className="truncate text-base font-semibold text-gray-900 transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
                   {project.name}
                 </h3>
-                <p className="mt-1 line-clamp-2 text-sm text-gray-500">
-                  {project.description || <span className="italic text-gray-300">No description</span>}
+                <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+                  {project.description || <span className="italic text-gray-300 dark:text-gray-500">No description</span>}
                 </p>
               </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[project.status]}`}>
+              <span className={`shrink-0 ${BORDER_RADIUS.tag} px-2.5 py-1 ${TYPOGRAPHY.caption} font-medium ${statusStyles[project.status]}`}>
                 {PROJECT_STATUS_LABELS[project.status]}
               </span>
             </div>
 
-            <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-              <span className="text-xs font-medium text-gray-500">
+            <div className={`mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700`}>
+              <span className={`${TYPOGRAPHY.caption} font-medium text-gray-500 dark:text-gray-400`}>
                 {PROJECT_TYPE_LABELS[project.type]}
               </span>
-             <span className="text-xs text-gray-400">
+             <span className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
   Created{" "}
   {new Date(project.createdAt).toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -175,6 +179,7 @@ function ProjectCard({
 }
 
 export function ProjectHistoryPage() {
+  const navigate = useNavigate()
   const { projects, loading, deleteProject } = useProjects()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | typeof ALL>(ALL)
@@ -219,14 +224,14 @@ export function ProjectHistoryPage() {
       )}
 
       {/* Sticky Header with Filters */}
-      <div className="sticky top-0 z-30 bg-gray-50">
-        <div className="w-full px-8">
-          <div className="py-6 border-b border-gray-200">
+      <div className="sticky top-0 z-30 bg-gray-50 dark:bg-gray-900">
+        <div className={`w-full ${SPACING.page.padding}`}>
+          <div className={`${SPACING.page.headerPadding} border-b border-gray-200 dark:border-gray-700`}>
             {/* Header */}
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-semibold text-gray-900">Project History</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>Project History</h1>
+                <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
                   {projects.length === 0
                     ? 'No projects yet'
                     : `${projects.length} project${projects.length === 1 ? '' : 's'} total`}
@@ -245,7 +250,7 @@ export function ProjectHistoryPage() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <div className="relative flex-1 min-w-48">
                   <svg
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
@@ -255,14 +260,14 @@ export function ProjectHistoryPage() {
                     placeholder="Search projects…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                    className={`w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                   />
                 </div>
 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | typeof ALL)}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className={`${BORDER_RADIUS.input} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-700 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 >
                   <option value={ALL}>All Statuses</option>
                   {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
@@ -273,7 +278,7 @@ export function ProjectHistoryPage() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value as ProjectType | typeof ALL)}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                  className={`${BORDER_RADIUS.input} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-700 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 >
                   <option value={ALL}>All Types</option>
                   {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
@@ -284,7 +289,7 @@ export function ProjectHistoryPage() {
                 {hasFilters && (
                   <button
                     onClick={() => { setSearch(''); setStatusFilter(ALL); setTypeFilter(ALL) }}
-                    className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-500 shadow-sm transition hover:bg-gray-50 hover:text-gray-700"
+                    className={`${BORDER_RADIUS.button} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-500 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200`}
                   >
                     Clear filters
                   </button>
@@ -296,62 +301,41 @@ export function ProjectHistoryPage() {
       </div>
 
       {/* Content */}
-      <div className="w-full px-8 bg-gray-50 pb-8">
-        <div className="mt-8">
+      <div className={`w-full ${SPACING.page.padding} bg-gray-50 pb-8 dark:bg-gray-900`}>
+        <div className={SPACING.section.marginTop}>
 
           {loading && (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
               {[1, 2, 3].map((i) => (
-                <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-2/3 rounded bg-gray-200" />
-                      <div className="h-3 w-full rounded bg-gray-100" />
-                      <div className="h-3 w-4/5 rounded bg-gray-100" />
-                    </div>
-                    <div className="h-6 w-16 rounded-full bg-gray-100" />
-                  </div>
-                  <div className="mt-4 flex justify-between border-t border-gray-100 pt-4">
-                    <div className="h-3 w-24 rounded bg-gray-100" />
-                    <div className="h-3 w-20 rounded bg-gray-100" />
-                  </div>
-                </div>
+                <CardSkeleton key={i} />
               ))}
             </div>
           )}
 
           {!loading && projects.length === 0 && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-14 text-center shadow-sm">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50">
-                <svg className="h-7 w-7 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900">No project history yet</h3>
-              <p className="mt-2 text-sm text-gray-500">
-                Projects you create will appear here as clickable cards
-              </p>
-              <Link
-                to="/projects/new"
-                className="mt-6 inline-block rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
-              >
-                Create your first project
-              </Link>
-            </div>
+            <EmptyState
+              title="No project history yet"
+              description="Projects you create will appear here as clickable cards with full history tracking."
+              action={{
+                label: 'Create your first project',
+                onClick: () => navigate('/projects/new'),
+              }}
+              size="lg"
+            />
           )}
 
           {!loading && projects.length > 0 && filtered.length === 0 && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center shadow-sm">
-              <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100">
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white p-12 text-center ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+              <div className={`mx-auto mb-3 flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.button} bg-gray-100 dark:bg-gray-700`}>
+                <svg className={ICON_SIZE.button} text-gray-400 dark:text-gray-500 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
                 </svg>
               </div>
-              <h3 className="text-base font-semibold text-gray-900">No projects match your filters</h3>
-              <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria</p>
+              <h3 className={`${TYPOGRAPHY.cardTitle} text-gray-900 dark:text-gray-100`}>No projects match your filters</h3>
+              <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>Try adjusting your search or filter criteria</p>
               <button
                 onClick={() => { setSearch(''); setStatusFilter(ALL); setTypeFilter(ALL) }}
-                className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
               >
                 Clear all filters
               </button>
@@ -360,10 +344,10 @@ export function ProjectHistoryPage() {
 
           {!loading && filtered.length > 0 && (
             <>
-              <p className="mb-4 text-xs text-gray-400">
+              <p className={`mb-4 ${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
                 Showing {filtered.length} of {projects.length} project{projects.length === 1 ? '' : 's'} — hover a card to delete it
               </p>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
                 {filtered.map((project) => (
                   <ProjectCard
                     key={project.id}

@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { generateProjectFeatures } from "./ai.service";
-import { getProjectById } from "../projects/project.service";
+import { getProjectById, createProjectWithFeatures } from "../projects/project.service";
 import prisma from "../../config/database";
+import { handleDatabaseError } from "../../utils/database-errors";
 
 const router = Router({ mergeParams: true });
 
@@ -50,11 +51,32 @@ router.post(
 
     await createAnalysis({
       projectId,
+      featureEstimates: originalFeatures.map(f => ({
+        feature: f.title,
+        complexity: 'Medium', // Will be updated by AI
+        estimatedHours: 0, // Will be updated by AI
+      })),
       scopeIncreasePercent: result.scopeScore,
       additionalHours: result.estimatedHours,
       delayWeeks: result.estimatedWeeks,
+      workingDays: result.availableHours ? Math.floor(result.availableHours / (project.workingHours || 8)) : undefined,
+      availableHours: result.availableHours,
+      productiveHours: result.effectiveAvailableHours,
+      estimatedHours: result.estimatedHours,
+      estimatedWeeks: result.estimatedWeeks,
+      capacityUtilization: result.capacityUtilization,
+      bufferHours: result.capacityBuffer,
+      bufferPercent: result.capacityBufferPercent,
+      timelineFit: result.deadlineFeasible ? 'ON_TRACK' : 'OVER_CAPACITY',
+      scopeScore: result.scopeScore,
+      complexityLevel: result.complexity.level,
+      complexityScore: result.complexity.score,
       riskLevel: result.riskLevel,
-      complexity: result.complexity.level,
+      projectHealth: result.projectHealth,
+      confidence: result.confidence,
+      effortBreakdown: result.effortBreakdown,
+      riskFactors: result.riskFactors,
+      recommendations: result.recommendations,
     });
 
     res.status(201).json({ success: true, data: result });
@@ -105,6 +127,82 @@ router.post(
     );
 
     res.status(201).json({ success: true, data: created });
+  }),
+);
+
+// NEW: Create project with AI-generated features in a single transaction
+router.post(
+  "/create-with-features",
+  asyncHandler(async (req: Request, res: Response) => {
+    const {
+      name,
+      description,
+      type,
+      projectType,
+      startDate,
+      deadline,
+      teamSize,
+      techStack,
+      methodology,
+      workingHours,
+      logo,
+    } = req.body;
+
+    // Step 1: Call Gemini to generate features BEFORE creating project
+    let features;
+    try {
+      features = await generateProjectFeatures({
+        name,
+        description,
+        type,
+        techStack,
+        teamSize: teamSize ? String(teamSize) : undefined,
+        methodology,
+        experienceLevel: undefined,
+        deadline,
+        workingHours,
+        startDate,
+        projectType,
+      });
+    } catch (error) {
+      // If Gemini fails, return error without creating project
+      const errorMessage = error instanceof Error ? error.message : 'AI feature generation failed';
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Failed to generate features',
+        error: errorMessage 
+      });
+    }
+
+    // Step 2: Create project and features in a single transaction
+    try {
+      const project = await createProjectWithFeatures(
+        {
+          name,
+          description,
+          type,
+          projectType,
+          startDate,
+          deadline,
+          teamSize,
+          techStack,
+          methodology,
+          workingHours,
+          logo,
+        },
+        req.user!.id,
+        features.map(f => ({
+          title: f.title,
+          description: f.description,
+          category: f.category,
+          priority: f.priority,
+        }))
+      );
+
+      res.status(201).json({ success: true, data: project });
+    } catch (error) {
+      throw handleDatabaseError(error);
+    }
   }),
 );
 
