@@ -144,6 +144,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         type: input.type ?? 'original',
       })
       setState((prev) => ({ ...prev, features: [...prev.features, feature] }))
+      
       return feature
     },
     [state.features]

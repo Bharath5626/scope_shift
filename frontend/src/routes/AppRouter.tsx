@@ -49,6 +49,7 @@ export function AppRouter() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/new" element={<CreateProjectPage />} />
+          <Route path="/create-project" element={<CreateProjectPage />} />
           <Route path="/scope-builder" element={<ScopeBuilder />} />
           <Route path="/analyzing" element={<AnalyzingPage />} />
           <Route path="/analysis-results" element={<AnalysisResultsPage />} />

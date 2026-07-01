@@ -37,47 +37,45 @@ export const getOverallDashboardStats = async () => {
   const draftProjects = projects.filter((p) => p.status === 'draft').length;
   const completedProjects = projects.filter((p) => p.status === 'completed').length;
 
-  // Calculate at-risk projects dynamically based on multiple factors
+  // Calculate at-risk projects based on deadline proximity only
   const today = new Date();
   const atRiskProjects = projects.filter((p) => {
     // Skip completed projects
     if (p.status === 'completed') return false;
 
-    // Factor 1: Deadline proximity (less than 7 days remaining)
+    // Only consider deadline proximity (less than 7 days remaining)
     if (p.deadline) {
       const daysUntilDeadline = Math.ceil((new Date(p.deadline).getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      if (daysUntilDeadline <= 7) return true;
-    }
-
-    // Factor 2: High or critical risk from latest analysis
-    if (p.analyses.length > 0) {
-      const latestAnalysis = p.analyses[0];
-      if (latestAnalysis.riskLevel && (latestAnalysis.riskLevel.toLowerCase() === 'high' || latestAnalysis.riskLevel.toLowerCase() === 'critical')) return true;
-    }
-
-    // Factor 3: High scope increase (more than 30%)
-    if (p.analyses.length > 0) {
-      const latestAnalysis = p.analyses[0];
-      if (latestAnalysis.scopeIncreasePercent > 30) return true;
+      return daysUntilDeadline <= 7;
     }
 
     return false;
   }).length;
 
-  // Calculate risk distribution from analyses
-  const allAnalyses = projects.flatMap((p) => p.analyses);
-  const totalAnalyses = allAnalyses.length;
+  // Get only the latest analysis from each project
+  const latestAnalyses = projects
+    .map((p) => {
+      if (p.analyses.length > 0) {
+        // Sort by createdAt desc and take the first one
+        return p.analyses.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+      }
+      return null;
+    })
+    .filter((a) => a !== null);
+
+  // Calculate risk distribution from latest analyses only
+  const totalAnalyses = latestAnalyses.length;
 
   const riskDistribution = {
-    low: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'low').length,
-    medium: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'medium').length,
-    high: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'high').length,
-    critical: allAnalyses.filter((a) => a.riskLevel && a.riskLevel.toLowerCase() === 'critical').length,
+    low: latestAnalyses.filter((a) => a!.riskLevel && a!.riskLevel.toLowerCase() === 'low').length,
+    medium: latestAnalyses.filter((a) => a!.riskLevel && a!.riskLevel.toLowerCase() === 'medium').length,
+    high: latestAnalyses.filter((a) => a!.riskLevel && a!.riskLevel.toLowerCase() === 'high').length,
+    critical: latestAnalyses.filter((a) => a!.riskLevel && a!.riskLevel.toLowerCase() === 'critical').length,
   };
 
   // Calculate scope health score
   const avgScopeIncrease = totalAnalyses > 0
-    ? allAnalyses.reduce((sum, a) => sum + a.scopeIncreasePercent, 0) / totalAnalyses
+    ? latestAnalyses.reduce((sum: number, a: any) => sum + (a.scopeIncreasePercent || 0), 0) / totalAnalyses
     : 0;
 
   const healthScore = Math.max(0, Math.min(100, 100 - avgScopeIncrease));

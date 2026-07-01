@@ -20,6 +20,7 @@ model User {
   otpExpiresAt  DateTime?
 
   projects      Project[]
+  auditLogs     AuditLog[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -51,6 +52,7 @@ model Project {
 
   features      Feature[]
   analyses      Analysis[]
+  auditLogs     AuditLog[]
 }
 model Feature {
   id          String @id @default(uuid())
@@ -69,12 +71,12 @@ model Analysis {
   id                   String @id @default(uuid())
   projectId            String
   analysisHash         String? // SHA256 hash of feature set for duplicate detection
-  
+
   // Legacy fields (kept for backward compatibility)
   scopeIncreasePercent Float?
   additionalHours      Float?
   delayWeeks           Float?
-  
+
   // Capacity engine metrics
   workingDays          Int?
   availableHours       Float?
@@ -90,7 +92,7 @@ model Analysis {
   bufferHours          Float?
   bufferPercent        Float?
   timelineFit          String?
-  
+
   // Derived metrics
   scopeScore           Int?
   complexityLevel      String?
@@ -98,7 +100,7 @@ model Analysis {
   riskLevel            String?
   projectHealth        String?
   confidence           Int?
-  
+
   // JSON fields for complex data
   effortBreakdown      Json?
   riskFactors          Json?
@@ -107,6 +109,25 @@ model Analysis {
   createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+
   @@unique([projectId, analysisHash])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  projectId   String
+  action      String   // created, updated, deleted, status_changed, feature_added, feature_removed, etc.
+  description String?  @db.Text
+  changes     Json?    // JSON object with field changes { field: { from: value, to: value } }
+  userId      String?
+  features    Json?    // Snapshot of features at the time of this log
+
+  createdAt   DateTime @default(now())
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@index([userId])
 }

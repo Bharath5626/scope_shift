@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
 import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION } from '../utils/designSystem'
@@ -95,6 +95,9 @@ const SelectWrapper = ({ children }: { children: React.ReactNode }) => (
 type Step = 'form' | 'generating'
 
 export function CreateProjectPage() {
+  const [searchParams] = useSearchParams()
+  const editProjectId = searchParams.get('edit')
+  const { createProject } = useProjects()
   const [projectTypeOther, setProjectTypeOther] = useState('')
   const [isCustomProjectType, setIsCustomProjectType] = useState(false)
   const [methodologyOther, setMethodologyOther] = useState('')
@@ -106,7 +109,6 @@ export function CreateProjectPage() {
   const [projectLogo, setProjectLogo] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const navigate = useNavigate()
-  const { createProject } = useProjects()
 
   // 🧠 CORE
   const [name, setName] = useState('')
@@ -122,27 +124,53 @@ export function CreateProjectPage() {
   const [methodology, setMethodology] = useState('')
   const [workingHours, setWorkingHours] = useState('')
 
-  // Load saved form data from localStorage on mount
+  // Load project data if editing
   useEffect(() => {
-    const savedData = localStorage.getItem('createProjectDraft')
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData)
-        if (data.name) setName(data.name)
-        if (data.description) setDescription(data.description)
-        if (data.teamSize) setTeamSize(data.teamSize)
-        if (data.deadline) setDeadline(data.deadline)
-        if (data.startDate) setStartDate(data.startDate)
-        if (data.projectType) setProjectType(data.projectType)
-        if (data.methodology) setMethodology(data.methodology)
-        if (data.workingHours) setWorkingHours(data.workingHours)
-        if (data.selectedSkills) setSelectedSkills(data.selectedSkills)
-        if (data.logoPreview) setLogoPreview(data.logoPreview)
-      } catch (e) {
-        console.error('Failed to load saved form data:', e)
-      }
+    if (editProjectId) {
+      // Fetch project directly from API to ensure we have the latest data
+      api.get(`/projects/${editProjectId}`)
+        .then((project: any) => {
+          setName(project.name)
+          setDescription(project.description || '')
+          setTeamSize(project.teamSize?.toString() || '')
+          setDeadline(project.deadline ? new Date(project.deadline).toISOString().split('T')[0] : '')
+          setStartDate(project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '')
+          setProjectType(project.projectType || '')
+          setMethodology(project.methodology || '')
+          setWorkingHours(project.workingHours?.toString() || '')
+          setLogoPreview(project.logo || null)
+          
+          if (project.techStack) {
+            const skills = project.techStack.split(',').map(s => s.trim()).filter(s => s)
+            setSelectedSkills(skills)
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to load project:', err)
+          setError('Failed to load project data. Please try again.')
+        })
     }
-  }, [])
+  }, [editProjectId])
+
+  // Load saved form data from localStorage on mount (only for new projects, not editing)
+  useEffect(() => {
+    if (editProjectId) return // Skip loading draft data when editing
+    
+    // Clear draft data on mount for new projects to start fresh
+    localStorage.removeItem('createProjectDraft')
+    
+    // Reset form fields
+    setName('')
+    setDescription('')
+    setTeamSize('')
+    setDeadline('')
+    setStartDate('')
+    setProjectType('')
+    setMethodology('')
+    setWorkingHours('')
+    setSelectedSkills([])
+    setLogoPreview(null)
+  }, [editProjectId])
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
@@ -290,28 +318,39 @@ const handleCreate = async () => {
 
   try {
     console.log('Creating project with logo:', logoPreview ? 'Yes' : 'No', logoPreview?.substring(0, 50) + '...')
-const project = await createProject({
-  name,
-  description: description.trim() || null,
-
-  type: TYPE_MAP[projectType] ?? 'saas',
-
-  startDate,
-  deadline,
-
-  teamSize: Number(teamSize),
-
-  techStack: selectedSkills.join(', '),
-  projectType: projectType || null,
-
-  methodology: methodology.trim() || null,
-
-  workingHours:
-    workingHours
-      ? Number(workingHours)
-      : null,
-  logo: logoPreview,
-})
+    
+    let project
+    if (editProjectId) {
+      // Update existing project
+      project = await api.put(`/projects/${editProjectId}`, {
+        name,
+        description: description.trim() || null,
+        type: TYPE_MAP[projectType] ?? 'saas',
+        startDate,
+        deadline,
+        teamSize: Number(teamSize),
+        techStack: selectedSkills.join(', '),
+        projectType: projectType || null,
+        methodology: methodology.trim() || null,
+        workingHours: workingHours ? Number(workingHours) : null,
+        logo: logoPreview,
+      })
+    } else {
+      // Create new project
+      project = await createProject({
+        name,
+        description: description.trim() || null,
+        type: TYPE_MAP[projectType] ?? 'saas',
+        startDate,
+        deadline,
+        teamSize: Number(teamSize),
+        techStack: selectedSkills.join(', '),
+        projectType: projectType || null,
+        methodology: methodology.trim() || null,
+        workingHours: workingHours ? Number(workingHours) : null,
+        logo: logoPreview,
+      })
+    }
 
     await api.post(`/projects/${project.id}/generate-features`, {
       core: {
@@ -374,10 +413,13 @@ const filteredSkills = SKILLS.filter(
         <div className={`mb-8 flex items-start justify-between`}>
           <div>
             <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
-              Create New Project
+              {editProjectId ? 'Edit Project Details' : 'Create New Project'}
             </h1>
             <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
-              Fill in the details — AI will generate features based on structured inputs
+              {editProjectId 
+                ? 'Update project details — AI will regenerate features based on your changes'
+                : 'Fill in the details — AI will generate Requirements based on structured inputs'
+              }
             </p>
           </div>
         </div>
@@ -393,7 +435,7 @@ const filteredSkills = SKILLS.filter(
           {/* CORE */}
           <SectionCard
             title="Project Identity"
-            description="Core inputs drive AI feature generation quality."
+            description="Core inputs drive AI Requirement generation quality."
           >
             <div className={`grid gap-5 sm:grid-cols-2 ${SPACING.section.gap}`}>
               <div>
@@ -530,6 +572,21 @@ const filteredSkills = SKILLS.filter(
           if (value.includes(',')) {
             const newSkills = value
               .split(',')
+              .map(s => s.trim())
+              .filter(s => s && !selectedSkills.includes(s))
+
+            if (newSkills.length > 0) {
+              setSelectedSkills([...selectedSkills, ...newSkills])
+              setTechStackInput('')
+            }
+          }
+
+          // Check if input contains multiple spaces (paste of space-separated list)
+          // Only split if there are multiple words (more than 2 spaces or the input looks like a list)
+          const spaceCount = (value.match(/ /g) || []).length
+          if (spaceCount >= 2) {
+            const newSkills = value
+              .split(/\s+/)
               .map(s => s.trim())
               .filter(s => s && !selectedSkills.includes(s))
 
@@ -800,7 +857,7 @@ const filteredSkills = SKILLS.filter(
         {/* Footer */}
         <div className={`mt-8 flex items-center justify-between ${BORDER_RADIUS.card} border border-gray-200 bg-white px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
-            AI will generate 6–10 features based on your inputs
+            AI will generate 6–10 Requirements based on your inputs
           </div>
 
           <div className="flex items-center gap-3">
@@ -824,7 +881,7 @@ const filteredSkills = SKILLS.filter(
 }
               className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-50`}
             >
-              Generate Features & Continue
+              {editProjectId ? 'Update & Regenerate Features' : 'Generate Requirements & Continue'}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { generateProjectFeatures } from "./ai.service";
 import { getProjectById, createProjectWithFeatures } from "../projects/project.service";
 import prisma from "../../config/database";
 import { handleDatabaseError } from "../../utils/database-errors";
+import { createAuditLog } from "../auditLogs/auditLog.service";
 
 const router = Router({ mergeParams: true });
 
@@ -77,6 +78,7 @@ router.post(
       effortBreakdown: result.effortBreakdown,
       riskFactors: result.riskFactors,
       recommendations: result.recommendations,
+      userId: req.user?.id,
     });
 
     res.status(201).json({ success: true, data: result });
@@ -125,6 +127,23 @@ router.post(
         }),
       ),
     );
+
+    // Fetch all features after creation for snapshot
+    const allFeatures = await prisma.feature.findMany({
+      where: { projectId },
+      orderBy: { order: "asc" },
+    });
+
+    // Create audit log for feature generation
+    if (req.user?.id) {
+      await createAuditLog({
+        projectId,
+        action: "features_generated",
+        description: `Generated ${created.length} new features for the project`,
+        userId: req.user.id,
+        features: allFeatures,
+      });
+    }
 
     res.status(201).json({ success: true, data: created });
   }),

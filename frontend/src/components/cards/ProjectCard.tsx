@@ -7,32 +7,6 @@ interface ProjectCardProps {
   project: Project
 }
 
-function getProgressColor(status: Project['status']): string {
-  switch (status) {
-    case 'completed':
-      return 'bg-green-500'
-    case 'active':
-      return 'bg-indigo-500'
-    case 'at_risk':
-      return 'bg-red-500'
-    default:
-      return 'bg-gray-400'
-  }
-}
-
-function getProgressPercentage(project: Project): number {
-  switch (project.status) {
-    case 'completed':
-      return 100
-    case 'active':
-      return 60
-    case 'at_risk':
-      return 40
-    default:
-      return 10
-  }
-}
-
 const statusStyles: Record<Project['status'], string> = {
   draft: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
   active: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
@@ -42,8 +16,6 @@ const statusStyles: Record<Project['status'], string> = {
 
 export function ProjectCard({ project }: ProjectCardProps) {
   const { setActiveProjectId } = useProjects()
-  const progress = getProgressPercentage(project)
-  const progressColor = getProgressColor(project.status)
 
   return (
     <Link
@@ -68,20 +40,6 @@ export function ProjectCard({ project }: ProjectCardProps) {
         >
           {PROJECT_STATUS_LABELS[project.status]}
         </span>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mt-4">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Progress</span>
-          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{progress}%</span>
-        </div>
-        <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700">
-          <div
-            className={`h-full rounded-full ${progressColor} transition-all duration-300`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
       </div>
 
       {/* Footer */}

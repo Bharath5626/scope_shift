@@ -5,6 +5,7 @@ import {
   logDatabaseTransactionSuccess,
   logDatabaseTransactionRollback,
 } from "../../utils/database-logging";
+import { createAuditLog } from "../auditLogs/auditLog.service";
 
 export const getFeaturesByProject = async (projectId: string, type?: string) => {
   try {
@@ -26,11 +27,12 @@ export const addFeature = async (
     priority: string;
     type?: string;
     order?: number;
-  }
+  },
+  userId?: string
 ) => {
   try {
     const count = await prisma.feature.count({ where: { projectId } });
-    return prisma.feature.create({
+    const feature = await prisma.feature.create({
       data: {
         projectId,
         title: data.title,
@@ -41,6 +43,11 @@ export const addFeature = async (
         order: data.order ?? count,
       },
     });
+
+    // Removed individual audit log for feature addition
+    // Use batch endpoint for multiple features to create single log
+
+    return feature;
   } catch (error) {
     throw handleDatabaseError(error);
   }

@@ -158,7 +158,7 @@ export function calculateCapacityMetricsNew(input: CapacityInput): CapacityMetri
 
   // Step 7: Calculate capacity utilization
   const capacityUtilization = productiveHours > 0
-    ? Math.round((estimatedHours / productiveHours) * 100)
+    ? parseFloat(((estimatedHours / productiveHours) * 100).toFixed(2))
     : 0;
 
   // Step 8: Calculate buffer

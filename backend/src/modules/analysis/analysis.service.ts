@@ -1,8 +1,8 @@
 import prisma from "../../config/database";
 import cron from "node-cron";
-import { 
-  handleDatabaseError, 
-  getDatabaseErrorStatusCode 
+import {
+  handleDatabaseError,
+  getDatabaseErrorStatusCode
 } from "../../utils/database-errors";
 import {
   logDatabaseTransactionStart,
@@ -12,6 +12,7 @@ import {
   logDatabaseError,
 } from "../../utils/database-logging";
 import { generateAnalysisHash } from "../../utils/hash";
+import { createAuditLog } from "../auditLogs/auditLog.service";
 
 
 cron.schedule("*/10 * * * *", async () => {
@@ -95,12 +96,14 @@ export const createAnalysis = async (data: {
   effortBreakdown?: any;
   riskFactors?: any;
   recommendations?: any;
+  userId?: string;
+  features?: any; // Snapshot of features at analysis time
 }) => {
   const startTime = Date.now();
   logDatabaseTransactionStart('createAnalysis', data.projectId);
 
   // Generate analysis hash from feature estimates for duplicate detection
-  const analysisHash = data.featureEstimates 
+  const analysisHash = data.featureEstimates
     ? generateAnalysisHash(data.featureEstimates)
     : undefined;
 
@@ -115,6 +118,15 @@ export const createAnalysis = async (data: {
       });
 
       if (existingAnalysis) {
+        // Create audit log even for duplicate analysis
+        if (data.userId) {
+          await createAuditLog({
+            projectId: data.projectId,
+            action: "analysis_retrieved",
+            description: "Existing analysis was retrieved (duplicate scope)",
+            userId: data.userId,
+          });
+        }
         // Return existing analysis instead of creating duplicate
         return existingAnalysis;
       }
@@ -134,7 +146,7 @@ export const createAnalysis = async (data: {
       if (data.delayWeeks !== undefined) createData.delayWeeks = data.delayWeeks;
       if (data.riskLevel !== undefined) createData.riskLevel = data.riskLevel;
       if (data.complexity !== undefined) createData.complexity = data.complexity;
-      
+
       // Capacity engine metrics
       if (data.workingDays !== undefined) createData.workingDays = data.workingDays;
       if (data.availableHours !== undefined) createData.availableHours = data.availableHours;
@@ -150,14 +162,14 @@ export const createAnalysis = async (data: {
       if (data.bufferHours !== undefined) createData.bufferHours = data.bufferHours;
       if (data.bufferPercent !== undefined) createData.bufferPercent = data.bufferPercent;
       if (data.timelineFit !== undefined) createData.timelineFit = data.timelineFit;
-      
+
       // Derived metrics
       if (data.scopeScore !== undefined) createData.scopeScore = data.scopeScore;
       if (data.complexityLevel !== undefined) createData.complexityLevel = data.complexityLevel;
       if (data.complexityScore !== undefined) createData.complexityScore = data.complexityScore;
       if (data.projectHealth !== undefined) createData.projectHealth = data.projectHealth;
       if (data.confidence !== undefined) createData.confidence = data.confidence;
-      
+
       // JSON fields
       if (data.effortBreakdown !== undefined) createData.effortBreakdown = data.effortBreakdown;
       if (data.riskFactors !== undefined) createData.riskFactors = data.riskFactors;
@@ -178,25 +190,73 @@ export const createAnalysis = async (data: {
     logDatabaseTransactionSuccess('createAnalysis', data.projectId, duration);
     logDatabaseAnalysisSaved(data.projectId, result.id);
 
+    // Fetch current features for snapshot
+    const currentFeatures = await prisma.feature.findMany({
+      where: { projectId: data.projectId },
+      orderBy: { order: "asc" },
+    });
+
+    console.log('Creating analysis audit log for project:', data.projectId, 'with features:', currentFeatures.length);
+
+    // Create audit log for analysis creation with feature snapshot
+    if (data.userId) {
+      await createAuditLog({
+        projectId: data.projectId,
+        action: "analysis_created",
+        description: "AI analysis was completed for the project",
+        userId: data.userId,
+        features: currentFeatures,
+      });
+      console.log('Analysis audit log created successfully');
+    } else {
+      console.log('No userId provided, skipping audit log creation');
+    }
+
     return result;
   } catch (error) {
     // Handle P2002 unique constraint violation - return existing analysis if it exists
     const dbError = handleDatabaseError(error);
-    
+
+    console.log('Analysis creation error:', dbError.originalCode, 'analysisHash:', analysisHash);
+
     // If it's a duplicate analysis error (P2002), try to return the existing analysis
     if (dbError.originalCode === 'P2002' && analysisHash) {
+      console.log('Duplicate analysis detected, searching for existing analysis');
       const existingAnalysis = await prisma.analysis.findFirst({
         where: {
           projectId: data.projectId,
           analysisHash,
         },
       });
-      
+
       if (existingAnalysis) {
+        console.log('Found existing analysis:', existingAnalysis.id);
+        
+        // Fetch current features for snapshot
+        const currentFeatures = await prisma.feature.findMany({
+          where: { projectId: data.projectId },
+          orderBy: { order: "asc" },
+        });
+
+        console.log('Analysis retrieved - features found:', currentFeatures.length);
+        console.log('Sample feature:', currentFeatures[0]);
+
+        // Create audit log for analysis retrieval with feature snapshot
+        if (data.userId) {
+          await createAuditLog({
+            projectId: data.projectId,
+            action: "analysis_retrieved",
+            description: "Existing analysis was retrieved (duplicate scope)",
+            userId: data.userId,
+            features: currentFeatures,
+          });
+          console.log('Analysis retrieved audit log created');
+        }
+
         return existingAnalysis;
       }
     }
-    
+
     logDatabaseTransactionRollback('createAnalysis', data.projectId, dbError.originalCode, dbError.originalMessage);
     throw dbError;
   }

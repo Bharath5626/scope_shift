@@ -54,7 +54,7 @@ export const getProjectById = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const updateProject = asyncHandler(async (req: Request, res: Response) => {
-  const project = await ProjectService.updateProject(req.params.id, req.body);
+  const project = await ProjectService.updateProject(req.params.id, req.body, req.user!.id);
   res.json({ success: true, data: project });
 });
 
@@ -67,3 +67,4 @@ export const getAnalyzedProjects = asyncHandler(async (_req: Request, res: Respo
   const projects = await ProjectService.getAnalyzedProjects();
   res.json({ success: true, data: projects });
 });
+

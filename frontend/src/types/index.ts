@@ -20,6 +20,12 @@ export interface Project {
   createdAt: string
   updatedAt: string
   logo?: string | null
+  projectType?: string | null
+  teamSize?: number | null
+  methodology?: string | null
+  workingHours?: number | null
+  techStack?: string | null
+  startDate?: string | null
 
   createdBy: {
     id: string

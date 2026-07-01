@@ -29,6 +29,32 @@ interface Analysis {
   createdAt: string
 }
 
+interface AuditLog {
+  id: string
+  projectId: string
+  action: string
+  description: string | null
+  changes: Record<string, { from: any; to: any }> | null
+  userId: string | null
+  features: Feature[] | null
+  createdAt: string
+  user?: {
+    id: string
+    name: string
+  }
+}
+
+interface Feature {
+  id: string
+  projectId: string
+  title: string
+  description: string | null
+  category: string
+  priority: string
+  order: number
+  type: string
+}
+
 interface Project {
   id: string
   name: string
@@ -60,7 +86,7 @@ const COMPLEXITY_STROKE: Record<string, string> = {
   Low: '#22c55e', Medium: '#f59e0b', High: '#ef4444',
 }
 
-const TABS = ['Summary', 'Effort Breakdown', 'Risk Analysis', 'Recommendations', 'Project Details'] as const
+const TABS = ['Summary', 'Effort Breakdown', 'Risk Analysis', 'Recommendations', 'Project Details', 'Logs'] as const
 type Tab = typeof TABS[number]
 
 function DonutChart({ level, score }: { level: string; score: number }) {
@@ -246,10 +272,6 @@ function RecommendationsTab({ recommendations }: { recommendations: string[] | n
 }
 
 function ProjectDetailsTab({ project }: { project: Project }) {
-  const { user } = useAuth()
-  const isCreator = user?.id === project.createdBy.id
-  const createdBy = isCreator ? 'you' : project.createdBy.name
-
   return (
     <div className="space-y-6">
       {/* Basic Info */}
@@ -322,41 +344,149 @@ function ProjectDetailsTab({ project }: { project: Project }) {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
 
-      {/* Audit Log */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Audit Log</h3>
-        <div className="space-y-3">
-          <div className="flex items-start gap-3 rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-700">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-xs font-semibold dark:bg-indigo-900/30 dark:text-indigo-400">
-              {createdBy.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                Project created by <span className="text-indigo-600 dark:text-indigo-400">{createdBy}</span>
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(project.createdAt).toLocaleString()}
-              </p>
-            </div>
-          </div>
-          {project.updatedAt !== project.createdAt && (
-            <div className="flex items-start gap-3 rounded-lg bg-gray-50 px-4 py-3 dark:bg-gray-700">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 text-xs font-semibold dark:bg-amber-900/30 dark:text-amber-400">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Project last modified</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(project.updatedAt).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          )}
+function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
+  const { user } = useAuth()
+  const [expandedLogId, setExpandedLogId] = useState<string | null>(null)
+
+  const handleShowFeatures = (logId: string) => {
+    if (expandedLogId === logId) {
+      setExpandedLogId(null)
+      return
+    }
+
+    setExpandedLogId(logId)
+  }
+
+  const getUserName = (log: AuditLog) => {
+    if (!log.user) return 'Unknown'
+    if (user?.id === log.user.id) return 'You'
+    return log.user.name
+  }
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case 'created':
+        return <span className="text-indigo-600 dark:text-indigo-400">C</span>
+      case 'updated':
+        return <span className="text-amber-600 dark:text-amber-400">U</span>
+      case 'analysis_created':
+        return <span className="text-green-600 dark:text-green-400">A</span>
+      case 'analysis_retrieved':
+        return <span className="text-blue-600 dark:text-blue-400">R</span>
+      case 'feature_added':
+        return <span className="text-purple-600 dark:text-purple-400">F</span>
+      default:
+        return <span className="text-gray-600 dark:text-gray-400">{action.charAt(0).toUpperCase()}</span>
+    }
+  }
+
+  const getActionLabel = (action: string) => {
+    switch (action) {
+      case 'created':
+        return 'Project Created'
+      case 'updated':
+        return 'Project Modified'
+      case 'analysis_created':
+        return 'Analysis Completed'
+      case 'analysis_retrieved':
+        return 'Analysis Retrieved'
+      case 'feature_added':
+        return 'Feature Added'
+      default:
+        return action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {auditLogs.length === 0 ? (
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+          <p className="text-sm text-gray-500 dark:text-gray-400">No logs available</p>
         </div>
-      </div>
+      ) : (
+        auditLogs.map((log) => (
+          <div key={log.id} className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-4">
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
+                  log.action === 'created' 
+                    ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+                    : log.action === 'updated'
+                    ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                    : log.action === 'analysis_created'
+                    ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                    : log.action === 'feature_added'
+                    ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                    : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                }`}>
+                  {getActionIcon(log.action)}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {getActionLabel(log.action)}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(log.createdAt).toLocaleString()} • By {getUserName(log)}
+                  </p>
+                  {log.description && (
+                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{log.description}</p>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => handleShowFeatures(log.id)}
+                className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50"
+              >
+                Features
+              </button>
+            </div>
+            
+            {expandedLogId === log.id && (
+              <div className="border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
+                {log.features && log.features.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                      Features ({log.features.length})
+                    </p>
+                    {log.features.map((feature) => (
+                      <div key={feature.id} className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{feature.title}</p>
+                            {feature.description && (
+                              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{feature.description}</p>
+                            )}
+                          </div>
+                          <div className="ml-4 flex gap-2">
+                            <span className="rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                              {feature.category}
+                            </span>
+                            <span className={`rounded-full px-2 py-1 text-xs font-medium ${
+                              feature.priority === 'high' 
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                : feature.priority === 'medium'
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            }`}>
+                              {feature.priority}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No features available</p>
+                )}
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   )
 }
@@ -366,6 +496,7 @@ export function ReportDetailPage() {
   const navigate = useNavigate()
   const [project, setProject] = useState<Project | null>(null)
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<Tab>('Summary')
@@ -496,10 +627,12 @@ export function ReportDetailPage() {
     Promise.all([
       api.get<Project>(`/projects/${projectId}`),
       api.get<Analysis>(`/projects/${projectId}/analyses/latest`),
+      api.get<AuditLog[]>(`/projects/${projectId}/audit-logs`),
     ])
-      .then(([proj, anal]) => {
+      .then(([proj, anal, logs]) => {
         setProject(proj)
         setAnalysis(anal)
+        setAuditLogs(logs)
       })
       .catch(() => setError('Failed to load report data'))
       .finally(() => setLoading(false))
@@ -613,6 +746,7 @@ export function ReportDetailPage() {
             <RecommendationsTab recommendations={analysis.recommendations as string[] | null} />
           )}
           {activeTab === 'Project Details' && <ProjectDetailsTab project={project} />}
+          {activeTab === 'Logs' && <LogsTab auditLogs={auditLogs} />}
         </div>
 
         {/* Navigation buttons */}

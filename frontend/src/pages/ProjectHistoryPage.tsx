@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { useAuth } from '../context/AuthContext'
@@ -6,15 +6,288 @@ import { PROJECT_STATUS_LABELS, PROJECT_TYPE_LABELS } from '../utils/constants'
 import { EmptyState } from '../components/EmptyState'
 import { CardSkeleton } from '../components/LoadingSkeleton'
 import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } from '../utils/designSystem'
+import { api } from '../services/api'
 import type { Project, ProjectStatus, ProjectType } from '../types'
 
 const ALL = 'all'
+
+interface AuditLog {
+  id: string
+  projectId: string
+  action: string
+  description: string | null
+  changes: Record<string, { from: any; to: any }> | null
+  userId: string | null
+  features: any[] | null
+  createdAt: string
+  user?: {
+    id: string
+    name: string
+  }
+}
 
 const statusStyles: Record<Project['status'], string> = {
   draft:     'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
   active:    'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   at_risk:   'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+}
+
+function ProjectDetailsModal({
+  project,
+  onClose,
+  onReanalyze,
+}: {
+  project: Project
+  onClose: () => void
+  onReanalyze: () => void
+}) {
+  const { user } = useAuth()
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'details' | 'logs'>('details')
+  const [showFeaturesForLog, setShowFeaturesForLog] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAuditLogs = async () => {
+      try {
+        const logs = await api.get<AuditLog[]>(`/projects/${project.id}/audit-logs`)
+        setAuditLogs(logs)
+      } catch (error) {
+        console.error('Failed to fetch audit logs:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAuditLogs()
+  }, [project.id])
+
+  const getUserName = (log: AuditLog) => {
+    if (!log.user) return 'Unknown'
+    if (user?.id === log.user.id) return 'You'
+    return log.user.name
+  }
+
+  const getActionLabel = (action: string) => {
+    switch (action) {
+      case 'created':
+        return 'Project Created'
+      case 'updated':
+        return 'Project Modified'
+      case 'analysis_created':
+        return 'Analysis Completed'
+      case 'analysis_retrieved':
+        return 'Analysis Retrieved'
+      case 'feature_added':
+        return 'Feature Added'
+      case 'features_generated':
+        return 'Features Generated'
+      case 'features_modified':
+        return 'Features Modified'
+      default:
+        return action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/30 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{project.name}</h2>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{PROJECT_TYPE_LABELS[project.type]}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setActiveTab('details')}
+            className={`px-6 py-3 text-sm font-medium transition ${
+              activeTab === 'details'
+                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Project Details
+          </button>
+          <button
+            onClick={() => setActiveTab('logs')}
+            className={`px-6 py-3 text-sm font-medium transition ${
+              activeTab === 'logs'
+                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Logs ({auditLogs.length})
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {activeTab === 'details' ? (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Project Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Project Name</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">{project.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Description</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.description || 'No description provided'}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Type</p>
+                      <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{PROJECT_TYPE_LABELS[project.type]}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</p>
+                      <p className="mt-1 text-sm text-gray-700 capitalize dark:text-gray-300">{project.status.replace('_', ' ')}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Technical Details */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Technical Configuration</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Project Type</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.projectType || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Team Size</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.teamSize ? `${project.teamSize} members` : 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Methodology</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.methodology || 'Not specified'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Working Hours</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.workingHours ? `${project.workingHours} hrs/day` : 'Not specified'}</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Tech Stack</p>
+                  <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.techStack || 'Not specified'}</p>
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Timeline</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Start Date</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                      {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Deadline</p>
+                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                      {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not specified'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                </div>
+              ) : auditLogs.length === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No logs available</p>
+                </div>
+              ) : (
+                auditLogs.map((log) => (
+                  <div key={log.id} className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                    <div className="flex items-start justify-between p-4">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {getActionLabel(log.action)}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(log.createdAt).toLocaleString()} • By {getUserName(log)}
+                        </p>
+                        {log.description && (
+                          <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{log.description}</p>
+                        )}
+                        {log.features && (
+                          <div className="mt-3">
+                            <button
+                              onClick={() => setShowFeaturesForLog(log.id)}
+                              className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                            >
+                              Show Features {log.features.length > 0 ? `(${log.features.length})` : ''}
+                            </button>
+                            {showFeaturesForLog === log.id && (
+                              <div className="mt-2 space-y-2">
+                                {!log.features || log.features.length === 0 ? (
+                                  <p className="text-xs text-gray-500">No features available</p>
+                                ) : (
+                                  log.features.map((feature: any, idx: number) => (
+                                    <div key={idx} className="rounded-lg bg-gray-50 p-2 dark:bg-gray-700">
+                                      <p className="text-xs font-medium text-gray-900 dark:text-gray-100">{feature.title}</p>
+                                      {feature.description && (
+                                        <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">{feature.description}</p>
+                                      )}
+                                    </div>
+                                  ))
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 border-t border-gray-200 p-6 dark:border-gray-700">
+          <button
+            onClick={onClose}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          >
+            Close
+          </button>
+          <button
+            onClick={onReanalyze}
+            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+          >
+            Re-analyze
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function DeleteModal({
@@ -80,18 +353,13 @@ function DeleteModal({
 function ProjectCard({
   project,
   onDeleteClick,
+  onViewDetails,
 }: {
   project: Project
   onDeleteClick: (project: Project) => void
+  onViewDetails: (project: Project) => void
 }) {
-  const { setActiveProjectId } = useProjects()
   const { user } = useAuth()
-  const navigate = useNavigate()
-
-  const handleOpen = () => {
-    setActiveProjectId(project.id)
-    navigate(`/scope-builder?project=${project.id}`)
-  }
 
   const createdBy = project.createdBy && user?.id === project.createdBy.id ? 'you' : project.createdBy?.name || 'Unknown'
 
@@ -122,7 +390,7 @@ function ProjectCard({
       </button>
 
       {/* Clickable card body */}
-      <button onClick={handleOpen} className="w-full p-6 text-left flex-1">
+      <button onClick={() => onViewDetails(project)} className="w-full p-6 text-left flex-1">
         <div className="flex items-start gap-4">
           {/* Project Logo */}
           {project.logo ? (
@@ -180,12 +448,13 @@ function ProjectCard({
 
 export function ProjectHistoryPage() {
   const navigate = useNavigate()
-  const { projects, loading, deleteProject } = useProjects()
+  const { projects, loading, deleteProject, setActiveProjectId } = useProjects()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | typeof ALL>(ALL)
   const [typeFilter, setTypeFilter] = useState<ProjectType | typeof ALL>(ALL)
   const [deleteTarget, setDeleteTarget] = useState<Project | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [detailsTarget, setDetailsTarget] = useState<Project | null>(null)
 
   const filtered = useMemo(() => {
     return projects.filter((p) => {
@@ -212,6 +481,12 @@ export function ProjectHistoryPage() {
     }
   }
 
+  const handleReanalyze = (project: Project) => {
+    setActiveProjectId(project.id)
+    setDetailsTarget(null)
+    navigate(`/scope-builder?project=${project.id}`)
+  }
+
   return (
     <>
       {deleteTarget && (
@@ -220,6 +495,14 @@ export function ProjectHistoryPage() {
           onConfirm={handleDeleteConfirm}
           onCancel={() => !deleting && setDeleteTarget(null)}
           deleting={deleting}
+        />
+      )}
+
+      {detailsTarget && (
+        <ProjectDetailsModal
+          project={detailsTarget}
+          onClose={() => setDetailsTarget(null)}
+          onReanalyze={() => handleReanalyze(detailsTarget)}
         />
       )}
 
@@ -353,6 +636,7 @@ export function ProjectHistoryPage() {
                     key={project.id}
                     project={project}
                     onDeleteClick={setDeleteTarget}
+                    onViewDetails={setDetailsTarget}
                   />
                 ))}
               </div>

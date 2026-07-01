@@ -11,7 +11,7 @@ export const getFeaturesByProject = asyncHandler(async (req: Request, res: Respo
 
 export const addFeature = asyncHandler(async (req: Request, res: Response) => {
   const { projectId } = req.params;
-  const feature = await FeatureService.addFeature(projectId, req.body);
+  const feature = await FeatureService.addFeature(projectId, req.body, req.user!.id);
   res.status(201).json({ success: true, data: feature });
 });
 

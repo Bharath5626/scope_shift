@@ -1,8 +1,8 @@
 import prisma from "../../config/database";
-import { 
-  handleDatabaseError, 
+import {
+  handleDatabaseError,
   getDatabaseErrorStatusCode,
-  type DatabaseError 
+  type DatabaseError
 } from "../../utils/database-errors";
 import {
   logDatabaseTransactionStart,
@@ -10,6 +10,7 @@ import {
   logDatabaseTransactionRollback,
   logDatabaseError,
 } from "../../utils/database-logging";
+import { createAuditLog, detectChanges } from "../auditLogs/auditLog.service";
 
 const syncProjectStatus = async (project: any) => {
   if (
@@ -126,6 +127,15 @@ export const createProjectWithFeatures = async (
         });
       }
 
+      // Create audit log with feature snapshot
+      await createAuditLog({
+        projectId: project.id,
+        action: "created",
+        description: `Project "${data.name}" was created`,
+        userId,
+        features: features || [],
+      });
+
       return project;
     });
 
@@ -189,7 +199,7 @@ export const createProject = async (
       }
     }
 
-    return prisma.project.create({
+    const project = await prisma.project.create({
       data: {
         name: data.name,
         description: data.description,
@@ -209,6 +219,23 @@ export const createProject = async (
         createdById: userId,
       },
     });
+
+    // Fetch features for snapshot
+    const features = await prisma.feature.findMany({
+      where: { projectId: project.id },
+      orderBy: { order: "asc" },
+    });
+
+    // Create audit log for project creation with feature snapshot
+    await createAuditLog({
+      projectId: project.id,
+      action: "created",
+      description: `Project "${data.name}" was created`,
+      userId,
+      features,
+    });
+
+    return project;
   } catch (error) {
     throw handleDatabaseError(error);
   }
@@ -239,10 +266,6 @@ export const getProjectById = async (id: string) => {
       where: { id },
       include: {
         createdBy: { select: { id: true, name: true } },
-        features: true,
-        analyses: {
-          orderBy: { createdAt: "desc" },
-        },
       },
     });
 
@@ -256,11 +279,79 @@ export const getProjectById = async (id: string) => {
 
 export const updateProject = async (
   id: string,
-  data: Partial<{ name: string; description: string; type: string; status: string;  startDate: Date;deadline: Date; }>
+  data: Partial<{
+    name: string
+    description: string
+    type: string
+    status: string
+    startDate: string
+    deadline: string
+    teamSize: number
+    techStack: string
+    projectType: string
+    methodology: string
+    workingHours: number
+    logo: string
+  }>,
+  userId?: string
 ) => {
   try {
-    return prisma.project.update({ where: { id }, data });
+    // Get the existing project to detect changes
+    const existingProject = await prisma.project.findUnique({
+      where: { id },
+    });
+
+    if (!existingProject) {
+      throw new Error("Project not found");
+    }
+
+    // Convert date strings to Date objects if provided
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.startDate !== undefined) updateData.startDate = new Date(data.startDate);
+    if (data.deadline !== undefined) updateData.deadline = new Date(data.deadline);
+    if (data.teamSize !== undefined) updateData.teamSize = data.teamSize;
+    if (data.techStack !== undefined) updateData.techStack = data.techStack;
+    if (data.projectType !== undefined) updateData.projectType = data.projectType;
+    if (data.methodology !== undefined) updateData.methodology = data.methodology;
+    if (data.workingHours !== undefined) updateData.workingHours = data.workingHours;
+    if (data.logo !== undefined) updateData.logo = data.logo;
+
+    // Detect changes
+    const changes = detectChanges(existingProject, updateData);
+
+    // Only update and create audit log if there are actual changes
+    if (Object.keys(changes).length === 0) {
+      return existingProject; // No changes, return existing project
+    }
+
+    // Update the project
+    const updatedProject = await prisma.project.update({ where: { id }, data: updateData });
+
+    // Fetch current features for snapshot
+    const features = await prisma.feature.findMany({
+      where: { projectId: id },
+      orderBy: { order: "asc" },
+    });
+
+    // Create audit log if userId is provided
+    if (userId) {
+      await createAuditLog({
+        projectId: id,
+        action: "updated",
+        description: `Project was updated`,
+        changes,
+        userId,
+        features,
+      });
+    }
+
+    return updatedProject;
   } catch (error) {
+    console.error('Error updating project:', error);
     throw handleDatabaseError(error);
   }
 };
@@ -282,6 +373,19 @@ export const getAnalyzedProjects = async () => {
         analyses: {
           orderBy: { createdAt: "desc" },
           take: 1,
+          select: {
+            id: true,
+            scopeScore: true,
+            complexityScore: true,
+            additionalHours: true,
+            estimatedWeeks: true,
+            riskLevel: true,
+            complexityLevel: true,
+            createdAt: true,
+            // Include legacy fields for backward compatibility
+            scopeIncreasePercent: true,
+            delayWeeks: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },

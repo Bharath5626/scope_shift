@@ -299,115 +299,6 @@ type FeatureInput = {
   priority: string;
 };
 
-const computeFallbackAnalysis = (
-  features: FeatureInput[],
-): ScopeAnalysisResult => {
-  const count = features.length;
-  const highPriority = features.filter((f) => f.priority === "high").length;
-  const totalHours = Math.round(count * 16);
-  const devHours = Math.round(totalHours * 0.6);
-  const testHours = Math.round(totalHours * 0.17);
-  const intHours = Math.round(totalHours * 0.13);
-  const docHours = totalHours - devHours - testHours - intHours;
-  const weeks = Math.max(1, Math.ceil(totalHours / 40));
-  const riskLevel: "Low" | "Medium" | "High" =
-    highPriority >= 3 || count >= 8 ? "High" : count >= 4 ? "Medium" : "Low";
-  const complexityScore = Math.min(95, 30 + count * 7);
-  const complexityLevel: "Low" | "Medium" | "High" =
-    complexityScore >= 70 ? "High" : complexityScore >= 45 ? "Medium" : "Low";
-  const scopeScore = Math.min(95, 20 + count * 9);
-
-  const riskFactorPool: Record<string, string[]> = {
-    authentication: [
-      "Session management complexity",
-      "Security compliance requirements",
-    ],
-    billing: ["Payment gateway integration", "Subscription state edge cases"],
-    integrations: ["External service reliability", "API rate limiting"],
-    general: [
-      "Scope creep risk",
-      "Dependency management",
-      "Cross-browser compatibility",
-    ],
-    default: [
-      "Timeline constraints",
-      "Technical debt accumulation",
-      "Change in user flow",
-    ],
-  };
-  const uniqueCategories = [...new Set(features.map((f) => f.category))];
-  const riskFactors: string[] = [];
-  for (const cat of uniqueCategories) {
-    const pool = riskFactorPool[cat] ?? riskFactorPool.general;
-    riskFactors.push(pool[0]);
-    if (riskFactors.length >= 4) break;
-  }
-  while (riskFactors.length < 4)
-    riskFactors.push(riskFactorPool.default[riskFactors.length % 3]);
-
-  const recommendationPool: Record<string, string[]> = {
-    saas: [
-      "Define clear API contracts before implementation begins",
-      "Implement caching early to avoid performance bottlenecks",
-      "Set up error monitoring (e.g. Sentry) from day one",
-      "Design for horizontal scaling from the start",
-    ],
-    ecommerce: [
-      "Optimise the checkout flow to reduce cart abandonment",
-      "Test all payment flows thoroughly in a staging environment",
-      "Add inventory webhooks for real-time stock updates",
-      "Implement product search with proper indexing",
-    ],
-    chatbot: [
-      "Log all conversations for training data collection",
-      "Add a human escalation fallback for low-confidence responses",
-      "Test with diverse user inputs and edge cases",
-      "Monitor intent confidence scores over time",
-    ],
-    landing_page: [
-      "A/B test the hero section CTA for conversion",
-      "Optimise images for Core Web Vitals",
-      "Add schema markup for improved SEO",
-      "Set up conversion tracking from day one",
-    ],
-    general: [
-      "Start with a minimal viable scope and expand iteratively",
-      "Establish clear acceptance criteria for each feature",
-      "Schedule weekly scope review meetings to catch drift early",
-      "Document all third-party dependencies and their SLAs",
-    ],
-  };
-
-  const typeKey = "general";
-  const recommendations = (
-    recommendationPool[typeKey] ?? recommendationPool.general
-  ).slice(0, 4);
-
-  return {
-    scopeScore,
-    estimatedHours: totalHours,
-    availableHours: 0,
-    effectiveAvailableHours: 0,
-    estimatedWeeks: weeks,
-    deadlineFeasible: true,
-    capacityUtilization: 0,
-    capacityBuffer: 0,
-    capacityBufferPercent: 0,
-    confidence: 60,
-    riskLevel,
-    projectHealth: "Healthy",
-    effortBreakdown: {
-      development: devHours,
-      testing: testHours,
-      integration: intHours,
-      documentation: docHours,
-    },
-    complexity: { level: complexityLevel, score: complexityScore },
-    riskFactors: riskFactors.slice(0, 4),
-    recommendations,
-  };
-};
-
 export const analyzeProjectScope = async (
 project: {
   name: string;
@@ -690,17 +581,7 @@ Return ONLY valid JSON. No markdown, no commentary.
 
     // Derive complexity from total estimated hours (deterministic)
     let complexityLevel: "Low" | "Medium" | "High";
-    let complexityScore: number;
-    if (capacityMetrics.estimatedHours < 100) {
-      complexityLevel = "Low";
-      complexityScore = 30;
-    } else if (capacityMetrics.estimatedHours <= 300) {
-      complexityLevel = "Medium";
-      complexityScore = 55;
-    } else {
-      complexityLevel = "High";
-      complexityScore = 80;
-    }
+    let complexityScore: number = 0;
 
     // Derive risk level from capacity utilization (deterministic)
     let riskLevel: "Low" | "Medium" | "High";
@@ -740,7 +621,11 @@ Return ONLY valid JSON. No markdown, no commentary.
     };
 
     // Calculate scope score from utilization (deterministic)
-    const scopeScore = Math.min(95, Math.round((capacityMetrics.estimatedHours / capacityMetrics.productiveHours) * 100));
+    const scopeScore = Math.min(95, parseFloat(((capacityMetrics.estimatedHours / capacityMetrics.productiveHours) * 100).toFixed(2)));
+    
+    // Use same formula for complexity score for consistency
+    complexityScore = scopeScore;
+    complexityLevel = complexityScore >= 70 ? "High" : complexityScore >= 45 ? "Medium" : "Low";
 
     // Log successful AI operation
     logAISuccess({

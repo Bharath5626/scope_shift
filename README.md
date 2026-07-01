@@ -1,125 +1,190 @@
-# ScopeAI — Scope Creep Analyzer
+# ScopeAI — AI-Powered Project Scope Management Platform
 
-AI-powered project scope management tool that detects scope creep before it derails your timeline. Define your project scope, track feature additions, and get real-time risk analysis powered by AI.
+A comprehensive project management tool that leverages artificial intelligence to detect scope creep, analyze project capacity, and provide actionable insights. Define your project scope, track feature additions, and get real-time risk analysis powered by Google Gemini AI with advanced what-if scenario modeling.
 
-## Features
+## 🚀 Key Features
 
-- **Project Management**: Create, update, and manage projects with deadlines
-- **Feature Tracking**: Add and organize project features with drag-and-drop reordering
-- **AI-Powered Analysis**: Automatic scope creep detection using Google Gemini AI
-- **Risk Assessment**: Get detailed risk analysis with effort breakdown and recommendations
-- **Project Status Workflow**: Track project status through draft → active → completed lifecycle
-- **PDF Export**: Download comprehensive analysis reports as PDF
-- **Excel Export**: Export project data to Excel spreadsheets
-- **Deadline Tracking**: Automatic status updates based on project deadlines
-- **Authentication**: Secure JWT-based user authentication
+### Project Management
+- **Full Project Lifecycle**: Create, update, and manage projects with comprehensive metadata
+- **Team & Timeline Configuration**: Define team size, working hours, methodology, and deadlines
+- **Project Types**: Support for SaaS, E-commerce, Chatbot, Landing Page, and custom project types
+- **Scope Versioning**: Track changes to project scope over time with version history
+- **Deadline Tracking**: Automatic status updates based on project deadlines and capacity analysis
 
-## Tech Stack
+### AI-Powered Analysis
+- **Hybrid AI Architecture**: Google Gemini AI for feature-level analysis + deterministic backend calculations
+- **Capacity Engine**: Advanced capacity calculations considering team size, working hours, and timeline
+- **What-If Scenarios**: Model changes to team size, deadlines, and scope with instant impact analysis
+- **Risk Assessment**: Detailed risk analysis with effort breakdown and actionable recommendations
+- **Feature Generation**: AI-powered initial feature generation based on project context
+- **Confidence Scoring**: AI confidence metrics based on complexity and risk factors
+
+### User Experience
+- **Modern Design System**: Consistent UI components with reusable Button, Input, and card components
+- **Dark Mode**: Full dark mode support with theme persistence
+- **Responsive Design**: Mobile-optimized interface with adaptive layouts
+- **Accessibility**: WCAG-compliant with ARIA attributes, keyboard navigation, and screen reader support
+- **Form Validation**: Real-time validation with clear error messages
+- **Performance**: Lazy loading with React Suspense for optimal initial load times
+
+### Reporting & Export
+- **PDF Export**: Download comprehensive analysis reports as formatted PDFs
+- **CSV Export**: Export project data and analysis results to CSV spreadsheets
+- **Interactive Reports**: Detailed report pages with visualizations and metrics
+- **Dashboard Analytics**: Aggregated statistics across all projects
+
+### User Management
+- **Secure Authentication**: JWT-based authentication with bcrypt password hashing
+- **Profile Management**: User profiles with avatar upload functionality
+- **Password Reset**: OTP-based password reset system
+- **Session Management**: Automatic token expiry handling and secure session management
+
+## 🛠 Tech Stack
 
 ### Frontend
 | Tool | Version | Purpose |
 |------|---------|---------|
-| React | 19 | UI framework |
-| Vite | 8 | Dev server & bundler |
-| TypeScript | 6 | Type safety |
-| Tailwind CSS | 4 | Styling |
-| React Router | 7 | Client-side routing |
-| @dnd-kit | 6/10 | Drag-and-drop feature reordering |
+| React | 19.2 | UI framework with hooks |
+| Vite | 8.0 | Dev server & bundler |
+| TypeScript | 6.0 | Type safety |
+| Tailwind CSS | 4.3 | Utility-first styling |
+| React Router | 7.18 | Client-side routing with lazy loading |
+| @dnd-kit | 6.3/10.0 | Drag-and-drop feature reordering |
 | jsPDF | 4.2 | PDF generation |
 | jspdf-autotable | 5.0 | PDF table generation |
-| xlsx | 0.18 | Excel export |
+| xlsx | 0.18 | Excel/CSV export |
 
 ### Backend
 | Tool | Version | Purpose |
 |------|---------|---------|
-| Express | 5 | HTTP server |
-| TypeScript | 6 | Type safety |
-| Prisma | 6 | ORM & migrations |
+| Express | 5.2 | HTTP server framework |
+| TypeScript | 6.0 | Type safety |
+| Prisma | 5.22 | ORM & database migrations |
 | MySQL | — | Primary database |
-| jsonwebtoken | 9 | JWT authentication |
-| bcryptjs | 3 | Password hashing |
-| Zod | 4 | Request validation |
+| jsonwebtoken | 9.0 | JWT authentication |
+| bcryptjs | 3.0 | Password hashing |
+| Zod | 4.4 | Request validation |
 | @google/genai | 2.8 | Gemini AI integration |
 | node-cron | 4.5 | Scheduled tasks |
-| Swagger UI | 5 | API documentation |
+| Swagger UI | 5.0 | API documentation |
+| multer | 2.2 | File upload handling |
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 /
-├── frontend/                  # React + Vite app (port 5000)
+├── frontend/                          # React + Vite app (port 5000)
 │   └── src/
 │       ├── pages/
-│       │   ├── DashboardPage.tsx
-│       │   ├── ProjectsPage.tsx
-│       │   ├── CreateProjectPage.tsx
-│       │   ├── ScopeBuilder.tsx
-│       │   ├── AnalysisPage.tsx
-│       │   ├── AnalysisResultsPage.tsx
-│       │   ├── ReportsPage.tsx
-│       │   ├── ReportDetailPage.tsx
-│       │   ├── LoginPage.tsx
-│       │   └── SignupPage.tsx
+│       │   ├── DashboardPage.tsx      # Main dashboard with analytics
+│       │   ├── ProjectsPage.tsx       # Project listing and management
+│       │   ├── CreateProjectPage.tsx  # Project creation wizard
+│       │   ├── ProjectDetailPage.tsx  # Individual project view
+│       │   ├── ScopeBuilder.tsx       # Feature scope definition
+│       │   ├── AnalysisPage.tsx      # AI analysis initiation
+│       │   ├── AnalyzingPage.tsx      # Analysis progress display
+│       │   ├── AnalysisResultsPage.tsx # Analysis results view
+│       │   ├── ReportsPage.tsx        # Reports listing with export
+│       │   ├── ReportDetailPage.tsx   # Detailed report view
+│       │   ├── ProjectHistoryPage.tsx # Project history tracking
+│       │   ├── UpcomingDeadlinesPage.tsx # Deadline tracking
+│       │   ├── LoginPage.tsx          # Authentication
+│       │   └── SignupPage.tsx         # User registration
 │       ├── context/
-│       │   ├── AuthContext.tsx    # JWT auth state
-│       │   └── ProjectContext.tsx # API-backed project state
+│       │   ├── AuthContext.tsx        # JWT auth state & user profile
+│       │   ├── ProjectContext.tsx      # API-backed project state
+│       │   ├── DashboardContext.tsx    # Dashboard analytics state
+│       │   └── ThemeContext.tsx        # Dark mode theme state
 │       ├── services/
-│       │   └── api.ts             # Fetch wrapper
+│       │   └── api.ts                 # Enhanced fetch wrapper with retry logic
 │       ├── components/
-│       │   ├── layout/            # AppLayout, Sidebar
-│       │   └── cards/             # ProjectCard, StatsCard
-│       └── utils/
-│           └── constants.ts       # Project types, labels
+│       │   ├── layout/                # AppLayout, Sidebar, DashboardLayout
+│       │   ├── cards/                 # ProjectCard, AnalysisCard, StatsCard
+│       │   ├── ui/                    # Reusable Button, Input components
+│       │   └── EmptyState.tsx         # Empty state component
+│       ├── utils/
+│       │   ├── constants.ts           # Project types, labels, status
+│       │   ├── designSystem.ts        # Design system constants
+│       │   └── formatters.ts          # Date and number formatting
+│       └── routes/
+│           └── AppRouter.tsx          # Route configuration with lazy loading
 │
-├── backend/                   # Express + Prisma API (port 3000)
+├── backend/                           # Express + Prisma API (port 3000)
 │   └── src/
 │       ├── modules/
-│       │   ├── auth/              # Register, login (JWT)
-│       │   ├── projects/          # CRUD, status sync
-│       │   ├── features/          # CRUD + reorder
-│       │   ├── analysis/          # Scope analysis, cron job
-│       │   ├── ai/                # Gemini integration
-│       │   └── dashboard/         # Aggregated stats
+│       │   ├── auth/                  # Register, login, password reset (JWT)
+│       │   ├── users/                 # User profile, avatar upload
+│       │   ├── projects/              # CRUD, status sync, metadata
+│       │   ├── features/              # CRUD + reorder, scope tracking
+│       │   ├── scopeVersions/         # Scope version history
+│       │   ├── analysis/              # Analysis results, history
+│       │   ├── ai/                    # Gemini integration, capacity engine
+│       │   │   ├── ai.service.ts      # AI analysis orchestration
+│       │   │   ├── ai-utils.ts        # Error handling, validation
+│       │   │   ├── scope-calculations.ts # Capacity calculations
+│       │   │   └── prompts/           # AI prompt templates
+│       │   └── dashboard/             # Aggregated stats, analytics
 │       ├── middlewares/
-│       │   ├── auth.middleware.ts  # JWT verify
-│       │   └── error.middleware.ts
+│       │   ├── auth.middleware.ts     # JWT verification
+│       │   ├── error.middleware.ts    # Global error handling
+│       │   ├── rateLimit.middleware.ts # API rate limiting
+│       │   ├── upload.middleware.ts   # File upload handling
+│       │   └── validate.middleware.ts # Request validation with Zod
 │       └── config/
-│           ├── database.ts        # Prisma client
-│           └── swagger.ts         # API docs config
+│           ├── database.ts           # Prisma client
+│           ├── env.ts                # Environment variables
+│           └── swagger.ts             # API docs configuration
 │
 └── backend/prisma/
-    └── schema.prisma              # Database schema
+    └── schema.prisma                 # Database schema
 ```
 
-## Database Schema
+## 🗄 Database Schema
 
 ```prisma
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String   // bcrypt hashed
-  projects  Project[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password      String   // bcrypt hashed
+  profileImage  String?
+  
+  // OTP for password reset
+  otpCode       String?
+  otpExpiresAt  DateTime?
+
+  projects      Project[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Project {
-  id          String   @id @default(uuid())
-  name        String
-  description String?  @db.Text
-  type        String   // saas | ecommerce | chatbot | landing_page
-  status      String   @default("draft") // draft | active | completed | at_risk
-  deadline    DateTime?
+  id            String   @id @default(uuid())
 
-  createdById String
-  createdBy   User @relation(fields: [createdById], references: [id])
+  name          String
+  description   String?  @db.Text
+  type          String
+  status        String   @default("draft") // draft | active | completed | at_risk
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  startDate     DateTime?
+  deadline      DateTime?
 
-  features Feature[]
-  analyses Analysis[]
+  teamSize      Int?
+  techStack     String?  @db.Text
+  projectType   String?
+  methodology   String?
+  workingHours  Int?
+  logo          String?  @db.Text
+
+  createdById   String
+  createdBy     User @relation(fields: [createdById], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  features      Feature[]
+  analyses      Analysis[]
 }
 
 model Feature {
@@ -128,7 +193,7 @@ model Feature {
   title       String
   description String?
   category    String
-  priority    String @default("medium") // low | medium | high | critical
+  priority    String @default("medium") // low | medium | high
   order       Int    @default(0)
   type        String @default("original") // original | new
 
@@ -138,35 +203,88 @@ model Feature {
 model Analysis {
   id                   String @id @default(uuid())
   projectId            String
-  scopeIncreasePercent Float
-  additionalHours      Float
-  delayWeeks           Float
-  riskLevel            String   // low | medium | high | critical
-  complexity           String   // low | medium | high
-  effortBreakdown      Json?    // { development, testing, integration, documentation }
-  riskFactors          Json?    // string[]
-  recommendations      Json?    // string[]
+  analysisHash         String? // SHA256 hash of feature set for duplicate detection
+  
+  // Legacy fields (kept for backward compatibility)
+  scopeIncreasePercent Float?
+  additionalHours      Float?
+  delayWeeks           Float?
+  
+  // Capacity engine metrics
+  workingDays          Int?
+  availableHours       Float?
+  productiveHours      Float?
+  rawDevelopmentHours  Float?
+  testingHours         Float?
+  integrationHours     Float?
+  documentationHours   Float?
+  reworkHours          Float?
+  estimatedHours       Float?
+  estimatedWeeks       Float?
+  capacityUtilization  Float?
+  bufferHours          Float?
+  bufferPercent        Float?
+  timelineFit          String?
+  
+  // Derived metrics
+  scopeScore           Int?
+  complexityLevel      String?
+  complexityScore      Int?
+  riskLevel            String?
+  projectHealth        String?
+  confidence           Int?
+  
+  // JSON fields for complex data
+  effortBreakdown      Json?
+  riskFactors          Json?
+  recommendations      Json?
 
   createdAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, analysisHash])
 }
 ```
 
-## Project Status Workflow
+## 🔄 Project Status Workflow
 
 Projects automatically transition through the following statuses:
 
 1. **Draft** (default): Project is created but not yet analyzed
 2. **Active**: Analysis is completed, project is in progress
 3. **Completed**: Project deadline has passed
-4. **At Risk**: (future) Project timeline at risk due to scope creep
+4. **At Risk**: Project timeline at risk due to scope creep or capacity issues
 
-The status is updated automatically:
+Status transitions occur automatically:
 - When an analysis is created → status changes to "active"
-- When the deadline passes → status changes to "completed" (via cron job every 10 minutes)
+- When the deadline passes → status changes to "completed" (via cron job)
+- When capacity utilization exceeds 90% → status changes to "at_risk"
 
-## API Reference
+## 🤖 AI Architecture
+
+The system uses a hybrid AI approach combining Google Gemini AI with deterministic backend calculations:
+
+### AI Responsibilities (Google Gemini)
+- **Feature-Level Analysis**: Estimates complexity and effort for individual features
+- **Risk Identification**: Provides specific technical risks tied to architecture and dependencies
+- **Engineering Recommendations**: Suggests actionable strategies to reduce timeline or risk
+- **Feature Generation**: Generates initial feature sets based on project context
+
+### Backend Responsibilities (Deterministic)
+- **Capacity Calculations**: Calculates available hours, productive hours, and timeline fit
+- **Project-Level Metrics**: Computes total hours, estimated weeks, risk level, scope score
+- **Effort Breakdown**: Distributes hours across development, testing, integration, documentation
+- **Health Assessment**: Derives project health from buffer percent and capacity utilization
+
+### What-If Scenarios
+The capacity engine supports scenario modeling:
+- Team size changes (e.g., "What if I increase team from 3 to 6?")
+- Deadline changes (e.g., "What if I delay by 2 weeks?")
+- Scope changes (e.g., "What if I remove authentication?")
+- Tech stack changes (e.g., "What if I change React to Angular?")
+
+## 📡 API Reference
 
 Base URL: `http://localhost:3000/api`  
 Interactive docs: `http://localhost:3000/api-docs`
@@ -176,14 +294,23 @@ Interactive docs: `http://localhost:3000/api-docs`
 |--------|----------|-------------|
 | POST | `/auth/register` | Create account → returns user |
 | POST | `/auth/login` | Sign in → returns `{ token }` |
+| POST | `/auth/forgot-password` | Request password reset OTP |
+| POST | `/auth/verify-otp` | Verify OTP and reset password |
+
+### Users
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users/me` | Get current user profile |
+| PUT | `/users/me` | Update user profile |
+| POST | `/users/me/avatar` | Upload profile avatar |
 
 ### Projects
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/projects` | List all projects (filtered by user) |
-| POST | `/projects` | Create a project (includes deadline) |
+| POST | `/projects` | Create a project with full metadata |
 | GET | `/projects/:id` | Get a single project |
-| PUT | `/projects/:id` | Update project (name, description, type, deadline, status) |
+| PUT | `/projects/:id` | Update project details |
 | DELETE | `/projects/:id` | Delete project (cascades features & analyses) |
 | GET | `/projects/analyzed` | Get projects with completed analyses |
 
@@ -195,6 +322,12 @@ Interactive docs: `http://localhost:3000/api-docs`
 | PUT | `/projects/:projectId/features/:id` | Update a feature |
 | DELETE | `/projects/:projectId/features/:id` | Delete a feature |
 | PUT | `/projects/:id/features/reorder` | Reorder features (`{ orderedIds: string[] }`) |
+
+### Scope Versions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/projects/:id/versions` | List scope versions |
+| POST | `/projects/:id/versions` | Create a scope version snapshot |
 
 ### Analyses
 | Method | Endpoint | Description |
@@ -209,12 +342,18 @@ Interactive docs: `http://localhost:3000/api-docs`
 | POST | `/projects/:id/ai/analyze` | Run AI scope analysis (updates project status to "active") |
 | POST | `/projects/:id/ai/generate-features` | Generate initial project features using AI |
 
-## Getting Started
+### Dashboard
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/dashboard/stats` | Get aggregated dashboard statistics |
+| GET | `/dashboard/deadlines` | Get upcoming project deadlines |
+
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+
 - MySQL database
-- AI API key
+- Google Gemini API key
 
 ### Environment Variables
 
@@ -223,7 +362,7 @@ Create a `.env` file in the `backend` directory:
 ```env
 DATABASE_URL=mysql://user:password@host:3306/dbname
 JWT_SECRET=your_jwt_secret_here
-GOOGLE_AI_API_KEY=your_gemini_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 PORT=3000
 ```
 
@@ -257,7 +396,7 @@ npx prisma db push
 npx prisma studio
 ```
 
-## Authentication Flow
+## 🔐 Authentication Flow
 
 1. User registers at `/signup` → account created in DB, auto-login fires
 2. Login calls `POST /api/auth/login` → receives a signed JWT (24h expiry)
@@ -266,17 +405,109 @@ npx prisma studio
 5. `AuthContext` decodes the token client-side to display user name/email
 6. Token expiry is checked on every page load — expired tokens are cleared automatically
 7. Logout removes the token and redirects to `/login`
+8. Password reset: User requests OTP → receives email → verifies OTP → resets password
 
-## Key Design Decisions
+## 🎨 Design System
 
-- **Vite proxy** — The frontend calls `/api/...` (relative). Vite forwards to `localhost:3000` in dev, avoiding CORS.
-- **MySQL over PostgreSQL** — Uses MySQL for broader compatibility and simpler hosting options.
-- **JSON fields in Analysis** — Effort breakdown, risk factors, and recommendations stored as JSON for flexibility.
-- **Cascade deletes** — Deleting a project automatically removes all its features and analyses via Prisma's `onDelete: Cascade`.
-- **Cron job for status sync** — A background job runs every 10 minutes to update project statuses based on deadlines.
-- **AI integration** —  AI provides intelligent scope analysis and feature generation.
-- **PDF/Excel export** — jsPDF and xlsx libraries enable report generation and data export.
+The application uses a comprehensive design system defined in `frontend/src/utils/designSystem.ts`:
 
-## License
+### Design Tokens
+- **Border Radius**: Consistent rounded corners for buttons, cards, inputs
+- **Typography**: Defined font sizes for page titles, headings, body, captions
+- **Shadows**: Card shadows with hover effects
+- **Transitions**: Smooth animations for interactive elements
+- **Icon Sizes**: Consistent icon sizing across components
+- **Spacing**: Standardized padding and margins
+
+### Reusable Components
+- **Button**: Primary, secondary, and danger variants with loading states
+- **Input**: Text inputs with validation states and error messages
+- **Cards**: Project cards, analysis cards, stats cards with consistent styling
+
+### Accessibility
+- ARIA attributes on interactive elements
+- Keyboard navigation support
+- Skip-to-content links
+- Focus management
+- Screen reader compatibility
+
+## 🔑 Key Design Decisions
+
+- **Hybrid AI Architecture**: AI handles feature-level analysis while backend handles deterministic project-level calculations for consistency and reliability
+- **Vite Proxy**: The frontend calls `/api/...` (relative). Vite forwards to `localhost:3000` in dev, avoiding CORS.
+- **MySQL over PostgreSQL**: Uses MySQL for broader compatibility and simpler hosting options.
+- **JSON Fields in Analysis**: Effort breakdown, risk factors, and recommendations stored as JSON for flexibility.
+- **Cascade Deletes**: Deleting a project automatically removes all its features and analyses via Prisma's `onDelete: Cascade`.
+- **Analysis Hashing**: SHA256 hash of feature set prevents duplicate analyses for identical scopes.
+- **Lazy Loading**: All page components are lazy-loaded with React Suspense for optimal initial bundle size.
+- **Design System**: Centralized design tokens ensure UI consistency across the application.
+- **Error Handling**: Enhanced API error handling with retry logic, timeouts, and user-friendly error messages.
+- **Rate Limiting**: API rate limiting middleware prevents abuse and ensures fair usage.
+- **File Upload**: Multer middleware handles avatar uploads with size and type validation.
+
+## 🧪 Testing
+
+The backend includes comprehensive test coverage:
+
+```bash
+# Run all tests
+cd backend
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+```
+
+Test suites include:
+- AI service tests
+- Capacity engine tests
+- Derivation logic tests
+- Database integration tests
+- Scope calculations tests
+
+## 📝 Development Notes
+
+### Adding New Features
+1. Update database schema in `backend/prisma/schema.prisma`
+2. Run `npx prisma db push` to apply changes
+3. Create backend module in `backend/src/modules/`
+4. Add API routes and controllers
+5. Create frontend page in `frontend/src/pages/`
+6. Add route in `frontend/src/routes/AppRouter.tsx`
+7. Update design system if needed
+
+### AI Prompt Engineering
+AI prompts are located in `backend/src/modules/ai/prompts/`. When modifying prompts:
+- Test with various project types
+- Validate JSON response structure
+- Check for edge cases
+- Monitor token usage
+
+### Performance Optimization
+- Use lazy loading for new pages
+- Implement pagination for large lists
+- Add loading skeletons for async operations
+- Optimize database queries with Prisma
+- Cache frequently accessed data
+
+## 🚢 Deployment
+
+### Backend Deployment
+1. Set environment variables in production
+2. Build TypeScript: `npm run build`
+3. Start server: `npm start`
+4. Ensure MySQL database is accessible
+5. Configure CORS for production domain
+
+### Frontend Deployment
+1. Build for production: `npm run build`
+2. Deploy `dist/` folder to static hosting
+3. Update API base URL for production
+4. Configure proper routing for SPA
+
+## 📄 License
 
 MIT

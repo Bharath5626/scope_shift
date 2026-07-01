@@ -10,11 +10,13 @@ type RiskLevel = 'Low' | 'Medium' | 'High'
 
 interface AnalysisRow {
   id: string
+  scopeScore: number
+  complexityScore: number | null
   scopeIncreasePercent: number
   additionalHours: number
-  delayWeeks: number
+  estimatedWeeks: number
   riskLevel: string
-  complexity: string
+  complexityLevel: string
   createdAt: string
 }
 
@@ -87,16 +89,16 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
   }
 
   const handleExportCSV = () => {
-    const headers = ['Project Name', 'Type', 'Risk Level', 'Scope Increase %', 'Additional Hours', 'Delay Weeks', 'Created Date']
+    const headers = ['Project Name', 'Type', 'Risk Level', 'Scope Score', 'Additional Hours', 'Estimated Weeks', 'Created Date']
     const rows = filteredProjects.map(project => {
       const analysis = project.analyses[0]
       return [
         project.name,
         PROJECT_TYPE_LABELS[project.type] ?? project.type,
         analysis?.riskLevel ?? 'Medium',
-        analysis?.scopeIncreasePercent ?? 0,
+        analysis?.scopeScore ?? 0,
         analysis?.additionalHours ?? 0,
-        analysis?.delayWeeks ?? 0,
+        analysis?.estimatedWeeks ?? 0,
         formatDate(analysis?.createdAt || project.createdAt)
       ]
     })
@@ -267,9 +269,9 @@ const matchesRisk =
                 {analysis && (
                   <div className={`mt-4 grid grid-cols-3 gap-3 ${SPACING.section.gap}`}>
                     <div className={`${BORDER_RADIUS.small} bg-gray-50 px-3 py-2 text-center dark:bg-gray-700`}>
-                      <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Scope</p>
+                      <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Scope Score</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
-                        {analysis.scopeIncreasePercent}%
+                        {analysis.complexityScore ?? Math.round(analysis.scopeIncreasePercent)}%
                       </p>
                     </div>
 
@@ -283,7 +285,7 @@ const matchesRisk =
                     <div className={`${BORDER_RADIUS.small} bg-gray-50 px-3 py-2 text-center dark:bg-gray-700`}>
                       <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Timeline</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
-                        {analysis.delayWeeks}w
+                        {analysis.estimatedWeeks}w
                       </p>
                     </div>
                   </div>

@@ -16,6 +16,7 @@ export const createAnalysis = asyncHandler(async (req: Request, res: Response) =
   const analysis = await AnalysisService.createAnalysis({
     projectId: req.params.projectId,
     ...req.body,
+    userId: req.user!.id,
   });
   res.status(201).json({ success: true, data: analysis });
 });
