@@ -10,6 +10,15 @@ interface UserProfileModalProps {
   onClose: () => void
 }
 
+type ProfileUpdateResponse = {
+  id: string
+  name: string
+  email: string
+  profileImage?: string | null
+  createdAt?: string | null
+  updatedAt?: string | null
+}
+
 export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { user, updateUser } = useAuth()
   const { theme, toggleTheme } = useTheme()
@@ -138,9 +147,9 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   // Track unsaved changes
   useEffect(() => {
     const nameChanged = name !== originalName
-    const imageChanged = imagePreview !== null || (user?.profileImage && imagePreview !== user.profileImage)
+    const imageChanged = imagePreview !== originalImage
     setHasUnsavedChanges(nameChanged || imageChanged)
-  }, [name, imagePreview, originalName, user?.profileImage])
+  }, [name, imagePreview, originalName, originalImage])
 
   const initials = useMemo(() => {
     return user?.name
@@ -228,7 +237,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     setError(null)
 
     try {
-      const updatedUser = await api.put('/users/profile', { name, profileImage: imagePreview })
+      const updatedUser = await api.put<ProfileUpdateResponse>('/users/profile', {
+        name,
+        profileImage: imagePreview ?? undefined,
+      })
       updateUser(updatedUser)
       showToast('Profile updated successfully', 'success')
       onClose()
@@ -345,18 +357,18 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     >
       <div
         ref={modalRef}
-        className="w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-gray-800 transition-all animate-in zoom-in-95 duration-200"
+        className="w-full max-w-lg rounded-2xl bg-[var(--bg-surface)] shadow-2xl dark:bg-gray-800 transition-all animate-in zoom-in-95 duration-200"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+        <div className="flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 dark:border-gray-700">
           <div>
-            <h2 id="settings-title" className="text-xl font-semibold text-gray-900 dark:text-white">⚙️ Settings</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Manage your account settings</p>
+            <h2 id="settings-title" className="text-xl font-semibold text-[var(--text-primary)] dark:text-white">⚙️ Settings</h2>
+            <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Manage your account settings</p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close settings"
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-gray-100 hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -365,13 +377,13 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200 px-6 dark:border-gray-700">
+        <div className="flex border-b border-[var(--border-primary)] px-6 dark:border-gray-700">
           <button
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'profile'
                 ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
             Account
@@ -381,7 +393,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'security'
                 ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
             Security
@@ -391,7 +403,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'preferences'
                 ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
             Preferences
@@ -423,7 +435,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   {imagePreview || user?.profileImage ? (
                     <>
                       <img
-                        src={imagePreview || user?.profileImage}
+                        src={imagePreview || user?.profileImage || undefined}
                         alt="Profile"
                         className="h-24 w-24 rounded-full object-cover"
                       />
@@ -474,7 +486,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     </>
                   )}
                 </div>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                   {imagePreview || user?.profileImage ? 'Hover to change or remove' : 'Click camera icon to upload'}
                 </p>
               </div>
@@ -482,71 +494,71 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               {/* Personal Information */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Email</label>
                   <input
                     type="email"
                     value={user?.email || ''}
                     readOnly
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-500 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-400"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-soft)] bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-[var(--text-subtle)]"
                   />
                 </div>
               </div>
 
               {/* Account Information */}
               <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700/30">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Account Information</h4>
+                <h4 className="text-sm font-medium text-[var(--text-primary)] dark:text-white mb-3">Account Information</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Member Since</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Member Since</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">
                       {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Role</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">User</p>
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Role</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">User</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Account Status</p>
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Account Status</p>
                     <div className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Active</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Active</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Last Login</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Today</p>
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Last Login</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Today</p>
                   </div>
                 </div>
               </div>
 
               {/* Account Preferences */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Theme</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300 mb-2">Theme</label>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-3 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className="flex items-center gap-3 rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   {theme === 'light' ? (
                     <>
-                      <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <svg className="h-5 w-5 text-[var(--text-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                       Light
                     </>
                   ) : (
                     <>
-                      <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <svg className="h-5 w-5 text-[var(--text-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                       </svg>
                       Dark
@@ -561,7 +573,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             <div className="space-y-6">
               {/* Active Sessions */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Active Sessions</h3>
+                <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Active Sessions</h3>
                 <div className="space-y-3">
                   {/* Current Session */}
                   <div className="flex items-center justify-between rounded-lg border-2 border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-900/20">
@@ -572,8 +584,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">This Device</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Chrome on Windows • Current session</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">This Device</p>
+                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Chrome on Windows • Current session</p>
                       </div>
                     </div>
                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
@@ -582,16 +594,16 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   </div>
 
                   {/* Other Sessions (placeholder for future implementation) */}
-                  <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+                  <div className="flex items-center justify-between rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4 dark:border-gray-700 dark:bg-gray-800">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-[var(--text-subtle)]">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">Mobile Device</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Safari on iOS • 2 hours ago</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Mobile Device</p>
+                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Safari on iOS • 2 hours ago</p>
                       </div>
                     </div>
                     <button className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
@@ -603,24 +615,24 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
               {/* Last Login */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Last Login</h3>
-                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Last Login</h3>
+                <div className="rounded-lg border border-[var(--border-primary)] bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Time</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{new Date().toLocaleString()}</p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Time</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">{new Date().toLocaleString()}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">IP Address</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">192.168.1.1</p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">IP Address</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">192.168.1.1</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Location</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">San Francisco, CA</p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Location</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">San Francisco, CA</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Device</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Chrome / Windows</p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Device</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Chrome / Windows</p>
                     </div>
                   </div>
                 </div>
@@ -628,7 +640,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
               {/* Session Management */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Session Management</h3>
+                <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Session Management</h3>
                 <button
                   onClick={() => {
                     showToast('Logged out from all devices', 'success')
@@ -640,27 +652,27 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               </div>
 
               {/* Password Change */}
-              <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Change Password</h3>
+              <div className="border-t border-[var(--border-primary)] pt-6 dark:border-gray-700">
+                <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Change Password</h3>
 
                 <div className="space-y-4 mt-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Current Password</label>
                     <input
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">New Password</label>
                     <input
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                     />
                     {newPassword && (
                       <div className="mt-2">
@@ -671,7 +683,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                               style={{ width: `${(getPasswordStrength(newPassword).score / 6) * 100}%` }}
                             />
                           </div>
-                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                          <span className="text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-subtle)]">
                             {getPasswordStrength(newPassword).label}
                           </span>
                         </div>
@@ -680,12 +692,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                    <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Confirm Password</label>
                     <input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                     />
                     {confirmPassword && newPassword && (
                       <p className={`mt-1 text-xs ${confirmPassword === newPassword ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -714,12 +726,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 </div>
 
                 {/* Forgot Password */}
-                <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Forgot your password?</p>
+                <div className="border-t border-[var(--border-primary)] pt-4 dark:border-gray-700">
+                  <p className="text-sm text-[var(--text-muted)] dark:text-[var(--text-subtle)] mb-3">Forgot your password?</p>
                   <button
                     onClick={handleSendOtp}
                     disabled={sendingOtp || otpCooldown > 0}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {sendingOtp ? (
                       <>
@@ -739,11 +751,11 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               </div>
 
               {showOtpForm && (
-                <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Reset Password with OTP</h3>
+                <div className="border-t border-[var(--border-primary)] pt-6 dark:border-gray-700">
+                  <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Reset Password with OTP</h3>
                   <div className="space-y-4 mt-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">OTP Code</label>
+                      <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">OTP Code</label>
                       <input
                         type="text"
                         inputMode="numeric"
@@ -751,17 +763,17 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter the 6-digit code"
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                      <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">New Password</label>
                       <input
                         type="password"
                         value={otpNewPassword}
                         onChange={(e) => setOtpNewPassword(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                       />
                       {otpNewPassword && (
                         <div className="mt-2">
@@ -772,7 +784,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                                 style={{ width: `${(getPasswordStrength(otpNewPassword).score / 6) * 100}%` }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                            <span className="text-xs font-medium text-[var(--text-muted)] dark:text-[var(--text-subtle)]">
                               {getPasswordStrength(otpNewPassword).label}
                             </span>
                           </div>
@@ -781,12 +793,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
+                      <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Confirm Password</label>
                       <input
                         type="password"
                         value={otpConfirmPassword}
                         onChange={(e) => setOtpConfirmPassword(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
                       />
                       {otpConfirmPassword && otpNewPassword && (
                         <p className={`mt-1 text-xs ${otpConfirmPassword === otpNewPassword ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -815,7 +827,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
                     <button
                       onClick={() => setShowOtpForm(false)}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                      className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                       Cancel
                     </button>
@@ -827,11 +839,11 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
           {activeTab === 'preferences' && (
             <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Preferences</h3>
+              <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Preferences</h3>
 
               {/* Theme Preferences */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</h4>
+                <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Theme</h4>
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
@@ -841,7 +853,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
                       theme === 'light'
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     Light
@@ -854,7 +866,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
                       theme === 'dark'
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     Dark
@@ -864,39 +876,39 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
               {/* Notification Preferences */}
               <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Notifications</h4>
+                <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Notifications</h4>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Email notifications</span>
+                    <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Email notifications</span>
                   </label>
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Project alerts</span>
+                    <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Project alerts</span>
                   </label>
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Deadline reminders</span>
+                    <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Deadline reminders</span>
                   </label>
                   <label className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       defaultChecked={false}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
                     />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">Weekly reports</span>
+                    <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Weekly reports</span>
                   </label>
                 </div>
               </div>
@@ -906,10 +918,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
         {/* Footer - Only show on Account tab */}
         {activeTab === 'profile' && (
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+          <div className="flex justify-end gap-3 border-t border-[var(--border-primary)] px-6 py-4 dark:border-gray-700">
             <button
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Cancel
             </button>

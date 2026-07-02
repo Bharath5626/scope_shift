@@ -10,6 +10,25 @@
   --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
   --radius-card: 14px;
   --color-mode: class;
+
+  /* Semantic Backgrounds */
+  --bg-page: #f9fafb;
+  --bg-surface: #ffffff;
+  --bg-section: #f3f4f6;
+
+  /* Semantic Text */
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-soft: #6b7280;
+  --text-subtle: #9ca3af;
+
+  /* Semantic Borders */
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+
+  /* Semantic UI Colors */
+  --color-info: #4f46e5;
 }
 
 * {
@@ -39,8 +58,42 @@ body {
   color: #f3f4f6;
 }
 
+/* Dark mode semantic variable overrides */
+.dark {
+  /* Semantic Backgrounds */
+  --bg-page: #0b1220;
+  --bg-surface: #111827;
+  --bg-section: #0f172a;
+
+  /* Semantic Text */
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-soft: #9ca3af;
+  --text-subtle: #6b7280;
+
+  /* Semantic Borders */
+  --border-primary: #1f2937;
+  --border-secondary: #374151;
+
+  /* Semantic UI Colors */
+  --color-info: #818cf8;
+}
+
 .dark .bg-white {
   background-color: #1f2937;
+}
+
+/* Exclude risk analysis section from global dark mode text overrides */
+.dark [data-risk-section="true"] {
+  background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark [data-risk-section="true"] h3,
+.dark [data-risk-section="true"] p,
+.dark [data-risk-section="true"] span {
+  color: #000000 !important;
 }
 
 .dark .bg-gray-50 {
@@ -75,6 +128,14 @@ body {
   color: #9ca3af;
 }
 
+/* Exclude risk analysis section from global dark mode text overrides */
+.dark #risk-analysis-container .text-gray-700,
+.dark #risk-analysis-container .text-gray-400,
+.dark #risk-analysis-container .text-gray-800,
+.dark #risk-analysis-container .text-gray-500 {
+  color: inherit;
+}
+
 .dark .border-gray-200 {
   border-color: #374151;
 }
@@ -98,4 +159,16 @@ body {
 
 .dark .shadow-sm {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Force black text in Risk Analysis section - must come after global rules */
+.dark [data-risk-section="true"] h3,
+.dark [data-risk-section="true"] p,
+.dark [data-risk-section="true"] span {
+  color: #000000 !important;
+}
+
+/* Also force the background to be white */
+.dark [data-risk-section="true"] {
+  background-color: #ffffff !important;
 }

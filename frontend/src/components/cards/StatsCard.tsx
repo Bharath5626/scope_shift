@@ -21,11 +21,11 @@ export function StatsCard({
   accent = 'primary',
 }: StatsCardProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30">
+    <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
-          <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+          <p className="text-sm font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{label}</p>
+          <p className="mt-2 text-3xl font-bold text-[var(--text-primary)] dark:text-gray-100">{value}</p>
         </div>
 
         <div

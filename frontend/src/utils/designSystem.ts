@@ -65,9 +65,9 @@ export const ICON_SIZE = {
 // Button Variants
 export const BUTTON_VARIANTS = {
   primary: 'bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white',
-  secondary: 'border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-50 text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
+  secondary: 'border border-[var(--border-primary)] bg-white hover:bg-gray-50 disabled:opacity-50 text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
   danger: 'bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white',
-  ghost: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
+  ghost: 'text-[var(--text-secondary)] hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
   success: 'bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white',
 } as const
 

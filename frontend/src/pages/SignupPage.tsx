@@ -81,19 +81,19 @@ export function SignupPage() {
       </div>
 
       {/* Right panel */}
-      <div className="flex flex-1 items-center justify-center bg-gray-50 px-6 py-12 dark:bg-gray-900">
+      <div className="flex flex-1 items-center justify-center bg-[var(--bg-page)] px-6 py-12 dark:bg-gray-900">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className={`mb-8 flex items-center gap-3 lg:hidden`}>
             <div className={`flex h-9 w-9 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-600 font-bold text-white`}>
               S
             </div>
-            <span className={`font-semibold text-gray-900 dark:text-gray-100 ${TYPOGRAPHY.body}`}>ScopeAI</span>
+            <span className={`font-semibold text-[var(--text-primary)] dark:text-gray-100 ${TYPOGRAPHY.body}`}>ScopeAI</span>
           </div>
 
-          <div className={`${BORDER_RADIUS.modal} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-            <h2 className={`${TYPOGRAPHY.pageTitle} font-semibold text-gray-900 dark:text-gray-100`}>Create an account</h2>
-            <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>Get started with ScopeAI for free</p>
+          <div className={`${BORDER_RADIUS.modal} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+            <h2 className={`${TYPOGRAPHY.pageTitle} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>Create an account</h2>
+            <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>Get started with ScopeAI for free</p>
 
             {error && (
               <div className={`mt-4 ${BORDER_RADIUS.card} bg-red-50 border border-red-200 px-4 py-3 ${TYPOGRAPHY.body} text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400`}>
@@ -103,7 +103,7 @@ export function SignupPage() {
 
             <form onSubmit={handleSubmit} className={`mt-6 space-y-5 ${SPACING.section.gap}`}>
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
                   Full name
                 </label>
                 <input
@@ -112,12 +112,12 @@ export function SignupPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Smith"
-                  className={`w-full ${BORDER_RADIUS.input} border border-gray-200 px-3.5 py-2.5 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 />
               </div>
 
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
                   Email address
                 </label>
                 <input
@@ -126,12 +126,12 @@ export function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className={`w-full ${BORDER_RADIUS.input} border border-gray-200 px-3.5 py-2.5 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 />
               </div>
 
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
                   Password
                 </label>
                 <input
@@ -140,12 +140,12 @@ export function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min. 6 characters"
-                  className={`w-full ${BORDER_RADIUS.input} border border-gray-200 px-3.5 py-2.5 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 />
               </div>
 
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
                   Confirm password
                 </label>
                 <input
@@ -154,7 +154,7 @@ export function SignupPage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full ${BORDER_RADIUS.input} border border-gray-200 px-3.5 py-2.5 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
                 />
               </div>
 
@@ -167,7 +167,7 @@ export function SignupPage() {
               </button>
             </form>
 
-            <p className={`mt-6 text-center ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+            <p className={`mt-6 text-center ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
               Already have an account?{' '}
               <Link to="/login" className={`font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 ${TRANSITION}`}>
                 Sign in

@@ -58,9 +58,9 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
         <div className="w-full px-8 py-10 space-y-8">
-          <div className="flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+          <div className="flex flex-col gap-4 border-b border-[var(--border-primary)] pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
             <div className="space-y-2">
               <LoadingSkeleton className="h-8 w-48" />
               <LoadingSkeleton className="h-4 w-64" />
@@ -82,7 +82,7 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
         <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
       </div>
     )
@@ -134,19 +134,19 @@ const matchesRisk =
   return matchesSearch && matchesRisk
 })
  return (
-  <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
     <div className={`w-full ${SPACING.page.padding} py-10 space-y-8`}>
 
       {/* HEADER + SEARCH ROW */}
 {/* HEADER + FILTERS */}
-<div className="flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+<div className="flex flex-col gap-4 border-b border-[var(--border-primary)] pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
 
   {/* LEFT TITLE */}
   <div>
-    <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
+    <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
       Analysis Reports
     </h1>
-    <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+    <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
       View AI-generated scope analysis reports for your projects
     </p>
   </div>
@@ -157,7 +157,7 @@ const matchesRisk =
     {/* SEARCH (slightly left aligned, not full right stick) */}
     <div className="relative w-full sm:w-[260px]">
       <svg
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500"
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-subtle)] dark:text-[var(--text-soft)]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -175,7 +175,7 @@ const matchesRisk =
   placeholder="Search reports…"
   value={search}
   onChange={(e) => setSearch(e.target.value)}
-  className={`w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} ${SHADOW.card}
+  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} ${SHADOW.card}
              focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
 />
     </div>
@@ -184,7 +184,7 @@ const matchesRisk =
     <select
   value={riskFilter}
   onChange={(e) => setRiskFilter(e.target.value as any)}
-  className={`${BORDER_RADIUS.input} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-700 ${SHADOW.card} focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
 >
   <option value="all">All Risk</option>
   <option value="Low">Low Risk</option>
@@ -196,7 +196,7 @@ const matchesRisk =
     {filteredProjects.length > 0 && (
       <button
         onClick={handleExportCSV}
-        className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+        className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
         title="Export to CSV"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -242,15 +242,15 @@ const matchesRisk =
             return (
               <div
                 key={project.id}
-                className={`group flex flex-col ${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} ${TRANSITION} hover:shadow-md cursor-pointer dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30`}
+                className={`group flex flex-col ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} ${TRANSITION} hover:shadow-md cursor-pointer dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30`}
                 onClick={() => navigate(`/reports/${project.id}`)}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className={`truncate ${TYPOGRAPHY.cardTitle} text-gray-900 dark:text-gray-100`}>
+                    <h2 className={`truncate ${TYPOGRAPHY.cardTitle} text-[var(--text-primary)] dark:text-gray-100`}>
                       {project.name}
                     </h2>
-                    <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
+                    <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                       {PROJECT_TYPE_LABELS[project.type] ?? project.type}
                     </p>
                   </div>
@@ -261,29 +261,29 @@ const matchesRisk =
                 </div>
 
                 {project.description && (
-                  <p className={`mt-3 ${TYPOGRAPHY.body} text-gray-500 line-clamp-2 dark:text-gray-400`}>
+                  <p className={`mt-3 ${TYPOGRAPHY.body} text-[var(--text-soft)] line-clamp-2 dark:text-[var(--text-subtle)]`}>
                     {project.description}
                   </p>
                 )}
 
                 {analysis && (
                   <div className={`mt-4 grid grid-cols-3 gap-3 ${SPACING.section.gap}`}>
-                    <div className={`${BORDER_RADIUS.small} bg-gray-50 px-3 py-2 text-center dark:bg-gray-700`}>
-                      <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Scope Score</p>
+                    <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
+                      <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Scope Score</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
                         {analysis.complexityScore ?? Math.round(analysis.scopeIncreasePercent)}%
                       </p>
                     </div>
 
-                    <div className={`${BORDER_RADIUS.small} bg-gray-50 px-3 py-2 text-center dark:bg-gray-700`}>
-                      <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Hours</p>
+                    <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
+                      <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Hours</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
                         {analysis.additionalHours} hrs
                       </p>
                     </div>
 
-                    <div className={`${BORDER_RADIUS.small} bg-gray-50 px-3 py-2 text-center dark:bg-gray-700`}>
-                      <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>Timeline</p>
+                    <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
+                      <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Timeline</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
                         {analysis.estimatedWeeks}w
                       </p>
@@ -292,7 +292,7 @@ const matchesRisk =
                 )}
 
                 <div className={`mt-4 flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700`}>
-                  <p className={`${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
+                  <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                     Report created on {formatDate(analysis?.createdAt || project.createdAt)}
                   </p>
                 </div>

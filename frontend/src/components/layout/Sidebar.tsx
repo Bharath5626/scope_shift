@@ -192,7 +192,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
       collapsed ? 'justify-center' : 'gap-3'
     } ${BORDER_RADIUS.card} px-3 py-2.5 ${TYPOGRAPHY.body} font-medium ${TRANSITION} duration-200 ${
       active
-        ? 'bg-white text-gray-900 shadow-lg dark:bg-white dark:!text-white'
+        ? 'bg-white text-[var(--text-primary)] shadow-lg dark:bg-white dark:!text-white'
         : 'text-indigo-100 hover:bg-white/10 hover:text-white'
     } group`
   }}
@@ -287,12 +287,12 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
       {showLogoutConfirm && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
           <div className={`${BORDER_RADIUS.modal} bg-white ${SPACING.card.padding} shadow-xl max-w-sm w-full mx-4`}>
-            <h3 className={`${TYPOGRAPHY.sectionHeader} font-semibold text-gray-900`}>Sign out</h3>
-            <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500`}>Are you sure you want to sign out?</p>
+            <h3 className={`${TYPOGRAPHY.sectionHeader} font-semibold text-[var(--text-primary)]`}>Sign out</h3>
+            <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)]`}>Are you sure you want to sign out?</p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className={`${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-100`}
+                className={`${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-100`}
               >
                 Cancel
               </button>

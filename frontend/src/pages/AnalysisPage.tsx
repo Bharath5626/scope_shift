@@ -13,7 +13,7 @@ import type { Project, ProjectStatus, ProjectType } from '../types'
 
 
 const statusStyles: Record<Project['status'], string> = {
-  draft:     'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+  draft:     'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active:    'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
   at_risk:   'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
@@ -48,8 +48,8 @@ function Step({ number, title, desc }: { number: number; title: string; desc: st
         {number}
       </div>
       <div>
-        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</p>
-        <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-300">{desc}</p>
+        <p className="text-sm font-semibold text-[var(--text-primary)] dark:text-gray-100">{title}</p>
+        <p className="mt-0.5 text-sm text-[var(--text-muted)] dark:text-gray-300">{desc}</p>
       </div>
     </div>
   )
@@ -72,15 +72,15 @@ function AnalysisProjectCard({
   }
 
   return (
-    <div className={`flex flex-col ${BORDER_RADIUS.card} border border-gray-200 bg-white ${SHADOW.card} ${TRANSITION} hover:border-indigo-200 ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30`}>
+    <div className={`flex flex-col ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SHADOW.card} ${TRANSITION} hover:border-indigo-200 ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30`}>
 
       {/* Card header */}
       <div className={`${SPACING.card.padding} pb-4`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-gray-900 dark:text-gray-100`}>{project.name}</h3>
-            <p className="mt-1 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
-              {project.description || <span className="italic text-gray-300 dark:text-gray-500">No description</span>}
+            <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-[var(--text-primary)] dark:text-gray-100`}>{project.name}</h3>
+            <p className="mt-1 line-clamp-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
+              {project.description || <span className="italic text-gray-300 dark:text-[var(--text-soft)]">No description</span>}
             </p>
           </div>
           <span className={`shrink-0 ${BORDER_RADIUS.tag} px-2.5 py-1 ${TYPOGRAPHY.caption} font-medium ${statusStyles[project.status]}`}>
@@ -88,8 +88,8 @@ function AnalysisProjectCard({
           </span>
         </div>
 
-        <div className={`mt-3 flex items-center justify-between ${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
-          <span className={`font-medium text-gray-500 dark:text-gray-400`}>{PROJECT_TYPE_LABELS[project.type]}</span>
+        <div className={`mt-3 flex items-center justify-between ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
+          <span className={`font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{PROJECT_TYPE_LABELS[project.type]}</span>
           <span>Updated {formatRelativeDate(project.updatedAt)}</span>
         </div>
       </div>
@@ -98,32 +98,32 @@ function AnalysisProjectCard({
       {lastAnalysis && risk ? (
         <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-gray-100 bg-gray-50 ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
           <div className="flex items-center justify-between mb-3">
-            <p className={`${TYPOGRAPHY.caption} font-semibold text-gray-500 uppercase tracking-wide dark:text-gray-400`}>Last Analysis</p>
+            <p className={`${TYPOGRAPHY.caption} font-semibold text-[var(--text-soft)] uppercase tracking-wide dark:text-[var(--text-subtle)]`}>Last Analysis</p>
             <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-semibold ${risk.badge}`}>
               {lastAnalysis.riskLevel} Risk
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 mb-3">
             <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
-              <p className="text-xs text-gray-400 dark:text-gray-500">Scope</p>
+              <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Scope</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.scopeIncreasePercent}%</p>
             </div>
             <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
-              <p className="text-xs text-gray-400 dark:text-gray-500">Hours</p>
+              <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Hours</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.additionalHours}h</p>
             </div>
             <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
-              <p className="text-xs text-gray-400 dark:text-gray-500">Delay</p>
+              <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Delay</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.delayWeeks}w</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
             Run {formatRelativeDate(lastAnalysis.createdAt)}
           </p>
         </div>
       ) : (
-        <div className="mx-6 mb-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
-          <p className="text-xs text-gray-400 dark:text-gray-500">No analysis run yet</p>
+        <div className="mx-6 mb-4 rounded-xl border border-dashed border-[var(--border-primary)] bg-gray-50/50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
+          <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No analysis run yet</p>
         </div>
       )}
 
@@ -142,7 +142,7 @@ function AnalysisProjectCard({
         {lastAnalysis && (
           <Link
             to={`/reports/${project.id}`}
-            className={`flex items-center justify-center gap-1.5 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-gray-700 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 active:scale-[0.98] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+            className={`flex items-center justify-center gap-1.5 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 active:scale-[0.98] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
             title="View full report"
           >
             <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -204,10 +204,10 @@ export function AnalysisPage() {
   
   {/* LEFT SIDE */}
   <div>
-    <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
+    <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
       AI Impact Analysis
     </h1>
-    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+    <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
       {projects.length === 0
         ? 'Create a project to get started'
         : analyzedCount > 0
@@ -222,7 +222,7 @@ export function AnalysisPage() {
     {/* SEARCH (slightly wider + left spacing fix) */}
     <div className="relative flex-1 min-w-56">
       <svg
-        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500"
+        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-subtle)] dark:text-[var(--text-soft)]"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -236,7 +236,7 @@ export function AnalysisPage() {
         placeholder="Search projects…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className={`w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+        className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
       />
     </div>
 
@@ -244,7 +244,7 @@ export function AnalysisPage() {
     <select
       value={statusFilter}
       onChange={(e) => setStatusFilter(e.target.value as any)}
-      className={`${BORDER_RADIUS.input} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-700 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+      className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
     >
       <option value={ALL}>All Statuses</option>
       {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
@@ -256,7 +256,7 @@ export function AnalysisPage() {
     <select
       value={typeFilter}
       onChange={(e) => setTypeFilter(e.target.value as any)}
-      className={`${BORDER_RADIUS.input} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-700 ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+      className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
     >
       <option value={ALL}>All Types</option>
       {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
@@ -272,7 +272,7 @@ export function AnalysisPage() {
           setStatusFilter(ALL)
           setTypeFilter(ALL)
         }}
-        className={`${BORDER_RADIUS.button} border border-gray-200 bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-gray-500 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 dark:hover:text-gray-200`}
+        className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
       >
         Clear
       </button>
@@ -334,7 +334,7 @@ export function AnalysisPage() {
           {/* Projects grid */}
           {!loading && projects.length > 0 && (
             <>
-              <p className={`mb-4 ${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
+              <p className={`mb-4 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                 {analyzedCount > 0
                   ? `${analyzedCount} project${analyzedCount === 1 ? '' : 's'} with past results — hover "Report" to revisit, or re-run the analysis`
                   : 'Click "Run AI Analysis" on any project to get started'}

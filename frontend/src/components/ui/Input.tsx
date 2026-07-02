@@ -19,8 +19,8 @@ export function Input({
     ${SPACING.card.padding}
     ${FOCUS_RING}
     ${TRANSITION}
-    border border-gray-200 bg-white text-gray-900 placeholder-gray-400
-    dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400
+    border border-[var(--border-primary)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder-[var(--text-subtle)]
+    dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)]
     ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}
     ${fullWidth ? 'w-full' : ''}
     ${className}
@@ -29,7 +29,7 @@ export function Input({
   return (
     <div className={fullWidth ? 'w-full' : ''}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1.5 dark:text-gray-300">
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300">
           {label}
         </label>
       )}

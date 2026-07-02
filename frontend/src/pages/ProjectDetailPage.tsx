@@ -8,7 +8,7 @@ import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } fro
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+  draft: 'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
   at_risk: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
@@ -63,7 +63,7 @@ export function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] p-8 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto">
           <LoadingSkeleton className="h-12 w-64 mb-6" />
           <LoadingSkeleton className="h-64 w-full rounded-xl" />
@@ -74,7 +74,7 @@ export function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
         <EmptyState
           title="Project not found"
           description="The project you're looking for doesn't exist or has been deleted."
@@ -92,27 +92,27 @@ export function ProjectDetailPage() {
   const newFeatures = features.filter((f) => f.type === 'new')
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${SPACING.page.padding} dark:bg-gray-900`}>
+    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900`}>
       <div className={`max-w-6xl mx-auto space-y-6 ${SPACING.section.gap}`}>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <button
               onClick={() => navigate('/history')}
-              className={`mb-4 flex items-center gap-2 ${TYPOGRAPHY.body} text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200`}
+              className={`mb-4 flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               Back to Projects
             </button>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>{project.name}</h1>
-            <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>{project.description || 'No description'}</p>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>{project.name}</h1>
+            <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{project.description || 'No description'}</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
-              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -142,27 +142,27 @@ export function ProjectDetailPage() {
 
         {/* Stats Cards */}
         <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ${SPACING.section.gap}`}>
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Status</p>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Status</p>
             <p className={`mt-1 text-sm font-semibold ${statusStyles[project.status]}`}>
               {PROJECT_STATUS_LABELS[project.status]}
             </p>
           </div>
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Type</p>
-            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Type</p>
+            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
               {PROJECT_TYPE_LABELS[project.type]}
             </p>
           </div>
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Features</p>
-            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Features</p>
+            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
               {features.length} total ({newFeatures.length} new)
             </p>
           </div>
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Deadline</p>
-            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Deadline</p>
+            <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
               {daysLeft !== null ? (
                 <span className={daysLeft <= 7 ? 'text-red-600' : daysLeft <= 14 ? 'text-amber-600' : 'text-green-600'}>
                   {daysLeft} days left
@@ -177,48 +177,48 @@ export function ProjectDetailPage() {
         {/* Project Details */}
         <div className={`grid gap-6 lg:grid-cols-2 ${SPACING.section.gap}`}>
           {/* Information */}
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Project Information</h2>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Project Information</h2>
             <div className={`mt-4 space-y-4 ${SPACING.section.gap}`}>
               <div>
-                <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Created</p>
-                <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-900 dark:text-gray-100`}>{formatDate(project.createdAt)}</p>
+                <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Created</p>
+                <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-primary)] dark:text-gray-100`}>{formatDate(project.createdAt)}</p>
               </div>
               <div>
-                <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Start Date</p>
-                <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-900 dark:text-gray-100`}>{formatDate(null)}</p>
+                <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Start Date</p>
+                <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-primary)] dark:text-gray-100`}>{formatDate(null)}</p>
               </div>
               <div>
-                <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Deadline</p>
-                <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-900 dark:text-gray-100`}>{formatDate(project.deadline)}</p>
+                <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Deadline</p>
+                <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-primary)] dark:text-gray-100`}>{formatDate(project.deadline)}</p>
               </div>
               <div>
-                <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Created By</p>
-                <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-900 dark:text-gray-100`}>{project.createdBy?.name || 'Unknown'}</p>
+                <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Created By</p>
+                <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-primary)] dark:text-gray-100`}>{project.createdBy?.name || 'Unknown'}</p>
               </div>
             </div>
           </div>
 
           {/* Analysis Summary */}
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-            <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Latest Analysis</h2>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+            <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Latest Analysis</h2>
             {latestAnalysis ? (
               <div className={`mt-4 space-y-4 ${SPACING.section.gap}`}>
                 <div className={`grid grid-cols-2 gap-4 ${SPACING.section.gap}`}>
                   <div>
-                    <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Scope Increase</p>
+                    <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Scope Increase</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.scopeIncreasePercent}%</p>
                   </div>
                   <div>
-                    <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Additional Hours</p>
+                    <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Additional Hours</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.additionalHours}h</p>
                   </div>
                   <div>
-                    <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Delay</p>
+                    <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Delay</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.delayWeeks}w</p>
                   </div>
                   <div>
-                    <p className={`${TYPOGRAPHY.caption} font-medium text-gray-500 uppercase tracking-wide`}>Risk Level</p>
+                    <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Risk Level</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold ${
                       latestAnalysis.riskLevel === 'low' ? 'text-green-600' :
                       latestAnalysis.riskLevel === 'medium' ? 'text-amber-600' : 'text-red-600'
@@ -236,7 +236,7 @@ export function ProjectDetailPage() {
               </div>
             ) : (
               <div className="mt-4">
-                <p className={`${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>No analysis has been run yet.</p>
+                <p className={`${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>No analysis has been run yet.</p>
                 <button
                   onClick={() => navigate(`/analyzing?project=${project.id}`)}
                   className={`mt-3 inline-flex items-center gap-2 ${BORDER_RADIUS.small} bg-indigo-600 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white hover:bg-indigo-700`}
@@ -249,12 +249,12 @@ export function ProjectDetailPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
-          <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Quick Actions</h2>
+        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
+          <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Quick Actions</h2>
           <div className={`mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 ${SPACING.section.gap}`}>
             <button
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
-              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-gray-200 bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
             >
               <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400`}>
                 <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -262,13 +262,13 @@ export function ProjectDetailPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Edit Scope</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Manage features</p>
+                <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">Edit Scope</p>
+                <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Manage features</p>
               </div>
             </button>
             <button
               onClick={() => navigate(`/analyzing?project=${project.id}`)}
-              className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-left transition hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+              className="flex items-center gap-3 rounded-lg border border-[var(--border-primary)] bg-gray-50 p-3 text-left transition hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -276,14 +276,14 @@ export function ProjectDetailPage() {
                 </svg>
               </div>
               <div>
-                <p className={`${TYPOGRAPHY.body} font-medium text-gray-900 dark:text-gray-100`}>Run Analysis</p>
-                <p className={`${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>AI scope analysis</p>
+                <p className={`${TYPOGRAPHY.body} font-medium text-[var(--text-primary)] dark:text-gray-100`}>Run Analysis</p>
+                <p className={`${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>AI scope analysis</p>
               </div>
             </button>
             {latestAnalysis && (
               <button
                 onClick={() => navigate(`/reports/${project.id}`)}
-                className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-gray-200 bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+                className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
               >
                 <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400`}>
                   <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -291,14 +291,14 @@ export function ProjectDetailPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className={`${TYPOGRAPHY.body} font-medium text-gray-900 dark:text-gray-100`}>View Report</p>
-                  <p className={`${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>Analysis details</p>
+                  <p className={`${TYPOGRAPHY.body} font-medium text-[var(--text-primary)] dark:text-gray-100`}>View Report</p>
+                  <p className={`${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>Analysis details</p>
                 </div>
               </button>
             )}
             <button
               onClick={() => navigate(`/history`)}
-              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-gray-200 bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
             >
               <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400`}>
                 <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -306,8 +306,8 @@ export function ProjectDetailPage() {
                 </svg>
               </div>
               <div>
-                <p className={`${TYPOGRAPHY.body} font-medium text-gray-900 dark:text-gray-100`}>All Projects</p>
-                <p className={`${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>View history</p>
+                <p className={`${TYPOGRAPHY.body} font-medium text-[var(--text-primary)] dark:text-gray-100`}>All Projects</p>
+                <p className={`${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>View history</p>
               </div>
             </button>
           </div>
@@ -317,16 +317,16 @@ export function ProjectDetailPage() {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className={`${BORDER_RADIUS.modal} border border-gray-200 bg-white ${SPACING.card.padding} shadow-lg dark:border-gray-700 dark:bg-gray-800 max-w-md w-full mx-auto`}>
-            <h3 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Delete Project</h3>
-            <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+          <div className={`${BORDER_RADIUS.modal} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} shadow-lg dark:border-gray-700 dark:bg-gray-800 max-w-md w-full mx-auto`}>
+            <h3 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Delete Project</h3>
+            <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
               Are you sure you want to delete "{project.name}"? This action cannot be undone and will delete all associated features and analysis data.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className={`${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Cancel
               </button>

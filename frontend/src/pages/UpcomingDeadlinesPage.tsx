@@ -7,7 +7,7 @@ import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION } from '../utils
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+  draft: 'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   at_risk: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -32,11 +32,11 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <button
       onClick={handleOpen}
-      className={`group w-full ${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} text-left ${SHADOW.card} ${TRANSITION} hover:-translate-y-0.5 hover:border-indigo-200 ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30`}
+      className={`group w-full ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} text-left ${SHADOW.card} ${TRANSITION} hover:-translate-y-0.5 hover:border-indigo-200 ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-gray-900 transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400`}>
+          <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-[var(--text-primary)] transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400`}>
             {project.name}
           </h3>
 
@@ -51,9 +51,9 @@ function ProjectCard({ project }: { project: Project }) {
             </p>
           )}
 
-          <p className="mt-2 line-clamp-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 line-clamp-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
             {project.description || (
-              <span className="italic text-gray-300 dark:text-gray-500">
+              <span className="italic text-gray-300 dark:text-[var(--text-soft)]">
                 No description
               </span>
             )}
@@ -70,7 +70,7 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       <div className={`mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700`}>
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        <span className="text-xs font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
           {PROJECT_TYPE_LABELS[project.type]}
         </span>
 
@@ -108,13 +108,13 @@ export function UpcomingDeadlinesPage() {
   }, [projects])
 
   return (
-    <div className={`w-full ${SPACING.page.padding} bg-gray-50 min-h-screen dark:bg-gray-900`}>
-      <div className={`${SPACING.page.headerPadding} border-b border-gray-200 dark:border-gray-700`}>
-        <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
+    <div className={`w-full ${SPACING.page.padding} bg-[var(--bg-page)] min-h-screen dark:bg-gray-900`}>
+      <div className={`${SPACING.page.headerPadding} border-b border-[var(--border-primary)] dark:border-gray-700`}>
+        <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
           Upcoming Deadlines
         </h1>
 
-        <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+        <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
           Projects sorted by nearest deadline
         </p>
       </div>
@@ -129,12 +129,12 @@ export function UpcomingDeadlinesPage() {
         )}
 
         {!loading && upcomingProjects.length === 0 && (
-          <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white p-14 text-center ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-            <h3 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>
+          <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] p-14 text-center ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+            <h3 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>
               No upcoming deadlines
             </h3>
 
-            <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+            <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
               All projects are completed or no deadlines have been assigned.
             </p>
           </div>
@@ -142,7 +142,7 @@ export function UpcomingDeadlinesPage() {
 
         {!loading && upcomingProjects.length > 0 && (
           <>
-            <p className={`mb-4 ${TYPOGRAPHY.caption} text-gray-400 dark:text-gray-500`}>
+            <p className={`mb-4 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
               Showing {upcomingProjects.length} upcoming projects
             </p>
 

@@ -119,27 +119,27 @@ export function AnalyzingPage() {
   }, [projectId])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm w-full max-w-md px-10 py-12 text-center dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+    <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm w-full max-w-md px-10 py-12 text-center dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
 
         {/* Decorative left accent */}
         <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-indigo-400 to-violet-600 rounded-l-2xl" />
 
         {!analysisStarted ? (
           <>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Ready to Analyze</h2>
-            <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] dark:text-gray-100">Ready to Analyze</h2>
+            <p className="mt-1.5 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
               Review project details before starting analysis
             </p>
 
             {/* Project Details */}
             {project && (
               <div className="mt-6 rounded-xl bg-gray-50 p-4 text-left dark:bg-gray-700">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{project.name}</h3>
-                <p className="mt-1 text-sm text-gray-500 line-clamp-2 dark:text-gray-400">
+                <h3 className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{project.name}</h3>
+                <p className="mt-1 text-sm text-[var(--text-soft)] line-clamp-2 dark:text-[var(--text-subtle)]">
                   {project.description || 'No description provided'}
                 </p>
-                <div className="mt-3 flex gap-2 text-xs text-gray-400 dark:text-gray-500">
+                <div className="mt-3 flex gap-2 text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
                   <span>{project.type}</span>
                   {project.deadline && (
                     <span>• Due {new Date(project.deadline).toLocaleDateString()}</span>
@@ -150,7 +150,7 @@ export function AnalyzingPage() {
 
             {/* Countdown Timer */}
             <div className="mt-6">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                 Auto-analyzing in <span className="font-semibold text-indigo-600 dark:text-indigo-400">{countdown}s</span>
               </p>
             </div>
@@ -159,7 +159,7 @@ export function AnalyzingPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                className="flex-1 rounded-xl border border-[var(--border-primary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
@@ -178,8 +178,8 @@ export function AnalyzingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Analysis Failed</h2>
-            <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] dark:text-gray-100">Analysis Failed</h2>
+            <p className="mt-1.5 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
               {error}
             </p>
             <button
@@ -191,8 +191,8 @@ export function AnalyzingPage() {
           </>
         ) : (
           <>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Analyzing Scope</h2>
-            <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)] dark:text-gray-100">Analyzing Scope</h2>
+            <p className="mt-1.5 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
               Please wait while our AI analyzes the impact…
             </p>
 
@@ -210,7 +210,7 @@ export function AnalyzingPage() {
             </div>
 
             {/* Status line */}
-            <div className="mt-3 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+            <div className="mt-3 flex items-center justify-between text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
               <span className="truncate">{MESSAGES[msgIndex]}</span>
               <span className="ml-3 shrink-0 font-medium text-indigo-500 dark:text-indigo-400">
                 {Math.round(Math.min(100, progress))}%

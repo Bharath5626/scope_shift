@@ -120,7 +120,7 @@ label="Completed Projects"
 
       <section className="mt-8">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Projects</h2>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Recent Projects</h2>
           <Link
   to="/history"
   className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
@@ -130,12 +130,12 @@ label="Completed Projects"
         </div>
 
         {sortedProjects.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-12 text-center shadow-sm">
+          <div className="rounded-2xl border border-dashed border-[var(--border-secondary)] bg-white p-12 text-center shadow-sm">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
               <FolderIcon />
             </div>
-            <h3 className="mt-4 text-base font-semibold text-gray-900">No projects yet</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <h3 className="mt-4 text-base font-semibold text-[var(--text-primary)]">No projects yet</h3>
+            <p className="mt-2 text-sm text-[var(--text-soft)]">
               Create your first project to start building and analyzing scope.
             </p>
             <Link
@@ -154,7 +154,7 @@ label="Completed Projects"
         )}
       </section>
      <section className="mt-8">
-  <h2 className="mb-6 text-lg font-semibold text-gray-900">
+  <h2 className="mb-6 text-lg font-semibold text-[var(--text-primary)]">
     Scope Health Analytics
   </h2>
 
@@ -162,7 +162,7 @@ label="Completed Projects"
     {/* Health Score */}
     <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900">Scope Health Score</h3>
+        <h3 className="font-semibold text-[var(--text-primary)]">Scope Health Score</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${
           (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
             ? 'bg-green-100 text-green-700'
@@ -199,14 +199,14 @@ label="Completed Projects"
               strokeDasharray={`${dashboardStats?.scopeHealth.healthScore ?? 78}, 100`}
             />
           </svg>
-          <span className="absolute text-2xl font-bold text-gray-900">{dashboardStats?.scopeHealth.healthScore ?? 78}%</span>
+          <span className="absolute text-2xl font-bold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.healthScore ?? 78}%</span>
         </div>
 
         <div className="flex-1 space-y-3">
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs text-gray-500">Analyses</span>
-              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.totalAnalyses ?? 0}</span>
+              <span className="text-xs text-[var(--text-soft)]">Analyses</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.totalAnalyses ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-gray-100">
               <div className="h-full rounded-full bg-indigo-500" style={{ width: '100%' }} />
@@ -214,8 +214,8 @@ label="Completed Projects"
           </div>
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs text-gray-500">Warnings</span>
-              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.warnings ?? 0}</span>
+              <span className="text-xs text-[var(--text-soft)]">Warnings</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.warnings ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-gray-100">
               <div className="h-full rounded-full bg-orange-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.warnings / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
@@ -223,8 +223,8 @@ label="Completed Projects"
           </div>
           <div>
             <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs text-gray-500">Healthy</span>
-              <span className="text-sm font-semibold text-gray-900">{dashboardStats?.scopeHealth.healthy ?? 0}</span>
+              <span className="text-xs text-[var(--text-soft)]">Healthy</span>
+              <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.healthy ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-gray-100">
               <div className="h-full rounded-full bg-green-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.healthy / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
@@ -236,11 +236,11 @@ label="Completed Projects"
 
     {/* Risk Distribution */}
     <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-      <h3 className="mb-4 font-semibold text-gray-900">Risk Distribution</h3>
+      <h3 className="mb-4 font-semibold text-[var(--text-primary)]">Risk Distribution</h3>
 
 {!dashboardStats || dashboardStats.riskDistribution.total === 0 ? (
   <div className="flex h-40 items-center justify-center">
-    <p className="text-sm text-gray-500">
+    <p className="text-sm text-[var(--text-soft)]">
       No analysis data available. Run scope analysis on your projects to see risk distribution.
     </p>
   </div>
@@ -275,8 +275,8 @@ label="Completed Projects"
     <div key={risk.label} className="flex items-center gap-3">
       <div className="flex-1">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">{risk.label} Risk</span>
-          <span className="text-sm font-semibold text-gray-900">{risk.value}</span>
+          <span className="text-sm font-medium text-[var(--text-secondary)]">{risk.label} Risk</span>
+          <span className="text-sm font-semibold text-[var(--text-primary)]">{risk.value}</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-gray-100">
           <div
@@ -285,7 +285,7 @@ label="Completed Projects"
           />
         </div>
       </div>
-      <span className="text-xs text-gray-500 w-12 text-right">{risk.percentage}%</span>
+      <span className="text-xs text-[var(--text-soft)] w-12 text-right">{risk.percentage}%</span>
     </div>
   ))}
 </div>
@@ -297,7 +297,7 @@ label="Completed Projects"
 <section className="mt-8">
   <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
     <div className="mb-6 flex items-center justify-between">
-      <h2 className="text-lg font-semibold text-gray-900">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Upcoming Deadlines
       </h2>
 
@@ -310,7 +310,7 @@ label="Completed Projects"
     </div>
 
     {upcomingProjects.length === 0 ? (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-[var(--text-soft)]">
         No upcoming deadlines.
       </p>
     ) : (
@@ -325,11 +325,11 @@ label="Completed Projects"
               className="flex items-center justify-between rounded-2xl border border-gray-100 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
             >
               <div>
-                <h3 className="font-medium text-gray-900">
+                <h3 className="font-medium text-[var(--text-primary)]">
                   {project.name}
                 </h3>
 
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-[var(--text-soft)]">
                   Due{" "}
                   {new Date(project.deadline!).toLocaleDateString()}
                 </p>
@@ -337,7 +337,7 @@ label="Completed Projects"
 
               <div className="flex items-center gap-2">
                 {!hasStarted && project.startDate && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-[var(--text-soft)]">
                     Starts {new Date(project.startDate).toLocaleDateString()}
                   </span>
                 )}

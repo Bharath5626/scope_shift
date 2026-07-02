@@ -86,7 +86,7 @@ function FeatureForm({
   }
 
   const inputCls =
-    'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500'
+    'w-full rounded-lg border border-[var(--border-primary)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500'
 
   const accentBg = tabType === 'new' ? 'bg-emerald-50/50 border-emerald-200' : 'bg-indigo-50/40 border-indigo-200'
 
@@ -94,7 +94,7 @@ function FeatureForm({
     <div className={`rounded-xl border p-4 space-y-3 ${accentBg}`}>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1 block text-xs font-medium text-gray-600">
+          <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
             Feature Title <span className="text-red-500">*</span>
           </label>
           <input
@@ -116,7 +116,7 @@ function FeatureForm({
           )}
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-gray-600">Description</label>
+          <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">Description</label>
           <input
             type="text"
             value={description}
@@ -138,7 +138,7 @@ function FeatureForm({
       <div className="flex justify-end gap-2">
         <button
           onClick={onCancel}
-          className="rounded-lg border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+          className="rounded-lg border border-[var(--border-primary)] bg-white px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-gray-50 transition"
         >
           Cancel
         </button>
@@ -209,7 +209,7 @@ function FeatureList({
             : 'Add the features that are included in the original agreed scope'
         }
         size="sm"
-        className={`${BORDER_RADIUS.card} border border-dashed border-gray-200`}
+        className={`${BORDER_RADIUS.card} border border-dashed border-[var(--border-primary)]`}
       />
     )
   }
@@ -217,7 +217,7 @@ function FeatureList({
 
 
   return (
-    <div className={`divide-y divide-gray-100 ${BORDER_RADIUS.card} border border-gray-200 overflow-hidden`}>
+    <div className={`divide-y divide-gray-100 ${BORDER_RADIUS.card} border border-[var(--border-primary)] overflow-hidden`}>
       {features.map((feature, index) => (
         <div
           key={feature.id}
@@ -244,7 +244,7 @@ function FeatureList({
               className={`flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
             >
               {/* Drag handle */}
-              <div className="cursor-grab text-gray-300 hover:text-gray-400 shrink-0 active:cursor-grabbing">
+              <div className="cursor-grab text-gray-300 hover:text-[var(--text-subtle)] shrink-0 active:cursor-grabbing">
                 <GripIcon />
               </div>
 
@@ -257,9 +257,9 @@ function FeatureList({
 
               {/* Title + description */}
               <div className="min-w-0 flex-1">
-                <p className={`truncate ${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>{feature.title}</p>
+                <p className={`truncate ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>{feature.title}</p>
                 {feature.description && (
-                  <p className={`mt-0.5 truncate ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>{feature.description}</p>
+                  <p className={`mt-0.5 truncate ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{feature.description}</p>
                 )}
               </div>
 
@@ -267,7 +267,7 @@ function FeatureList({
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   onClick={() => onEdit(feature.id)}
-                  className={`${BORDER_RADIUS.small} p-1.5 text-gray-400 ${TRANSITION} hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300`}
+                  className={`${BORDER_RADIUS.small} p-1.5 text-[var(--text-subtle)] ${TRANSITION} hover:bg-gray-100 hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300`}
                   title="Edit"
                 >
                   <PencilIcon />
@@ -397,7 +397,7 @@ export function ScopeBuilder() {
 
   if (!projectId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
         <EmptyState
           title="No project selected"
           description="Open a project from the dashboard or projects page to start building its scope."
@@ -417,16 +417,16 @@ export function ScopeBuilder() {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${SPACING.page.padding} dark:bg-gray-900`}>
+    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900`}>
       <div className="mx-auto max-w-3xl">
 
         {/* Page header */}
         <div className={`mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4`}>
           <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>Scope Builder</h1>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>Scope Builder</h1>
             {project && (
-              <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
-                <span className="font-medium text-gray-700 dark:text-gray-300">{project.name}</span> — define original scope and client additions
+              <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
+                <span className="font-medium text-[var(--text-secondary)] dark:text-gray-300">{project.name}</span> — define original scope and client additions
               </p>
             )}
           </div>
@@ -437,7 +437,7 @@ export function ScopeBuilder() {
                 {autosaveStatus === 'saving' && (
                   <>
                     <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
-                    <span className="text-gray-500 dark:text-gray-400">Saving...</span>
+                    <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
                   </>
                 )}
                 {autosaveStatus === 'saved' && (
@@ -473,13 +473,13 @@ export function ScopeBuilder() {
         </div>
 
         {/* Tab bar */}
-        <div className={`mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-gray-200 bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+        <div className={`mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <button
             onClick={() => handleTabSwitch('original')}
             className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'original'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-gray-50 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
             aria-pressed={activeTab === 'original'}
             role="tab"
@@ -499,7 +499,7 @@ export function ScopeBuilder() {
             className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'new'
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-gray-50 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
             aria-pressed={activeTab === 'new'}
             role="tab"
@@ -531,15 +531,15 @@ export function ScopeBuilder() {
         )}
 
         {/* Main card */}
-        <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
 
           {/* Card header */}
           <div className={`flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700`}>
             <div>
-              <h2 className={`${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>
+              <h2 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
                 {activeTab === 'original' ? 'Original Scope Features' : 'Client-Requested Additions'}
               </h2>
-              <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>
+              <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
                 {activeTab === 'original'
                   ? 'Features agreed in the initial project contract'
                   : 'New features added after original scope was locked'}
@@ -579,7 +579,7 @@ export function ScopeBuilder() {
             )}
 
             {/* Section label */}
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-subtle)]">
               {activeTab === 'original' ? 'Original Scope' : 'New Additions'} ({activeFeatures.length} feature{activeFeatures.length !== 1 ? 's' : ''})
             </p>
 
@@ -599,7 +599,7 @@ export function ScopeBuilder() {
             />
 
             {activeFeatures.length > 1 && (
-              <p className="text-center text-xs text-gray-400">
+              <p className="text-center text-xs text-[var(--text-subtle)]">
                 Drag the <span className="font-medium">⠿ grip</span> handle to reorder features
               </p>
             )}
@@ -609,7 +609,7 @@ export function ScopeBuilder() {
           <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
             <button
               onClick={() => navigate(-1)}
-              className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50"
             >
               Back
             </button>
@@ -636,18 +636,18 @@ export function ScopeBuilder() {
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
     <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800 dark:shadow-gray-900/20">
 
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)] dark:text-gray-100">
         Delete Feature?
       </h2>
 
-      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+      <p className="mt-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
         This action cannot be undone.
       </p>
 
       <div className="mt-6 flex justify-end gap-3">
         <button
           onClick={() => setConfirmDeleteId(null)}
-          className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
         >
           Cancel
         </button>

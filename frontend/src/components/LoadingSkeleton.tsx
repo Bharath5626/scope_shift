@@ -14,7 +14,7 @@ interface CardSkeletonProps {
 
 export function CardSkeleton({ className = '' }: CardSkeletonProps) {
   return (
-    <div className={`rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-4 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20 ${className}`}>
+    <div className={`rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm space-y-4 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20 ${className}`}>
       <div className="flex justify-between gap-3">
         <div className="-flex-1 space-y-2">
           <LoadingSkeleton className="h-4 w-2/3" />
@@ -35,7 +35,7 @@ interface StatsCardSkeletonProps {
 
 export function StatsCardSkeleton({ className = '' }: StatsCardSkeletonProps) {
   return (
-    <div className={`rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20 ${className}`}>
+    <div className={`rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] px-5 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20 ${className}`}>
       <LoadingSkeleton className="h-3 w-20 mb-1" />
       <LoadingSkeleton className="h-8 w-16" />
     </div>

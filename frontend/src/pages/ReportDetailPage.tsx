@@ -102,8 +102,8 @@ function DonutChart({ level, score }: { level: string; score: number }) {
           strokeDasharray={`${filled} ${circ}`} strokeLinecap="round" />
       </svg>
       <div className="text-center">
-        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{level}</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500">complexity</p>
+        <p className="text-lg font-bold text-[var(--text-primary)] dark:text-gray-100">{level}</p>
+        <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">complexity</p>
       </div>
     </div>
   )
@@ -127,10 +127,10 @@ function CheckIcon() {
 
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+      <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{label}</p>
       <p className={`mt-1 text-2xl font-bold ${color ?? 'text-indigo-700 dark:text-indigo-400'}`}>{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{sub}</p>}
+      {sub && <p className="mt-0.5 text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">{sub}</p>}
     </div>
   )
 }
@@ -147,8 +147,8 @@ function SummaryTab({ analysis }: { analysis: Analysis }) {
         <StatCard label="Scope Score" value={`${score}%`} />
         <StatCard label="Estimated Effort" value={`${analysis.additionalHours} hrs`} />
         <StatCard label="Timeline" value={`${analysis.delayWeeks} ${analysis.delayWeeks === 1 ? 'week' : 'weeks'}`} />
-        <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Risk Level</p>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Risk Level</p>
           <p className={`mt-1 text-2xl font-bold ${riskColors.text}`}>{risk}</p>
           <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${riskColors.badge}`}>
             {risk} Risk
@@ -156,12 +156,12 @@ function SummaryTab({ analysis }: { analysis: Analysis }) {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:gap-8 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+      <div className="flex flex-col items-center gap-3 rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm sm:flex-row sm:gap-8 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
         <DonutChart level={complexity} score={score} />
         <div>
-          <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">Complexity Level</p>
+          <p className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Complexity Level</p>
           <p className={`mt-1 text-3xl font-bold ${riskColors.text}`}>{complexity}</p>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
             Based on {analysis.additionalHours} hours of estimated effort across all categories.
           </p>
         </div>
@@ -172,7 +172,7 @@ function SummaryTab({ analysis }: { analysis: Analysis }) {
 
 function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
   if (!breakdown) {
-    return <p className="text-sm text-gray-400 dark:text-gray-500">No effort breakdown available for this analysis.</p>
+    return <p className="text-sm text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No effort breakdown available for this analysis.</p>
   }
   const rows = [
     { label: 'Development',   hours: breakdown.development,   pct: 60 },
@@ -184,15 +184,15 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
   const maxHours = Math.max(...rows.map((r) => r.hours), 1)
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-5 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Hours by Category</h3>
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm space-y-5 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+      <h3 className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Hours by Category</h3>
       {rows.map(({ label, hours }) => {
         const pct = Math.round((hours / maxHours) * 100)
         return (
           <div key={label}>
             <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-gray-600 dark:text-gray-400">{label}</span>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">{hours} hrs</span>
+              <span className="text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{label}</span>
+              <span className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{hours} hrs</span>
             </div>
             <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700">
               <div
@@ -203,8 +203,8 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
           </div>
         )
       })}
-      <div className="border-t border-gray-200 pt-4 flex items-center justify-between text-sm font-bold dark:border-gray-700">
-        <span className="text-gray-800 dark:text-gray-200">Total</span>
+      <div className="border-t border-[var(--border-primary)] pt-4 flex items-center justify-between text-sm font-bold dark:border-gray-700">
+        <span className="text-gray-800 dark:text-black">Total</span>
         <span className="text-indigo-700 dark:text-indigo-400">{total} hrs</span>
       </div>
     </div>
@@ -218,29 +218,29 @@ function RiskTab({ riskLevel, riskFactors, complexity }: { riskLevel: string | n
 
   return (
     <div className="space-y-5">
-      <div className={`flex items-center gap-4 rounded-xl border p-5 ${riskColors.bg} ${riskColors.border}`}>
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold ${riskColors.text}`}>
+      <div data-risk-section="true" className={`flex items-center gap-4 rounded-xl border p-5 ${riskColors.bg} ${riskColors.border}`} style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold ${riskColors.text}`} style={{ backgroundColor: '#ffffff' }}>
           {risk[0]}
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Overall Risk: {risk}</p>
-          <p className="text-xs text-gray-500 mt-0.5 dark:text-gray-400">Complexity level: {complexity || 'Unknown'}</p>
+          <p className="text-sm font-semibold text-gray-800" style={{ color: '#000000' }}>Overall Risk: {risk}</p>
+          <p className="text-xs text-[var(--text-soft)] mt-0.5" style={{ color: '#000000' }}>Complexity level: {complexity || 'Unknown'}</p>
         </div>
         <span className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${riskColors.badge}`}>
           {risk} Risk
         </span>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Identified Risk Factors</h3>
+      <div data-risk-section="true" className="rounded-xl border border-[var(--border-primary)] p-6 shadow-sm" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
+        <h3 className="mb-4 text-sm font-semibold" style={{ color: '#000000' }}>Identified Risk Factors</h3>
         {factors.length === 0 ? (
-          <p className="text-sm text-gray-400 dark:text-gray-500">No risk factors recorded for this analysis.</p>
+          <p className="text-sm" style={{ color: '#000000' }}>No risk factors recorded for this analysis.</p>
         ) : (
           <div className="space-y-3">
             {factors.map((factor, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg bg-amber-50 border border-amber-100 px-4 py-3 dark:bg-amber-900/30 dark:border-amber-800">
+              <div key={i} className="flex items-start gap-3 rounded-lg border px-4 py-3" style={{ backgroundColor: '#fef3c7', borderColor: '#fcd34d' }}>
                 <WarningIcon />
-                <span className="text-sm text-gray-700 dark:text-gray-200">{factor}</span>
+                <span className="text-sm" style={{ color: '#000000' }}>{factor}</span>
               </div>
             ))}
           </div>
@@ -253,16 +253,16 @@ function RiskTab({ riskLevel, riskFactors, complexity }: { riskLevel: string | n
 function RecommendationsTab({ recommendations }: { recommendations: string[] | null }) {
   const items = recommendations ?? []
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-      <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">AI Recommendations</h3>
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+      <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">AI Recommendations</h3>
       {items.length === 0 ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500">No recommendations recorded for this analysis.</p>
+        <p className="text-sm text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No recommendations recorded for this analysis.</p>
       ) : (
         <div className="space-y-3">
           {items.map((rec, i) => (
             <div key={i} className="flex items-start gap-3 rounded-lg bg-indigo-50 border border-indigo-100 px-4 py-3 dark:bg-indigo-900/30 dark:border-indigo-800">
               <CheckIcon />
-              <span className="text-sm text-gray-700 dark:text-gray-200">{rec}</span>
+              <span className="text-sm text-[var(--text-secondary)] dark:text-gray-200">{rec}</span>
             </div>
           ))}
         </div>
@@ -275,70 +275,70 @@ function ProjectDetailsTab({ project }: { project: Project }) {
   return (
     <div className="space-y-6">
       {/* Basic Info */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Project Information</h3>
+      <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+        <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Project Information</h3>
         <div className="space-y-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Project Name</p>
-            <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-gray-100">{project.name}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-black">Project Name</p>
+            <p className="mt-1 text-sm font-semibold text-[var(--text-primary)] dark:text-gray-100">{project.name}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Description</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.description || 'No description provided'}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Description</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.description || 'No description provided'}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Type</p>
-              <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{PROJECT_TYPE_LABELS[project.type] ?? project.type}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Type</p>
+              <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{PROJECT_TYPE_LABELS[project.type] ?? project.type}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</p>
-              <p className="mt-1 text-sm text-gray-700 capitalize dark:text-gray-300">{project.status.replace('_', ' ')}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Status</p>
+              <p className="mt-1 text-sm text-[var(--text-secondary)] capitalize dark:text-gray-300">{project.status.replace('_', ' ')}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Technical Details */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Technical Configuration</h3>
+      <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+        <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Technical Configuration</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Project Type</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.projectType || 'Not specified'}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Project Type</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.projectType || 'Not specified'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Team Size</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.teamSize ? `${project.teamSize} members` : 'Not specified'}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Team Size</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.teamSize ? `${project.teamSize} members` : 'Not specified'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Methodology</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.methodology || 'Not specified'}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Methodology</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.methodology || 'Not specified'}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Working Hours</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.workingHours ? `${project.workingHours} hrs/day` : 'Not specified'}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Working Hours</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.workingHours ? `${project.workingHours} hrs/day` : 'Not specified'}</p>
           </div>
         </div>
         <div className="mt-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Tech Stack</p>
-          <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{project.techStack || 'Not specified'}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Tech Stack</p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.techStack || 'Not specified'}</p>
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-        <h3 className="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Timeline</h3>
+      <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+        <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Timeline</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Start Date</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Start Date</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
               {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Deadline</p>
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Deadline</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
               {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not specified'}
             </p>
           </div>
@@ -380,7 +380,7 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
       case 'feature_added':
         return <span className="text-purple-600 dark:text-purple-400">F</span>
       default:
-        return <span className="text-gray-600 dark:text-gray-400">{action.charAt(0).toUpperCase()}</span>
+        return <span className="text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{action.charAt(0).toUpperCase()}</span>
     }
   }
 
@@ -404,12 +404,12 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
   return (
     <div className="space-y-4">
       {auditLogs.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-          <p className="text-sm text-gray-500 dark:text-gray-400">No logs available</p>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+          <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">No logs available</p>
         </div>
       ) : (
         auditLogs.map((log) => (
-          <div key={log.id} className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+          <div key={log.id} className="rounded-xl border border-[var(--border-primary)] bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-4">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
@@ -426,14 +426,14 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
                   {getActionIcon(log.action)}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">
                     {getActionLabel(log.action)}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                     {new Date(log.createdAt).toLocaleString()} • By {getUserName(log)}
                   </p>
                   {log.description && (
-                    <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{log.description}</p>
+                    <p className="mt-1 text-xs text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{log.description}</p>
                   )}
                 </div>
               </div>
@@ -446,41 +446,25 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
             </div>
             
             {expandedLogId === log.id && (
-              <div className="border-t border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
+              <div className="border-t border-[var(--border-primary)] bg-[var(--bg-section)] p-4 dark:border-gray-700 dark:bg-gray-700/50">
                 {log.features && log.features.length > 0 ? (
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                       Features ({log.features.length})
                     </p>
                     {log.features.map((feature) => (
-                      <div key={feature.id} className="rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{feature.title}</p>
-                            {feature.description && (
-                              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{feature.description}</p>
-                            )}
-                          </div>
-                          <div className="ml-4 flex gap-2">
-                            <span className="rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
-                              {feature.category}
-                            </span>
-                            <span className={`rounded-full px-2 py-1 text-xs font-medium ${
-                              feature.priority === 'high' 
-                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                : feature.priority === 'medium'
-                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                            }`}>
-                              {feature.priority}
-                            </span>
-                          </div>
+                      <div key={feature.id} className="rounded-lg border border-[var(--border-primary)] bg-white p-3 dark:border-gray-600 dark:bg-gray-800">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">{feature.title}</p>
+                          {feature.description && (
+                            <p className="mt-1 text-xs text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{feature.description}</p>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">No features available</p>
+                  <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">No features available</p>
                 )}
               </div>
             )}
@@ -640,10 +624,10 @@ export function ReportDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
         <div className="text-center">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Loading report…</p>
+          <p className="mt-3 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Loading report…</p>
         </div>
       </div>
     )
@@ -651,7 +635,7 @@ export function ReportDetailPage() {
 
   if (error || !project || !analysis) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
         <div className="text-center">
           <p className="text-sm text-red-500 dark:text-red-400">{error || 'Report not found'}</p>
           <button
@@ -666,7 +650,7 @@ export function ReportDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--bg-page)] p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header */}
@@ -674,15 +658,15 @@ export function ReportDetailPage() {
           <div>
             <button
               onClick={() => navigate('/reports')}
-              className="mb-2 flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="mb-2 flex items-center gap-1.5 text-xs text-[var(--text-subtle)] hover:text-[var(--text-muted)] dark:hover:text-gray-300"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               Back to Reports
             </button>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">{project.name}</h1>
-            <p className="mt-0.5 text-sm text-gray-400 dark:text-gray-500">
+            <h1 className="text-xl font-bold text-[var(--text-primary)] dark:text-gray-100">{project.name}</h1>
+            <p className="mt-0.5 text-sm text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
               {PROJECT_TYPE_LABELS[project.type] ?? project.type} · Detailed Analysis Report
             </p>
           </div>
@@ -711,7 +695,7 @@ export function ReportDetailPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-[var(--border-primary)] dark:border-gray-700">
           <nav className="-mb-px flex gap-0">
             {TABS.map((tab) => (
               <button
@@ -720,7 +704,7 @@ export function ReportDetailPage() {
                 className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab
                     ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-600'
+                    : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:border-gray-300 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:border-gray-600'
                 }`}
               >
                 {tab}
@@ -759,7 +743,7 @@ export function ReportDetailPage() {
               }
             }}
             disabled={TABS.indexOf(activeTab) === 0}
-            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            className="flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

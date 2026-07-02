@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
+import type { Project } from '../types'
 import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION } from '../utils/designSystem'
 
 const SectionCard = ({
@@ -14,10 +15,10 @@ const SectionCard = ({
   children: React.ReactNode
 }) => {
   return (
-    <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+    <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
       <div className="mb-4">
-        <h3 className={`${TYPOGRAPHY.body} font-semibold text-gray-900 dark:text-gray-100`}>{title}</h3>
-        {description && <p className={`mt-1 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>{description}</p>}
+        <h3 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>{title}</h3>
+        {description && <p className={`mt-1 ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{description}</p>}
       </div>
       {children}
     </div>
@@ -25,12 +26,12 @@ const SectionCard = ({
 }
 
 const inputCls =
-  `w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white px-4 py-3 ${TYPOGRAPHY.body} text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
+  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
 
 const selectCls =
-  `w-full ${BORDER_RADIUS.input} border border-gray-200 bg-white px-4 py-3  pr-10 ${TYPOGRAPHY.body} text-gray-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 appearance-none cursor-pointer ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
+  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3  pr-10 ${TYPOGRAPHY.body} text-[var(--text-secondary)] focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 appearance-none cursor-pointer ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
 
-const labelCls = `block ${TYPOGRAPHY.body} font-medium text-gray-700 mb-1.5 dark:text-gray-300`
+const labelCls = `block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`
 
 const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'> = {
   'Web App': 'saas',
@@ -76,7 +77,7 @@ const SelectWrapper = ({ children }: { children: React.ReactNode }) => (
     {children}
 
     <svg
-      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+      className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)] dark:text-[var(--text-soft)]"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -98,15 +99,11 @@ export function CreateProjectPage() {
   const [searchParams] = useSearchParams()
   const editProjectId = searchParams.get('edit')
   const { createProject } = useProjects()
-  const [projectTypeOther, setProjectTypeOther] = useState('')
   const [isCustomProjectType, setIsCustomProjectType] = useState(false)
-  const [methodologyOther, setMethodologyOther] = useState('')
   const [isCustomMethodology, setIsCustomMethodology] = useState(false)
-  const [workingHoursOther, setWorkingHoursOther] = useState('')
 
   const [techStackInput, setTechStackInput] = useState('')
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
-  const [projectLogo, setProjectLogo] = useState<File | null>(null)
   const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -141,7 +138,7 @@ export function CreateProjectPage() {
           setLogoPreview(project.logo || null)
           
           if (project.techStack) {
-            const skills = project.techStack.split(',').map(s => s.trim()).filter(s => s)
+            const skills = project.techStack.split(',').map((skill: string) => skill.trim()).filter((skill: string) => skill)
             setSelectedSkills(skills)
           }
         })
@@ -191,7 +188,6 @@ export function CreateProjectPage() {
 
   const [step, setStep] = useState<Step>('form')
   const [error, setError] = useState('')
-  const [showOptional, setShowOptional] = useState(false)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{
@@ -262,7 +258,6 @@ if (touchedFields.has('techStack')) {
         return
       }
 
-      setProjectLogo(file)
       const reader = new FileReader()
       reader.onloadend = () => {
         setLogoPreview(reader.result as string)
@@ -274,7 +269,6 @@ if (touchedFields.has('techStack')) {
   }
 
   const handleLogoRemove = () => {
-    setProjectLogo(null)
     setLogoPreview(null)
   }
 const handleCreate = async () => {
@@ -319,10 +313,10 @@ const handleCreate = async () => {
   try {
     console.log('Creating project with logo:', logoPreview ? 'Yes' : 'No', logoPreview?.substring(0, 50) + '...')
     
-    let project
+    let project: Project
     if (editProjectId) {
       // Update existing project
-      project = await api.put(`/projects/${editProjectId}`, {
+      project = await api.put<Project>(`/projects/${editProjectId}`, {
         name,
         description: description.trim() || null,
         type: TYPE_MAP[projectType] ?? 'saas',
@@ -385,8 +379,8 @@ const filteredSkills = SKILLS.filter(
 
   if (step === 'generating') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8 dark:bg-gray-900">
-        <div className={`${BORDER_RADIUS.card} border border-gray-200 bg-white p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
+        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-50 dark:bg-indigo-900/30`}>
             <svg className={`h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -394,10 +388,10 @@ const filteredSkills = SKILLS.filter(
             </svg>
           </div>
 
-          <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>
+          <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>
             Generating features with AI
           </h2>
-          <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+          <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
             Analysing your project details and building the initial feature list…
           </p>
         </div>
@@ -406,16 +400,16 @@ const filteredSkills = SKILLS.filter(
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
       <div className={`mx-auto max-w-5xl ${SPACING.page.padding} py-10`}>
 
         {/* Header */}
         <div className={`mb-8 flex items-start justify-between`}>
           <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-gray-900 dark:text-gray-100`}>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
               {editProjectId ? 'Edit Project Details' : 'Create New Project'}
             </h1>
-            <p className={`mt-1 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+            <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
               {editProjectId 
                 ? 'Update project details — AI will regenerate features based on your changes'
                 : 'Fill in the details — AI will generate Requirements based on structured inputs'
@@ -478,7 +472,7 @@ const filteredSkills = SKILLS.filter(
               <label className={labelCls}>Project Logo (Optional)</label>
               <div className="flex items-start gap-4">
                 {logoPreview ? (
-                  <div className={`relative h-20 w-20 shrink-0 overflow-hidden ${BORDER_RADIUS.card} border border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700`}>
+                  <div className={`relative h-20 w-20 shrink-0 overflow-hidden ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700`}>
                     <img
                       src={logoPreview}
                       alt="Project logo preview"
@@ -495,8 +489,8 @@ const filteredSkills = SKILLS.filter(
                     </button>
                   </div>
                 ) : (
-                  <div className="h-20 w-20 shrink-0 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center dark:border-gray-600 dark:bg-gray-700">
-                    <svg className="h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="h-20 w-20 shrink-0 rounded-xl border-2 border-dashed border-[var(--border-secondary)] bg-[var(--bg-section)] flex items-center justify-center dark:border-gray-600 dark:bg-gray-700">
+                    <svg className="h-8 w-8 text-[var(--text-subtle)] dark:text-[var(--text-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -511,14 +505,14 @@ const filteredSkills = SKILLS.filter(
                   />
                   <label
                     htmlFor="logo-upload"
-                    className={`inline-flex cursor-pointer items-center gap-2 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                    className={`inline-flex cursor-pointer items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
                   >
                     <svg className={`h-4 w-4`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     {logoPreview ? 'Change Logo' : 'Upload Logo'}
                   </label>
-                  <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-gray-500 dark:text-gray-400`}>
+                  <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
                     Upload a logo or image for your project reference. PNG, JPG, or SVG up to 500KB.
                   </p>
                 </div>
@@ -537,7 +531,7 @@ const filteredSkills = SKILLS.filter(
   <label className={labelCls}>Tech Stack <span className="text-red-500">*</span></label>
 
   <div className="relative">
-    <div className={`flex flex-wrap gap-2 ${BORDER_RADIUS.input} border p-3 min-h-[52px] ${fieldErrors.techStack ? 'border-red-500 ' : 'border-gray-200 dark:border-gray-600'}`}>
+    <div className={`flex flex-wrap gap-2 ${BORDER_RADIUS.input} border p-3 min-h-[52px] ${fieldErrors.techStack ? 'border-red-500 ' : 'border-[var(--border-primary)] dark:border-gray-600'}`}>
       
       {selectedSkills.map((skill) => (
         <span
@@ -630,7 +624,7 @@ const filteredSkills = SKILLS.filter(
     )}
 
     {techStackInput && filteredSkills.length > 0 && (
-      <div className={`absolute z-10 mt-1 w-full ${BORDER_RADIUS.card} border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:shadow-gray-900/30`}>
+      <div className={`absolute z-10 mt-1 w-full ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:shadow-gray-900/30`}>
         {filteredSkills.slice(0, 8).map((skill) => (
           <button
             key={skill}
@@ -742,7 +736,7 @@ const filteredSkills = SKILLS.filter(
           setProjectType('')
           setIsCustomProjectType(false)
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)] hover:text-[var(--text-muted)] dark:text-[var(--text-soft)] dark:hover:text-gray-300"
       >
         ✕
       </button>
@@ -797,7 +791,7 @@ const filteredSkills = SKILLS.filter(
           setMethodology('')
           setIsCustomMethodology(false)
         }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)] hover:text-[var(--text-muted)] dark:text-[var(--text-soft)] dark:hover:text-gray-300"
       >
         ✕
       </button>
@@ -855,8 +849,8 @@ const filteredSkills = SKILLS.filter(
         </div>
 
         {/* Footer */}
-        <div className={`mt-8 flex items-center justify-between ${BORDER_RADIUS.card} border border-gray-200 bg-white px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-          <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+        <div className={`mt-8 flex items-center justify-between ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+          <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
             AI will generate 6–10 Requirements based on your inputs
           </div>
 
@@ -864,7 +858,7 @@ const filteredSkills = SKILLS.filter(
             {hasUnsavedChanges && (
               <button
                 onClick={handleCancel}
-                className={`${BORDER_RADIUS.button} border border-gray-200 bg-white px-5 py-2.5 ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-5 py-2.5 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Cancel
               </button>
@@ -903,15 +897,15 @@ const filteredSkills = SKILLS.filter(
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className={`${TYPOGRAPHY.sectionHeader} text-gray-900 dark:text-gray-100`}>Unsaved Changes</h2>
-            <p className={`mt-2 ${TYPOGRAPHY.body} text-gray-500 dark:text-gray-400`}>
+            <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Unsaved Changes</h2>
+            <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
               You have unsaved changes. Are you sure you want to cancel?
             </p>
 
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className={`flex-1 ${BORDER_RADIUS.button} border border-gray-200 bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-gray-700 ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`flex-1 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Keep Editing
               </button>

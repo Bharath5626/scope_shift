@@ -54,8 +54,8 @@ function DonutChart({ level, score }: { level: RiskLevel; score: number }) {
         />
       </svg>
       <div className="text-center">
-        <p className="text-lg font-bold text-gray-900">{level}</p>
-        <p className="text-xs text-gray-400">complexity</p>
+        <p className="text-lg font-bold text-[var(--text-primary)]">{level}</p>
+        <p className="text-xs text-[var(--text-subtle)]">complexity</p>
       </div>
     </div>
   )
@@ -63,10 +63,10 @@ function DonutChart({ level, score }: { level: RiskLevel; score: number }) {
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-sm">
-      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm">
+      <p className="text-xs font-medium text-[var(--text-soft)] uppercase tracking-wide">{label}</p>
       <p className="mt-1 text-2xl font-bold text-indigo-700">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-gray-400">{sub}</p>}
+      {sub && <p className="mt-0.5 text-xs text-[var(--text-subtle)]">{sub}</p>}
     </div>
   )
 }
@@ -89,9 +89,9 @@ export function AnalysisResultsPage() {
 
   if (!result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-500 text-sm">No analysis data found.</p>
+          <p className="text-[var(--text-soft)] text-sm">No analysis data found.</p>
           <button
             onClick={() => navigate(projectId ? `/scope-builder?project=${projectId}` : '/')}
             className="mt-4 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
@@ -115,29 +115,29 @@ export function AnalysisResultsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-[var(--bg-page)] p-8">
       <div className="w-full max-w-6xl mx-auto space-y-6">
 
         {/* Header */}
         <div>
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">6</div>
-            <h1 className="text-xl font-semibold text-gray-900">Impact Analysis Results (Summary)</h1>
+            <h1 className="text-xl font-semibold text-[var(--text-primary)]">Impact Analysis Results (Summary)</h1>
           </div>
         </div>
 
         {/* Main card */}
-        <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-          <h2 className="text-base font-semibold text-gray-900">Impact Analysis Summary</h2>
-          <p className="mt-0.5 text-sm text-gray-500">Here's how the scope affects your project</p>
+        <div className="rounded-xl border border-[var(--border-primary)] bg-white p-8 shadow-sm">
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">Impact Analysis Summary</h2>
+          <p className="mt-0.5 text-sm text-[var(--text-soft)]">Here's how the scope affects your project</p>
 
           {/* Top stats row */}
           <div className="mt-6 grid grid-cols-4 gap-4">
             <StatCard label="Scope" value={`${scopeScore}%`} />
             <StatCard label="Estimated Effort" value={`${estimatedHours} hrs`} />
             <StatCard label="Estimated Timeline" value={`${estimatedWeeks} ${estimatedWeeks === 1 ? 'week' : 'weeks'}`} />
-            <div className="rounded-xl border border-gray-200 bg-white px-5 py-4 text-center shadow-sm">
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Risk Level</p>
+            <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm">
+              <p className="text-xs font-medium text-[var(--text-soft)] uppercase tracking-wide">Risk Level</p>
               <p className={`mt-1 text-2xl font-bold ${riskColors.text}`}>{riskLevel}</p>
               <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${riskColors.badge}`}>
                 {riskLevel} Risk
@@ -150,15 +150,15 @@ export function AnalysisResultsPage() {
 
             {/* Effort Breakdown */}
             <div className="col-span-1">
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Effort Breakdown (Hours)</h3>
+              <h3 className="mb-3 text-sm font-semibold text-[var(--text-secondary)]">Effort Breakdown (Hours)</h3>
               <div className="space-y-2">
                 {effortRows.map(({ label, hours }) => (
                   <div key={label} className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">{label}</span>
-                    <span className="font-medium text-gray-900">+{hours} hrs</span>
+                    <span className="text-[var(--text-muted)]">{label}</span>
+                    <span className="font-medium text-[var(--text-primary)]">+{hours} hrs</span>
                   </div>
                 ))}
-                <div className="mt-3 border-t border-gray-200 pt-3 flex items-center justify-between text-sm font-semibold">
+                <div className="mt-3 border-t border-[var(--border-primary)] pt-3 flex items-center justify-between text-sm font-semibold">
                   <span className="text-gray-800">Total</span>
                   <span className="text-indigo-700">+{total} hrs</span>
                 </div>
@@ -167,19 +167,19 @@ export function AnalysisResultsPage() {
 
             {/* Complexity donut */}
             <div className="col-span-1 flex flex-col items-center justify-start">
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Complexity</h3>
+              <h3 className="mb-3 text-sm font-semibold text-[var(--text-secondary)]">Complexity</h3>
               <DonutChart level={complexity.level} score={complexity.score} />
-              <p className="mt-2 text-xs text-gray-400">(was Medium)</p>
+              <p className="mt-2 text-xs text-[var(--text-subtle)]">(was Medium)</p>
             </div>
 
             {/* Risk Factors */}
             <div className="col-span-1">
-              <h3 className="mb-3 text-sm font-semibold text-gray-700">Risk Factors</h3>
+              <h3 className="mb-3 text-sm font-semibold text-[var(--text-secondary)]">Risk Factors</h3>
               <div className="space-y-2.5">
                 {riskFactors.map((factor, i) => (
                   <div key={i} className="flex items-start gap-2">
                     <WarningIcon />
-                    <span className="text-sm text-gray-600">{factor}</span>
+                    <span className="text-sm text-[var(--text-muted)]">{factor}</span>
                   </div>
                 ))}
               </div>
