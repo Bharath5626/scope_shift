@@ -96,7 +96,7 @@ function AnalysisProjectCard({
 
       {/* Last analysis summary */}
       {lastAnalysis && risk ? (
-        <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-gray-100 bg-[var(--bg-section)] ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
+        <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-[var(--bg-section)] ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
           <div className="flex items-center justify-between mb-3">
             <p className={`${TYPOGRAPHY.caption} font-semibold text-[var(--text-soft)] uppercase tracking-wide dark:text-[var(--text-subtle)]`}>Last Analysis</p>
             <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-semibold ${risk.badge}`}>
@@ -104,15 +104,15 @@ function AnalysisProjectCard({
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 mb-3">
-            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
+            <div className="rounded-lg bg-white border border-[var(--border-primary)] px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
               <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Scope</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.scopeIncreasePercent}%</p>
             </div>
-            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
+            <div className="rounded-lg bg-white border border-[var(--border-primary)] px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
               <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Hours</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.additionalHours}h</p>
             </div>
-            <div className="rounded-lg bg-white border border-gray-100 px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
+            <div className="rounded-lg bg-white border border-[var(--border-primary)] px-2 py-2 text-center dark:bg-gray-800 dark:border-gray-600">
               <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">Delay</p>
               <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">{lastAnalysis.delayWeeks}w</p>
             </div>
@@ -128,7 +128,7 @@ function AnalysisProjectCard({
       )}
 
       {/* Action buttons */}
-      <div className={`mt-auto flex gap-2 border-t border-gray-100 ${SPACING.card.compactPadding} dark:border-gray-700`}>
+      <div className={`mt-auto flex gap-2 border-t border-[var(--border-primary)] ${SPACING.card.compactPadding} dark:border-gray-700`}>
         <button
           onClick={handleRun}
           className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] active:scale-[0.98]`}
@@ -200,7 +200,7 @@ export function AnalysisPage() {
     <div className="h-screen bg-[var(--bg-page)] flex flex-col dark:bg-gray-900">
   <div className={`w-full ${SPACING.page.padding} pt-10 pb-4`}>
 
-<div className="sticky top-0 z-30 bg-[var(--bg-page)] py-4 flex items-start justify-between gap-4 border-b border-gray-100 dark:bg-gray-900 dark:border-gray-700">
+<div className="sticky top-0 z-30 bg-[var(--bg-page)] py-4 flex items-start justify-between gap-4 border-b border-[var(--border-primary)] dark:bg-gray-900 dark:border-gray-700">
   
   {/* LEFT SIDE */}
   <div>
@@ -272,7 +272,7 @@ export function AnalysisPage() {
           setStatusFilter(ALL)
           setTypeFilter(ALL)
         }}
-        className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
+        className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
       >
         Clear
       </button>

@@ -3,6 +3,7 @@ import { z } from "zod";
 export const updateProfileSchema = z.object({
   name: z.string().min(2).max(50).optional(),
   profileImage: z.string().url().optional(),
+  theme: z.enum(["light", "dark"]).optional(),
 });
 
 export const changePasswordSchema = z.object({

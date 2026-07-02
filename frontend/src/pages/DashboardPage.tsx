@@ -160,7 +160,7 @@ label="Completed Projects"
 
   <div className="grid gap-6 lg:grid-cols-2">
     {/* Health Score */}
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-[var(--text-primary)]">Scope Health Score</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${
@@ -235,7 +235,7 @@ label="Completed Projects"
     </div>
 
     {/* Risk Distribution */}
-    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
       <h3 className="mb-4 font-semibold text-[var(--text-primary)]">Risk Distribution</h3>
 
 {!dashboardStats || dashboardStats.riskDistribution.total === 0 ? (
@@ -295,7 +295,7 @@ label="Completed Projects"
 </section>
 
 <section className="mt-8">
-  <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+  <div className="rounded-3xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
     <div className="mb-6 flex items-center justify-between">
       <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Upcoming Deadlines
@@ -322,7 +322,7 @@ label="Completed Projects"
           return (
             <div
               key={project.id}
-              className="flex items-center justify-between rounded-2xl border border-gray-100 p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
+              className="flex items-center justify-between rounded-2xl border border-[var(--border-primary)] p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
             >
               <div>
                 <h3 className="font-medium text-[var(--text-primary)]">

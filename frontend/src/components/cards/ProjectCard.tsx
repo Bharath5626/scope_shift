@@ -43,7 +43,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700">
+      <div className="mt-4 flex items-center justify-between border-t border-[var(--border-primary)] pt-4 dark:border-gray-700">
         <span className="text-xs font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
           {PROJECT_TYPE_LABELS[project.type]}
         </span>

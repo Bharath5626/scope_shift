@@ -32,8 +32,8 @@ export const getProfile = asyncHandler(
 export const updateProfile = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user!.id;
-    const { name, profileImage } = req.body;
-    const user = await updateUserProfile(userId, { name, profileImage });
+    const { name, profileImage, theme } = req.body;
+    const user = await updateUserProfile(userId, { name, profileImage, theme });
     res.status(200).json({
       success: true,
       data: user,

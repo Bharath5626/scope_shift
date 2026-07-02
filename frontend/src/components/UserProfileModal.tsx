@@ -509,13 +509,13 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     type="email"
                     value={user?.email || ''}
                     readOnly
-                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-soft)] bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50 dark:text-[var(--text-subtle)]"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-soft)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700/50 dark:text-[var(--text-subtle)]"
                   />
                 </div>
               </div>
 
               {/* Account Information */}
-              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700/30">
+              <div className="rounded-lg bg-[var(--bg-section)] p-4 dark:bg-gray-700/30">
                 <h4 className="text-sm font-medium text-[var(--text-primary)] dark:text-white mb-3">Account Information</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -547,7 +547,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300 mb-2">Theme</label>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-3 rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className="flex items-center gap-3 rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   {theme === 'light' ? (
                     <>
@@ -616,7 +616,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               {/* Last Login */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Last Login</h3>
-                <div className="rounded-lg border border-[var(--border-primary)] bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                <div className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-section)] p-4 dark:border-gray-700 dark:bg-gray-800">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Time</p>
@@ -731,7 +731,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <button
                     onClick={handleSendOtp}
                     disabled={sendingOtp || otpCooldown > 0}
-                    className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {sendingOtp ? (
                       <>
@@ -827,7 +827,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
                     <button
                       onClick={() => setShowOtpForm(false)}
-                      className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                      className="w-full rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
                     >
                       Cancel
                     </button>
@@ -853,7 +853,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
                       theme === 'light'
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     Light
@@ -866,7 +866,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
                       theme === 'dark'
                         ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
                     Dark

@@ -10,7 +10,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
       <Sidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <div className="ml-0 lg:ml-64 flex-1">
         {/* Skip to main content link for accessibility */}

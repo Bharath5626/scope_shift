@@ -291,7 +291,7 @@ const matchesRisk =
                   </div>
                 )}
 
-                <div className={`mt-4 flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700`}>
+                <div className={`mt-4 flex items-center justify-between pt-4 border-t border-[var(--border-primary)] dark:border-gray-700`}>
                   <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                     Report created on {formatDate(analysis?.createdAt || project.createdAt)}
                   </p>

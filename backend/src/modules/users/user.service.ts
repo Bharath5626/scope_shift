@@ -73,6 +73,7 @@ export const getUserProfile = async (userId: string) => {
       name: true,
       email: true,
       profileImage: true,
+      theme: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -87,7 +88,7 @@ export const getUserProfile = async (userId: string) => {
 
 export const updateUserProfile = async (
   userId: string,
-  data: { name?: string; profileImage?: string }
+  data: { name?: string; profileImage?: string; theme?: "light" | "dark" }
 ) => {
   const user = await prisma.user.update({
     where: {
@@ -99,6 +100,7 @@ export const updateUserProfile = async (
       name: true,
       email: true,
       profileImage: true,
+      theme: true,
       createdAt: true,
       updatedAt: true,
     },
