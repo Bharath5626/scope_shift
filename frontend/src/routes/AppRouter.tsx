@@ -21,7 +21,7 @@ const UpcomingDeadlinesPage = lazy(() => import('../pages/UpcomingDeadlinesPage'
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+    <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900 flex items-center justify-center">
       <LoadingSkeleton className="h-8 w-48" />
     </div>
   )

@@ -140,7 +140,7 @@ label="Completed Projects"
             </p>
             <Link
               to="/projects/new"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
             >
               Create Project
             </Link>
@@ -165,7 +165,7 @@ label="Completed Projects"
         <h3 className="font-semibold text-[var(--text-primary)]">Scope Health Score</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${
           (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
-            ? 'bg-green-100 text-green-700'
+            ? 'bg-green-100 text-[var(--color-success)]'
             : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
             ? 'bg-yellow-100 text-yellow-700'
             : 'bg-red-100 text-red-700'
@@ -187,10 +187,10 @@ label="Completed Projects"
             <path
               className={`transition-all duration-500 ${
                 (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
-                  ? 'text-green-500'
+                  ? 'text-[var(--color-success)]'
                   : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
                   ? 'text-yellow-500'
-                  : 'text-red-500'
+                  : 'text-[var(--color-danger)]'
               }`}
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
@@ -208,7 +208,7 @@ label="Completed Projects"
               <span className="text-xs text-[var(--text-soft)]">Analyses</span>
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.totalAnalyses ?? 0}</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
               <div className="h-full rounded-full bg-indigo-500" style={{ width: '100%' }} />
             </div>
           </div>
@@ -217,7 +217,7 @@ label="Completed Projects"
               <span className="text-xs text-[var(--text-soft)]">Warnings</span>
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.warnings ?? 0}</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
               <div className="h-full rounded-full bg-orange-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.warnings / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
             </div>
           </div>
@@ -226,7 +226,7 @@ label="Completed Projects"
               <span className="text-xs text-[var(--text-soft)]">Healthy</span>
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.healthy ?? 0}</span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
               <div className="h-full rounded-full bg-green-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.healthy / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
             </div>
           </div>
@@ -278,7 +278,7 @@ label="Completed Projects"
           <span className="text-sm font-medium text-[var(--text-secondary)]">{risk.label} Risk</span>
           <span className="text-sm font-semibold text-[var(--text-primary)]">{risk.value}</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+        <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
           <div
             className={`h-full rounded-full transition-all duration-500 ${risk.color}`}
             style={{ width: `${risk.percentage}%` }}
@@ -344,10 +344,10 @@ label="Completed Projects"
                 <div
                   className={`rounded-full px-3 py-1 text-xs font-medium ${
                     daysLeft <= 3
-                      ? "bg-red-100 text-red-700"
+                      ? "bg-red-100 text-[var(--color-danger)]"
                       : daysLeft <= 7
                     ? "bg-yellow-100 text-yellow-700"
-                    : "bg-green-100 text-green-700"
+                    : "bg-green-100 text-[var(--color-success)]"
                 }`}
               >
                 {daysLeft} days left

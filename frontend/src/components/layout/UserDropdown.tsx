@@ -27,7 +27,7 @@ export function UserDropdown({
             onClose()
             onSettings()
           }}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] hover:bg-gray-100 ${TRANSITION} dark:!text-black dark:hover:bg-gray-700`}
+          className={`flex w-full items-center gap-3 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] hover:bg-[var(--bg-section)] ${TRANSITION} dark:!text-black dark:hover:bg-gray-700`}
           role="menuitem"
         >
           <svg className={`${ICON_SIZE.button} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -43,7 +43,7 @@ export function UserDropdown({
             onTheme()
             onClose()
           }}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] hover:bg-gray-100 ${TRANSITION} dark:!text-black dark:hover:bg-gray-700`}
+          className={`flex w-full items-center gap-3 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] hover:bg-[var(--bg-section)] ${TRANSITION} dark:!text-black dark:hover:bg-gray-700`}
         >
           <svg className={`${ICON_SIZE.button} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />

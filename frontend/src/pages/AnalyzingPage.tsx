@@ -134,7 +134,7 @@ export function AnalyzingPage() {
 
             {/* Project Details */}
             {project && (
-              <div className="mt-6 rounded-xl bg-gray-50 p-4 text-left dark:bg-gray-700">
+              <div className="mt-6 rounded-xl bg-[var(--bg-section)] p-4 text-left dark:bg-gray-700">
                 <h3 className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{project.name}</h3>
                 <p className="mt-1 text-sm text-[var(--text-soft)] line-clamp-2 dark:text-[var(--text-subtle)]">
                   {project.description || 'No description provided'}
@@ -159,13 +159,13 @@ export function AnalyzingPage() {
             <div className="mt-6 flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex-1 rounded-xl border border-[var(--border-primary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                className="flex-1 rounded-xl border border-[var(--border-primary)] px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 Cancel
               </button>
               <button
                 onClick={startAnalysis}
-                className="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700"
+                className="flex-1 rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)]"
               >
                 Analyze Now
               </button>
@@ -184,7 +184,7 @@ export function AnalyzingPage() {
             </p>
             <button
               onClick={handleCancel}
-              className="mt-6 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700"
+              className="mt-6 rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)]"
             >
               Go Back
             </button>
@@ -202,7 +202,7 @@ export function AnalyzingPage() {
             </div>
 
             {/* Progress bar */}
-            <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-[var(--bg-section)] dark:bg-gray-700">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500 ease-out"
                 style={{ width: `${Math.min(100, progress)}%` }}

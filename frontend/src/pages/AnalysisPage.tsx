@@ -13,17 +13,17 @@ import type { Project, ProjectStatus, ProjectType } from '../types'
 
 
 const statusStyles: Record<Project['status'], string> = {
-  draft:     'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
-  active:    'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-  at_risk:   'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+  draft:     'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
+  active:    'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
+  at_risk:   'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
 }
 
 
 const RISK_COLORS: Record<string, { badge: string; text: string; bar: string }> = {
-  Low:    { badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',  text: 'text-green-700 dark:text-green-400',  bar: 'bg-green-400' },
-  Medium: { badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',  text: 'text-amber-700 dark:text-amber-400',  bar: 'bg-amber-400' },
-  High:   { badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',      text: 'text-red-700 dark:text-red-400',    bar: 'bg-red-400' },
+  Low:    { badge: 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',  text: 'text-[var(--color-success)] dark:text-green-400',  bar: 'bg-green-400' },
+  Medium: { badge: 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400',  text: 'text-[var(--color-warning)] dark:text-amber-400',  bar: 'bg-amber-400' },
+  High:   { badge: 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',      text: 'text-[var(--color-danger)] dark:text-red-400',    bar: 'bg-red-400' },
 }
 
 interface AnalysisRow {
@@ -96,7 +96,7 @@ function AnalysisProjectCard({
 
       {/* Last analysis summary */}
       {lastAnalysis && risk ? (
-        <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-gray-100 bg-gray-50 ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
+        <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-gray-100 bg-[var(--bg-section)] ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
           <div className="flex items-center justify-between mb-3">
             <p className={`${TYPOGRAPHY.caption} font-semibold text-[var(--text-soft)] uppercase tracking-wide dark:text-[var(--text-subtle)]`}>Last Analysis</p>
             <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-semibold ${risk.badge}`}>
@@ -122,7 +122,7 @@ function AnalysisProjectCard({
           </p>
         </div>
       ) : (
-        <div className="mx-6 mb-4 rounded-xl border border-dashed border-[var(--border-primary)] bg-gray-50/50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
+        <div className="mx-6 mb-4 rounded-xl border border-dashed border-[var(--border-primary)] bg-[var(--bg-section)]/50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
           <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No analysis run yet</p>
         </div>
       )}
@@ -131,7 +131,7 @@ function AnalysisProjectCard({
       <div className={`mt-auto flex gap-2 border-t border-gray-100 ${SPACING.card.compactPadding} dark:border-gray-700`}>
         <button
           onClick={handleRun}
-          className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 active:scale-[0.98]`}
+          className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] active:scale-[0.98]`}
         >
           <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -142,7 +142,7 @@ function AnalysisProjectCard({
         {lastAnalysis && (
           <Link
             to={`/reports/${project.id}`}
-            className={`flex items-center justify-center gap-1.5 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 active:scale-[0.98] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+            className={`flex items-center justify-center gap-1.5 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] active:scale-[0.98] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
             title="View full report"
           >
             <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -197,10 +197,10 @@ export function AnalysisPage() {
   const analyzedCount = Object.values(analysisMap).filter(Boolean).length
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col dark:bg-gray-900">
+    <div className="h-screen bg-[var(--bg-page)] flex flex-col dark:bg-gray-900">
   <div className={`w-full ${SPACING.page.padding} pt-10 pb-4`}>
 
-<div className="sticky top-0 z-30 bg-gray-50 py-4 flex items-start justify-between gap-4 border-b border-gray-100 dark:bg-gray-900 dark:border-gray-700">
+<div className="sticky top-0 z-30 bg-[var(--bg-page)] py-4 flex items-start justify-between gap-4 border-b border-gray-100 dark:bg-gray-900 dark:border-gray-700">
   
   {/* LEFT SIDE */}
   <div>

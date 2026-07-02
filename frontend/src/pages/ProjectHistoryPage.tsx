@@ -27,10 +27,10 @@ interface AuditLog {
 }
 
 const statusStyles: Record<Project['status'], string> = {
-  draft:     'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
-  active:    'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-  at_risk:   'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  draft:     'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
+  active:    'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
+  at_risk:   'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
 }
 
 function ProjectDetailsModal({
@@ -104,7 +104,7 @@ function ProjectDetailsModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-gray-100 hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -249,7 +249,7 @@ function ProjectDetailsModal({
                                   <p className="text-xs text-[var(--text-soft)]">No features available</p>
                                 ) : (
                                   log.features.map((feature: any, idx: number) => (
-                                    <div key={idx} className="rounded-lg bg-gray-50 p-2 dark:bg-gray-700">
+                                    <div key={idx} className="rounded-lg bg-[var(--bg-section)] p-2 dark:bg-gray-700">
                                       <p className="text-xs font-medium text-[var(--text-primary)] dark:text-gray-100">{feature.title}</p>
                                       {feature.description && (
                                         <p className="mt-0.5 text-xs text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{feature.description}</p>
@@ -274,13 +274,13 @@ function ProjectDetailsModal({
         <div className="flex justify-end gap-3 border-t border-[var(--border-primary)] p-6 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="rounded-xl border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            className="rounded-xl border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Close
           </button>
           <button
             onClick={onReanalyze}
-            className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+            className="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
           >
             Re-analyze
           </button>
@@ -311,7 +311,7 @@ function DeleteModal({
       {/* Dialog */}
       <div className="relative w-full max-w-md rounded-2xl bg-white shadow-2xl p-8 text-center dark:bg-gray-800 dark:shadow-gray-900/30">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/30">
-          <svg className="h-7 w-7 text-red-500 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="h-7 w-7 text-[var(--color-danger)] dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </div>
@@ -321,20 +321,20 @@ function DeleteModal({
           <span className="font-semibold text-gray-800 dark:text-gray-200">"{project.name}"</span>.
           This will remove all its features, analyses, and reports.
         </p>
-        <p className="mt-1 text-xs font-medium text-red-500 dark:text-red-400">This action cannot be undone.</p>
+        <p className="mt-1 text-xs font-medium text-[var(--color-danger)] dark:text-red-400">This action cannot be undone.</p>
 
         <div className="mt-6 flex gap-3">
           <button
             onClick={onCancel}
             disabled={deleting}
-            className="flex-1 rounded-xl border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            className="flex-1 rounded-xl border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={deleting}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[var(--color-danger)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
           >
             {deleting && (
               <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -378,7 +378,7 @@ function ProjectCard({
   flex h-8 w-8 items-center justify-center
   rounded-lg text-gray-300
   opacity-0 transition-all duration-150
-  hover:bg-red-50 hover:text-red-500
+  hover:bg-red-50 hover:text-[var(--color-danger)]
   group-hover:opacity-100
   cursor-pointer
   dark:hover:bg-red-900/30 dark:hover:text-red-400
@@ -507,7 +507,7 @@ export function ProjectHistoryPage() {
       )}
 
       {/* Sticky Header with Filters */}
-      <div className="sticky top-0 z-30 bg-gray-50 dark:bg-gray-900">
+      <div className="sticky top-0 z-30 bg-[var(--bg-section)] dark:bg-gray-900">
         <div className={`w-full ${SPACING.page.padding}`}>
           <div className={`${SPACING.page.headerPadding} border-b border-[var(--border-primary)] dark:border-gray-700`}>
             {/* Header */}
@@ -522,7 +522,7 @@ export function ProjectHistoryPage() {
               </div>
               {/* <Link
                 to="/projects/new"
-                className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                className="rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
               >
                 + New Project
               </Link> */}
@@ -572,7 +572,7 @@ export function ProjectHistoryPage() {
                 {hasFilters && (
                   <button
                     onClick={() => { setSearch(''); setStatusFilter(ALL); setTypeFilter(ALL) }}
-                    className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
+                    className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
                   >
                     Clear filters
                   </button>
@@ -584,7 +584,7 @@ export function ProjectHistoryPage() {
       </div>
 
       {/* Content */}
-      <div className={`w-full ${SPACING.page.padding} bg-gray-50 pb-8 dark:bg-gray-900`}>
+      <div className={`w-full ${SPACING.page.padding} bg-[var(--bg-section)] pb-8 dark:bg-gray-900`}>
         <div className={SPACING.section.marginTop}>
 
           {loading && (
@@ -609,7 +609,7 @@ export function ProjectHistoryPage() {
 
           {!loading && projects.length > 0 && filtered.length === 0 && (
             <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-12 text-center ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-              <div className={`mx-auto mb-3 flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.button} bg-gray-100 dark:bg-gray-700`}>
+              <div className={`mx-auto mb-3 flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.button} bg-[var(--bg-section)] dark:bg-gray-700`}>
                 <svg className={`${ICON_SIZE.button} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
                 </svg>

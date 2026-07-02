@@ -21,9 +21,9 @@ interface AnalysisResult {
 }
 
 const RISK_COLORS: Record<RiskLevel, { bg: string; text: string; badge: string }> = {
-  Low:    { bg: 'bg-green-50',  text: 'text-green-700',  badge: 'bg-green-100 text-green-700' },
-  Medium: { bg: 'bg-amber-50',  text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700' },
-  High:   { bg: 'bg-red-50',    text: 'text-red-700',    badge: 'bg-red-100 text-red-700' },
+  Low:    { bg: 'bg-green-50',  text: 'text-[var(--color-success)]',  badge: 'bg-green-100 text-[var(--color-success)]' },
+  Medium: { bg: 'bg-amber-50',  text: 'text-[var(--color-warning)]',  badge: 'bg-amber-100 text-[var(--color-warning)]' },
+  High:   { bg: 'bg-red-50',    text: 'text-[var(--color-danger)]',    badge: 'bg-red-100 text-[var(--color-danger)]' },
 }
 
 const COMPLEXITY_STROKE: Record<RiskLevel, string> = {
@@ -73,7 +73,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 
 function WarningIcon() {
   return (
-    <svg className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg className="h-4 w-4 text-[var(--color-warning)] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
     </svg>
   )
@@ -94,7 +94,7 @@ export function AnalysisResultsPage() {
           <p className="text-[var(--text-soft)] text-sm">No analysis data found.</p>
           <button
             onClick={() => navigate(projectId ? `/scope-builder?project=${projectId}` : '/')}
-            className="mt-4 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+            className="mt-4 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)]"
           >
             Go Back
           </button>
@@ -121,7 +121,7 @@ export function AnalysisResultsPage() {
         {/* Header */}
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-xs font-bold text-white">6</div>
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white">6</div>
             <h1 className="text-xl font-semibold text-[var(--text-primary)]">Impact Analysis Results (Summary)</h1>
           </div>
         </div>
@@ -192,7 +192,7 @@ export function AnalysisResultsPage() {
         <div className="flex justify-end">
           <button
             onClick={() => navigate(`/reports/${projectId}`)}
-            className="rounded-lg bg-indigo-600 px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+            className="rounded-lg bg-[var(--color-primary)] px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
           >
             View Detailed Report
           </button>

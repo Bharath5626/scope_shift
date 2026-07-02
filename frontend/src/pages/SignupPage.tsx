@@ -96,7 +96,7 @@ export function SignupPage() {
             <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>Get started with ScopeAI for free</p>
 
             {error && (
-              <div className={`mt-4 ${BORDER_RADIUS.card} bg-red-50 border border-red-200 px-4 py-3 ${TYPOGRAPHY.body} text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400`}>
+              <div className={`mt-4 ${BORDER_RADIUS.card} bg-red-50 border border-red-200 px-4 py-3 ${TYPOGRAPHY.body} text-[var(--color-danger)] dark:bg-red-900/30 dark:border-red-800 dark:text-red-400`}>
                 {error}
               </div>
             )}
@@ -161,7 +161,7 @@ export function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full ${BORDER_RADIUS.button} bg-indigo-600 py-2.5 ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-60`}
+                className={`w-full ${BORDER_RADIUS.button} bg-[var(--color-primary)] py-2.5 ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-60`}
               >
                 {loading ? 'Creating account…' : 'Create account'}
               </button>

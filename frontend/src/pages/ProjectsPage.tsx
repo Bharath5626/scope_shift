@@ -23,7 +23,7 @@ export function ProjectsPage() {
 
           <Link
             to="/projects/new"
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+            className="rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
           >
             New Project
           </Link>
@@ -49,7 +49,7 @@ export function ProjectsPage() {
 
               <Link
                 to="/projects/new"
-                className="mt-6 inline-block rounded-xl bg-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                className="mt-6 inline-block rounded-xl bg-[var(--color-primary)] px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-[var(--color-primary-hover)]"
               >
                 Create Project
               </Link>

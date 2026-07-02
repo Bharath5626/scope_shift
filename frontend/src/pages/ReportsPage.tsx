@@ -31,9 +31,9 @@ interface AnalyzedProject {
 }
 
 const RISK_COLORS: Record<string, { badge: string; dot: string }> = {
-  Low:    { badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',  dot: 'bg-green-500' },
-  Medium: { badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',  dot: 'bg-amber-500' },
-  High:   { badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',      dot: 'bg-red-500' },
+  Low:    { badge: 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',  dot: 'bg-green-500' },
+  Medium: { badge: 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400',  dot: 'bg-amber-500' },
+  High:   { badge: 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',      dot: 'bg-red-500' },
 }
 
 function formatDate(iso: string) {
@@ -83,7 +83,7 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
   if (error) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
-        <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-sm text-[var(--color-danger)] dark:text-red-400">{error}</p>
       </div>
     )
   }
@@ -196,7 +196,7 @@ const matchesRisk =
     {filteredProjects.length > 0 && (
       <button
         onClick={handleExportCSV}
-        className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+        className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
         title="Export to CSV"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

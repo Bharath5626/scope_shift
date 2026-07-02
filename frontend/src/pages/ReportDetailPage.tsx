@@ -77,9 +77,9 @@ interface Project {
 }
 
 const RISK_COLORS: Record<string, { bg: string; text: string; badge: string; border: string }> = {
-  Low:    { bg: 'bg-green-50',  text: 'text-green-700',  badge: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',  border: 'border-green-200 dark:border-green-800' },
-  Medium: { bg: 'bg-amber-50',  text: 'text-amber-700',  badge: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',  border: 'border-amber-200 dark:border-amber-800' },
-  High:   { bg: 'bg-red-50',    text: 'text-red-700',    badge: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',      border: 'border-red-200 dark:border-red-800' },
+  Low:    { bg: 'bg-green-50',  text: 'text-[var(--color-success)]',  badge: 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',  border: 'border-green-200 dark:border-green-800' },
+  Medium: { bg: 'bg-amber-50',  text: 'text-[var(--color-warning)]',  badge: 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400',  border: 'border-amber-200 dark:border-amber-800' },
+  High:   { bg: 'bg-red-50',    text: 'text-[var(--color-danger)]',    badge: 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',      border: 'border-red-200 dark:border-red-800' },
 }
 
 const COMPLEXITY_STROKE: Record<string, string> = {
@@ -111,7 +111,7 @@ function DonutChart({ level, score }: { level: string; score: number }) {
 
 function WarningIcon() {
   return (
-    <svg className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <svg className="h-4 w-4 text-[var(--color-warning)] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
     </svg>
   )
@@ -194,7 +194,7 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
               <span className="text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{label}</span>
               <span className="font-semibold text-[var(--text-primary)] dark:text-gray-100">{hours} hrs</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700">
+            <div className="h-2 w-full rounded-full bg-[var(--bg-section)] dark:bg-gray-700">
               <div
                 className="h-2 rounded-full bg-indigo-500 transition-all"
                 style={{ width: `${pct}%` }}
@@ -370,11 +370,11 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'created':
-        return <span className="text-indigo-600 dark:text-indigo-400">C</span>
+        return <span className="text-[var(--color-info)] dark:text-indigo-400">C</span>
       case 'updated':
-        return <span className="text-amber-600 dark:text-amber-400">U</span>
+        return <span className="text-[var(--color-warning)] dark:text-amber-400">U</span>
       case 'analysis_created':
-        return <span className="text-green-600 dark:text-green-400">A</span>
+        return <span className="text-[var(--color-success)] dark:text-green-400">A</span>
       case 'analysis_retrieved':
         return <span className="text-blue-600 dark:text-blue-400">R</span>
       case 'feature_added':
@@ -414,11 +414,11 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
               <div className="flex items-center gap-4">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                   log.action === 'created' 
-                    ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+                    ? 'bg-indigo-100 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400'
                     : log.action === 'updated'
-                    ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                    ? 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400'
                     : log.action === 'analysis_created'
-                    ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                    ? 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400'
                     : log.action === 'feature_added'
                     ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
                     : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
@@ -637,10 +637,10 @@ export function ReportDetailPage() {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
         <div className="text-center">
-          <p className="text-sm text-red-500 dark:text-red-400">{error || 'Report not found'}</p>
+          <p className="text-sm text-[var(--color-danger)] dark:text-red-400">{error || 'Report not found'}</p>
           <button
             onClick={() => navigate('/reports')}
-            className="mt-4 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+            className="mt-4 rounded-lg bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white hover:bg-[var(--color-primary-hover)]"
           >
             Back to Reports
           </button>
@@ -704,7 +704,7 @@ export function ReportDetailPage() {
                 className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab
                     ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400'
-                    : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:border-gray-300 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:border-gray-600'
+                    : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:border-[var(--border-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:border-gray-600'
                 }`}
               >
                 {tab}
@@ -743,7 +743,7 @@ export function ReportDetailPage() {
               }
             }}
             disabled={TABS.indexOf(activeTab) === 0}
-            className="flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            className="flex items-center gap-2 rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--bg-section)] disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -759,7 +759,7 @@ export function ReportDetailPage() {
               }
             }}
             disabled={TABS.indexOf(activeTab) === TABS.length - 1}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

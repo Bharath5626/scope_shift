@@ -64,11 +64,11 @@ export const ICON_SIZE = {
 
 // Button Variants
 export const BUTTON_VARIANTS = {
-  primary: 'bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white',
-  secondary: 'border border-[var(--border-primary)] bg-white hover:bg-gray-50 disabled:opacity-50 text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
-  danger: 'bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white',
-  ghost: 'text-[var(--text-secondary)] hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700',
-  success: 'bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white',
+  primary: 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-50 text-white',
+  secondary: 'border border-[var(--border-primary)] bg-[var(--bg-surface)] hover:bg-[var(--bg-section)] disabled:opacity-50 text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
+  danger: 'bg-[var(--color-danger)] hover:bg-red-700 disabled:opacity-50 text-white',
+  ghost: 'text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-gray-200 dark:hover:bg-gray-700',
+  success: 'bg-[var(--color-success)] hover:bg-green-700 disabled:opacity-50 text-white',
 } as const
 
 // Focus Ring

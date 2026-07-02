@@ -8,7 +8,7 @@ interface ProjectCardProps {
 }
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
+  draft: 'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
   completed: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
   at_risk: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',

@@ -292,7 +292,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className={`${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-100`}
+                className={`${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)]`}
               >
                 Cancel
               </button>

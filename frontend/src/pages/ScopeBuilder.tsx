@@ -95,7 +95,7 @@ function FeatureForm({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
-            Feature Title <span className="text-red-500">*</span>
+            Feature Title <span className="text-[var(--color-danger)]">*</span>
           </label>
           <input
             autoFocus
@@ -112,7 +112,7 @@ function FeatureForm({
             aria-describedby={titleError ? 'title-error' : undefined}
           />
           {titleError && (
-            <p id="title-error" className="mt-1 text-xs text-red-600">{titleError}</p>
+            <p id="title-error" className="mt-1 text-xs text-[var(--color-danger)]">{titleError}</p>
           )}
         </div>
         <div>
@@ -131,14 +131,14 @@ function FeatureForm({
             aria-describedby={descriptionError ? 'description-error' : undefined}
           />
           {descriptionError && (
-            <p id="description-error" className="mt-1 text-xs text-red-600">{descriptionError}</p>
+            <p id="description-error" className="mt-1 text-xs text-[var(--color-danger)]">{descriptionError}</p>
           )}
         </div>
       </div>
       <div className="flex justify-end gap-2">
         <button
           onClick={onCancel}
-          className="rounded-lg border border-[var(--border-primary)] bg-white px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-gray-50 transition"
+          className="rounded-lg border border-[var(--border-primary)] bg-white px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-section)] transition"
         >
           Cancel
         </button>
@@ -146,7 +146,7 @@ function FeatureForm({
           onClick={handleSave}
           disabled={!title.trim() || saving}
           className={`rounded-lg px-4 py-1.5 text-sm font-medium text-white transition disabled:opacity-50 ${
-            tabType === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'
+            tabType === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
           }`}
         >
           {saving ? 'Saving…' : initial ? 'Update' : 'Add Feature'}
@@ -241,7 +241,7 @@ function FeatureList({
               draggable
               onDragStart={() => setDragId(feature.id)}
               onDragEnd={() => { setDragId(null); setDragOverId(null) }}
-              className={`flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
+              className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[var(--bg-section)]/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
             >
               {/* Drag handle */}
               <div className="cursor-grab text-gray-300 hover:text-[var(--text-subtle)] shrink-0 active:cursor-grabbing">
@@ -267,7 +267,7 @@ function FeatureList({
               <div className="flex shrink-0 items-center gap-1.5">
                 <button
                   onClick={() => onEdit(feature.id)}
-                  className={`${BORDER_RADIUS.small} p-1.5 text-[var(--text-subtle)] ${TRANSITION} hover:bg-gray-100 hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300`}
+                  className={`${BORDER_RADIUS.small} p-1.5 text-[var(--text-subtle)] ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300`}
                   title="Edit"
                 >
                   <PencilIcon />
@@ -275,7 +275,7 @@ function FeatureList({
                 <button
   onClick={() => onRequestDelete(feature.id)}
   disabled={deletingId === feature.id}
-  className="rounded-md p-1.5 text-red-400 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-40 dark:hover:bg-red-900/30 dark:hover:text-red-300"
+  className="rounded-md p-1.5 text-[var(--color-danger)] transition hover:bg-red-50 hover:text-[var(--color-danger)] disabled:opacity-40 dark:hover:bg-red-900/30 dark:hover:text-red-300"
   title="Delete"
 >
   <TrashIcon />
@@ -442,18 +442,18 @@ export function ScopeBuilder() {
                 )}
                 {autosaveStatus === 'saved' && (
                   <>
-                    <svg className={`${ICON_SIZE.button} text-green-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-green-600 dark:text-green-400">Saved</span>
+                    <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
                   </>
                 )}
                 {autosaveStatus === 'error' && (
                   <>
-                    <svg className={`${ICON_SIZE.button} text-red-500`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    <span className="text-red-600 dark:text-red-400">Error saving</span>
+                    <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
                   </>
                 )}
               </div>
@@ -461,7 +461,7 @@ export function ScopeBuilder() {
             <button
               onClick={() => navigate(`/create-project?edit=${projectId}`)}
               disabled={originalFeatures.length === 0}
-              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-40`}
+              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-40`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -478,8 +478,8 @@ export function ScopeBuilder() {
             onClick={() => handleTabSwitch('original')}
             className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'original'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-gray-50 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
+                ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
             aria-pressed={activeTab === 'original'}
             role="tab"
@@ -499,7 +499,7 @@ export function ScopeBuilder() {
             className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
               activeTab === 'new'
                 ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-gray-50 dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
+                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
             aria-pressed={activeTab === 'new'}
             role="tab"
@@ -534,7 +534,7 @@ export function ScopeBuilder() {
         <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
 
           {/* Card header */}
-          <div className={`flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-gray-700`}>
+          <div className={`flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 dark:border-gray-700`}>
             <div>
               <h2 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
                 {activeTab === 'original' ? 'Original Scope Features' : 'Client-Requested Additions'}
@@ -548,7 +548,7 @@ export function ScopeBuilder() {
             <button
               onClick={() => { setShowAddForm(true); setEditingId(null); setAddError('') }}
               className={`flex items-center gap-2 ${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} ${
-                activeTab === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700'
+                activeTab === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
               }`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -571,7 +571,7 @@ export function ScopeBuilder() {
                   tabType={activeTab}
                 />
                 {addError && (
-                  <div className={`${BORDER_RADIUS.small} border border-red-200 bg-red-50 px-4 py-2.5 ${TYPOGRAPHY.body} text-red-600`}>
+                  <div className={`${BORDER_RADIUS.small} border border-red-200 bg-red-50 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--color-danger)]`}>
                     {addError}
                   </div>
                 )}
@@ -606,10 +606,10 @@ export function ScopeBuilder() {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
+          <div className="flex items-center justify-between border-t border-[var(--border-primary)] px-6 py-4">
             <button
               onClick={() => navigate(-1)}
-              className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50"
+              className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)]"
             >
               Back
             </button>
@@ -623,7 +623,7 @@ export function ScopeBuilder() {
               <button
                 onClick={() => navigate(`/analyzing?project=${projectId}`)}
                 disabled={originalFeatures.length === 0}
-                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
               >
                 {newFeatures.length > 0 ? 'Run Scope Creep Analysis →' : 'Run Analysis →'}
               </button>
@@ -647,7 +647,7 @@ export function ScopeBuilder() {
       <div className="mt-6 flex justify-end gap-3">
         <button
           onClick={() => setConfirmDeleteId(null)}
-          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
         >
           Cancel
         </button>
@@ -657,7 +657,7 @@ export function ScopeBuilder() {
             await handleDelete(confirmDeleteId)
             setConfirmDeleteId(null)
           }}
-          className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+          className="rounded-lg bg-[var(--color-danger)] px-4 py-2 text-sm text-white hover:bg-red-700"
         >
           Delete
         </button>

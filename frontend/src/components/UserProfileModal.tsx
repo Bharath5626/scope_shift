@@ -368,7 +368,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           <button
             onClick={onClose}
             aria-label="Close settings"
-            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-gray-100 hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -596,7 +596,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   {/* Other Sessions (placeholder for future implementation) */}
                   <div className="flex items-center justify-between rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4 dark:border-gray-700 dark:bg-gray-800">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-[var(--text-subtle)]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-[var(--text-subtle)]">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
@@ -921,7 +921,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           <div className="flex justify-end gap-3 border-t border-[var(--border-primary)] px-6 py-4 dark:border-gray-700">
             <button
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:text-gray-300 dark:hover:bg-gray-700"
             >
               Cancel
             </button>

@@ -481,7 +481,7 @@ const filteredSkills = SKILLS.filter(
                     <button
                       type="button"
                       onClick={handleLogoRemove}
-                      className={`absolute right-1 top-1 flex h-6 w-6 items-center justify-center ${BORDER_RADIUS.tag} bg-red-500 text-white shadow-md ${TRANSITION} hover:bg-red-600`}
+                      className={`absolute right-1 top-1 flex h-6 w-6 items-center justify-center ${BORDER_RADIUS.tag} bg-[var(--color-danger)] text-white shadow-md ${TRANSITION} hover:bg-red-600`}
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -505,7 +505,7 @@ const filteredSkills = SKILLS.filter(
                   />
                   <label
                     htmlFor="logo-upload"
-                    className={`inline-flex cursor-pointer items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                    className={`inline-flex cursor-pointer items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
                   >
                     <svg className={`h-4 w-4`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -636,7 +636,7 @@ const filteredSkills = SKILLS.filter(
                 techStackInputRef.current?.focus()
               }, 0)
             }}
-            className={`block w-full px-4 py-2 text-left ${TYPOGRAPHY.body} hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-200`}
+            className={`block w-full px-4 py-2 text-left ${TYPOGRAPHY.body} hover:bg-[var(--bg-section)] dark:hover:bg-gray-700 dark:text-gray-200`}
           >
             {skill}
           </button>
@@ -858,7 +858,7 @@ const filteredSkills = SKILLS.filter(
             {hasUnsavedChanges && (
               <button
                 onClick={handleCancel}
-                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-5 py-2.5 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-5 py-2.5 ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Cancel
               </button>
@@ -873,7 +873,7 @@ const filteredSkills = SKILLS.filter(
   !deadline ||
   selectedSkills.length === 0
 }
-              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-50`}
+              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-50`}
             >
               {editProjectId ? 'Update & Regenerate Features' : 'Generate Requirements & Continue'}
             </button>
@@ -893,7 +893,7 @@ const filteredSkills = SKILLS.filter(
           {/* Dialog */}
           <div className={`relative w-full max-w-md mx-auto ${BORDER_RADIUS.modal} bg-white ${SHADOW.modal} ${SPACING.card.padding} text-center dark:bg-gray-800 dark:shadow-gray-900/30`}>
             <div className={`mx-auto mb-4 flex h-14 w-14 items-center justify-center ${BORDER_RADIUS.tag} bg-amber-50 dark:bg-amber-900/30`}>
-              <svg className={`h-7 w-7 text-amber-500 dark:text-amber-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className={`h-7 w-7 text-[var(--color-warning)] dark:text-amber-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
@@ -905,13 +905,13 @@ const filteredSkills = SKILLS.filter(
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowCancelConfirm(false)}
-                className={`flex-1 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`flex-1 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Keep Editing
               </button>
               <button
                 onClick={confirmCancel}
-                className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-red-500 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-white ${TRANSITION} hover:bg-red-600`}
+                className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-danger)] ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-semibold text-white ${TRANSITION} hover:bg-red-600`}
               >
                 Cancel Project
               </button>

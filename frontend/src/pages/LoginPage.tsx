@@ -123,7 +123,7 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full ${BORDER_RADIUS.button} bg-indigo-600 py-2.5 ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700 disabled:opacity-60`}
+                className={`w-full ${BORDER_RADIUS.button} bg-[var(--color-primary)] py-2.5 ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-60`}
               >
                 {loading ? 'Signing in…' : 'Login '}
               </button>

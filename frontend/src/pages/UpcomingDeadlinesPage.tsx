@@ -7,10 +7,10 @@ import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION } from '../utils
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
-  active: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-  at_risk: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  draft: 'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
+  active: 'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
+  at_risk: 'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
 }
 
 function ProjectCard({ project }: { project: Project }) {
@@ -41,7 +41,7 @@ function ProjectCard({ project }: { project: Project }) {
           </h3>
 
           {project.deadline && (
-            <p className="mt-1 text-xs font-medium text-red-500 dark:text-red-400">
+            <p className="mt-1 text-xs font-medium text-[var(--color-danger)] dark:text-red-400">
               Deadline:{' '}
               {new Date(project.deadline).toLocaleDateString('en-IN', {
                 day: '2-digit',
@@ -69,7 +69,7 @@ function ProjectCard({ project }: { project: Project }) {
         </span>
       </div>
 
-      <div className={`mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700`}>
+      <div className={`mt-4 flex items-center justify-between border-t border-[var(--border-primary)] pt-4 dark:border-gray-700`}>
         <span className="text-xs font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
           {PROJECT_TYPE_LABELS[project.type]}
         </span>
@@ -77,10 +77,10 @@ function ProjectCard({ project }: { project: Project }) {
         <span
           className={`${BORDER_RADIUS.tag} px-3 py-1 ${TYPOGRAPHY.caption} font-medium ${
             daysLeft <= 3
-              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              ? 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400'
               : daysLeft <= 7
               ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+              : 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400'
           }`}
         >
           {daysLeft} days left

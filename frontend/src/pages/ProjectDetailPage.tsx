@@ -8,10 +8,10 @@ import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } fro
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
-  active: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-  at_risk: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+  draft: 'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
+  active: 'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
+  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
+  at_risk: 'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
 }
 
 function formatDate(dateString: string | null) {
@@ -112,7 +112,7 @@ export function ProjectDetailPage() {
           <div className="flex gap-2">
             <button
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
-              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -121,7 +121,7 @@ export function ProjectDetailPage() {
             </button>
             <button
               onClick={() => navigate(`/analyzing?project=${project.id}`)}
-              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} bg-indigo-600 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-indigo-700`}
+              className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)]`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -164,7 +164,7 @@ export function ProjectDetailPage() {
             <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Deadline</p>
             <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
               {daysLeft !== null ? (
-                <span className={daysLeft <= 7 ? 'text-red-600' : daysLeft <= 14 ? 'text-amber-600' : 'text-green-600'}>
+                <span className={daysLeft <= 7 ? 'text-[var(--color-danger)]' : daysLeft <= 14 ? 'text-[var(--color-warning)]' : 'text-[var(--color-success)]'}>
                   {daysLeft} days left
                 </span>
               ) : (
@@ -220,8 +220,8 @@ export function ProjectDetailPage() {
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Risk Level</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold ${
-                      latestAnalysis.riskLevel === 'low' ? 'text-green-600' :
-                      latestAnalysis.riskLevel === 'medium' ? 'text-amber-600' : 'text-red-600'
+                      latestAnalysis.riskLevel === 'low' ? 'text-[var(--color-success)]' :
+                      latestAnalysis.riskLevel === 'medium' ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'
                     }`}>
                       {latestAnalysis.riskLevel}
                     </p>
@@ -239,7 +239,7 @@ export function ProjectDetailPage() {
                 <p className={`${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>No analysis has been run yet.</p>
                 <button
                   onClick={() => navigate(`/analyzing?project=${project.id}`)}
-                  className={`mt-3 inline-flex items-center gap-2 ${BORDER_RADIUS.small} bg-indigo-600 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white hover:bg-indigo-700`}
+                  className={`mt-3 inline-flex items-center gap-2 ${BORDER_RADIUS.small} bg-[var(--color-primary)] ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white hover:bg-[var(--color-primary-hover)]`}
                 >
                   Run First Analysis
                 </button>
@@ -254,7 +254,7 @@ export function ProjectDetailPage() {
           <div className={`mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 ${SPACING.section.gap}`}>
             <button
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
-              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
             >
               <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400`}>
                 <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -268,7 +268,7 @@ export function ProjectDetailPage() {
             </button>
             <button
               onClick={() => navigate(`/analyzing?project=${project.id}`)}
-              className="flex items-center gap-3 rounded-lg border border-[var(--border-primary)] bg-gray-50 p-3 text-left transition hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
+              className="flex items-center gap-3 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left transition hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -283,7 +283,7 @@ export function ProjectDetailPage() {
             {latestAnalysis && (
               <button
                 onClick={() => navigate(`/reports/${project.id}`)}
-                className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+                className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
               >
                 <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400`}>
                   <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -298,9 +298,9 @@ export function ProjectDetailPage() {
             )}
             <button
               onClick={() => navigate(`/history`)}
-              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-gray-50 p-3 text-left ${TRANSITION} hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
+              className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
             >
-              <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400`}>
+              <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400`}>
                 <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -326,14 +326,14 @@ export function ProjectDetailPage() {
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={deleting}
-                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+                className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className={`${BORDER_RADIUS.button} bg-red-600 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white hover:bg-red-700 disabled:opacity-50`}
+                className={`${BORDER_RADIUS.button} bg-[var(--color-danger)] ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-white hover:bg-red-700 disabled:opacity-50`}
               >
                 {deleting ? 'Deleting...' : 'Delete'}
               </button>

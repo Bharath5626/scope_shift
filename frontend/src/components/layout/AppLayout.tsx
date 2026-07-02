@@ -25,7 +25,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-[var(--border-primary)] dark:border-gray-700 px-4 py-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="p-2 rounded-lg hover:bg-[var(--bg-section)] dark:hover:bg-gray-700"
             aria-label="Open menu"
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
