@@ -22,7 +22,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </a>
         
         {/* Mobile header */}
-        <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-[var(--border-primary)] dark:border-gray-700 px-4 py-3">
+        <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-[var(--border-primary)] dark:border-gray-700 px-4 py-3 sm:px-6">
           <button
             onClick={() => setMobileOpen(true)}
             className="p-2 rounded-lg hover:bg-[var(--bg-section)] dark:hover:bg-gray-700"

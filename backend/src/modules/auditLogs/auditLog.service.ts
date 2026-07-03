@@ -33,7 +33,21 @@ export const createAuditLog = async (data: CreateAuditLogInput) => {
   return result;
 };
 
-export const getAuditLogsByProjectId = async (projectId: string) => {
+export const getAuditLogsByProjectId = async (projectId: string, userId: string) => {
+  // Verify project ownership
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      createdById: userId,
+    },
+  });
+
+  if (!project) {
+    const error = new Error("Project not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
+
   return prisma.auditLog.findMany({
     where: {
       projectId,

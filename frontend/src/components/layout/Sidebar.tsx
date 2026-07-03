@@ -8,6 +8,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { UserProfileModal as SettingsModal } from '../UserProfileModal'
 import { UserDropdown } from './UserDropdown'
 import { SPACING, TYPOGRAPHY, BORDER_RADIUS, TRANSITION, ICON_SIZE } from '../../utils/designSystem'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 const EXTRA_ACTIVE: Record<string, string[]> = {
   '/analysis': ['/analyzing', '/analysis-results'],
@@ -59,7 +60,8 @@ function NavIcon({ icon }: { icon: string }) {
 export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; setMobileOpen?: (open: boolean) => void }) {
   const { user, logout } = useAuth()
   const { pathname } = useLocation()
-  const { toggleTheme } = useTheme()
+  const { toggleTheme, setTheme, theme } = useTheme()
+  const isMobile = useIsMobile()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false)
@@ -74,13 +76,21 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
   // Close mobile sidebar on route change
   useEffect(() => {
     handleSetMobileOpen(false)
-  }, [pathname])
+  }, [pathname, handleSetMobileOpen])
+  
+  // Reset collapsed state when switching between mobile/desktop
+  useEffect(() => {
+    if (isMobile) {
+      setCollapsed(false)
+    }
+  }, [isMobile])
   
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U'
 
   const handleLogout = () => {
+    setTheme('light')
     logout()
     setShowLogoutConfirm(false)
   }
@@ -131,7 +141,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
       
       <aside
   className={`fixed left-0 top-0 z-40 flex h-screen flex-col bg-gradient-to-b from-indigo-600 to-violet-700 text-white transition-all duration-300 lg:z-20 ${
-    collapsed ? 'w-20' : 'w-64'
+    collapsed ? 'lg:w-20 w-64' : 'w-64'
   } ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
 >
      {/* Header */}
@@ -152,10 +162,16 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
 </div>
 
   <button
-    onClick={() => setCollapsed((prev) => !prev)}
+    onClick={() => {
+      if (isMobile) {
+        handleSetMobileOpen(false) // Mobile: close drawer only
+      } else {
+        setCollapsed((prev) => !prev) // Desktop: toggle collapse
+      }
+    }}
     className={`${BORDER_RADIUS.small} p-2 text-indigo-100 hover:bg-white/10 hover:text-white ${TRANSITION}`}
-    title="Toggle sidebar"
-    aria-label="Toggle sidebar collapse"
+    title={isMobile ? "Close menu" : "Toggle sidebar"}
+    aria-label={isMobile ? "Close menu" : "Toggle sidebar collapse"}
   >
     <svg
   className={ICON_SIZE.hero}
@@ -248,6 +264,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
           onTheme={() => toggleTheme()}
           onSignOut={handleSignOutClick}
           onClose={() => setShowSettingsDropdown(false)}
+          currentTheme={theme as 'light' | 'dark'}
         />
       )}
     </div>
@@ -277,6 +294,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
           onSignOut={handleSignOutClick}
           onClose={() => setShowSettingsDropdown(false)}
           positionClass="absolute bottom-full left-0 ml-2 mb-2"
+          currentTheme={theme as 'light' | 'dark'}
         />
       )}
     </div>

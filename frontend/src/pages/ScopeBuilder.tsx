@@ -88,11 +88,11 @@ function FeatureForm({
   const inputCls =
     'w-full rounded-lg border border-[var(--border-primary)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500'
 
-  const accentBg = tabType === 'new' ? 'bg-emerald-50/50 border-emerald-200' : 'bg-indigo-50/40 border-indigo-200'
+  const accentBg = tabType === 'new' ? 'bg-[var(--color-success)]/10 border-[var(--color-success)]/30' : 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30'
 
   return (
     <div className={`rounded-xl border p-4 space-y-3 ${accentBg}`}>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
             Feature Title <span className="text-[var(--color-danger)]">*</span>
@@ -135,18 +135,18 @@ function FeatureForm({
           )}
         </div>
       </div>
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col sm:flex-row justify-end gap-2">
         <button
           onClick={onCancel}
-          className="rounded-lg border border-[var(--border-primary)] bg-white px-4 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-section)] transition"
+          className="w-full sm:w-auto rounded-lg border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-section)] transition min-h-[44px]"
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={!title.trim() || saving}
-          className={`rounded-lg px-4 py-1.5 text-sm font-medium text-white transition disabled:opacity-50 ${
-            tabType === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
+          className={`w-full sm:w-auto rounded-lg px-4 py-2.5 text-sm font-medium text-white transition disabled:opacity-50 min-h-[44px] ${
+            tabType === 'new' ? 'bg-[var(--color-success)] hover:bg-green-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
           }`}
         >
           {saving ? 'Saving…' : initial ? 'Update' : 'Add Feature'}
@@ -224,7 +224,7 @@ function FeatureList({
           onDragOver={(e) => { e.preventDefault(); setDragOverId(feature.id) }}
           onDrop={() => handleDrop(feature.id)}
           onDragLeave={() => setDragOverId(null)}
-          className={`transition-colors ${dragOverId === feature.id && dragId !== feature.id ? 'bg-indigo-50 border-l-2 border-l-indigo-400' : ''}`}
+          className={`transition-colors ${dragOverId === feature.id && dragId !== feature.id ? 'bg-[var(--color-primary)]/10 border-l-2 border-l-[var(--color-primary)]' : ''}`}
         >
           {editingId === feature.id ? (
             <div className={SPACING.card.compactPadding}>
@@ -241,45 +241,51 @@ function FeatureList({
               draggable
               onDragStart={() => setDragId(feature.id)}
               onDragEnd={() => { setDragId(null); setDragOverId(null) }}
-              className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[var(--bg-section)]/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
+              className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 px-4 py-3.5 hover:bg-[var(--bg-section)]/60 ${TRANSITION} ${dragId === feature.id ? 'opacity-40' : ''}`}
             >
-              {/* Drag handle */}
-              <div className="cursor-grab text-gray-300 hover:text-[var(--text-subtle)] shrink-0 active:cursor-grabbing">
-                <GripIcon />
+              {/* Mobile: Badge + Title row */}
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                {/* Number badge */}
+                <div className={`flex ${ICON_SIZE.button} shrink-0 items-center justify-center ${BORDER_RADIUS.tag} ${TYPOGRAPHY.caption} font-semibold ${
+                  tabType === 'new' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'
+                }`}>
+                  {index + 1}
+                </div>
+
+                {/* Title + description */}
+                <div className="min-w-0 flex-1">
+                  <p className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>{feature.title}</p>
+                  {feature.description && (
+                    <p className={`mt-0.5 ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{feature.description}</p>
+                  )}
+                </div>
               </div>
 
-              {/* Number badge */}
-              <div className={`flex ${ICON_SIZE.button} shrink-0 items-center justify-center ${BORDER_RADIUS.tag} ${TYPOGRAPHY.caption} font-semibold ${
-                tabType === 'new' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700'
-              }`}>
-                {index + 1}
-              </div>
+              {/* Mobile: Drag handle + Actions row */}
+              <div className="flex items-center justify-between w-full sm:w-auto sm:ml-auto sm:gap-1.5">
+                {/* Drag handle */}
+                <div className="cursor-grab text-gray-300 hover:text-[var(--text-subtle)] shrink-0 active:cursor-grabbing sm:order-2">
+                  <GripIcon />
+                </div>
 
-              {/* Title + description */}
-              <div className="min-w-0 flex-1">
-                <p className={`truncate ${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>{feature.title}</p>
-                {feature.description && (
-                  <p className={`mt-0.5 truncate ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{feature.description}</p>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="flex shrink-0 items-center gap-1.5">
-                <button
-                  onClick={() => onEdit(feature.id)}
-                  className={`${BORDER_RADIUS.small} p-1.5 text-[var(--text-subtle)] ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300`}
-                  title="Edit"
-                >
-                  <PencilIcon />
-                </button>
-                <button
-  onClick={() => onRequestDelete(feature.id)}
-  disabled={deletingId === feature.id}
-  className="rounded-md p-1.5 text-[var(--color-danger)] transition hover:bg-red-50 hover:text-[var(--color-danger)] disabled:opacity-40 dark:hover:bg-red-900/30 dark:hover:text-red-300"
-  title="Delete"
->
-  <TrashIcon />
-</button>
+                {/* Actions */}
+                <div className="flex items-center gap-2 sm:gap-1.5 sm:order-1">
+                  <button
+                    onClick={() => onEdit(feature.id)}
+                    className={`${BORDER_RADIUS.small} p-2 sm:p-1.5 text-[var(--text-subtle)] ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300 min-h-[36px] sm:min-h-0`}
+                    title="Edit"
+                  >
+                    <PencilIcon />
+                  </button>
+                  <button
+                    onClick={() => onRequestDelete(feature.id)}
+                    disabled={deletingId === feature.id}
+                    className="rounded-md p-2 sm:p-1.5 text-[var(--color-danger)] transition hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] disabled:opacity-40 dark:hover:bg-[var(--color-danger)]/20 dark:hover:text-red-300 min-h-[36px] sm:min-h-0"
+                    title="Delete"
+                  >
+                    <TrashIcon />
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -397,7 +403,7 @@ export function ScopeBuilder() {
 
   if (!projectId) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8 dark:bg-gray-900">
         <EmptyState
           title="No project selected"
           description="Open a project from the dashboard or projects page to start building its scope."
@@ -417,23 +423,50 @@ export function ScopeBuilder() {
   }
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900`}>
-      <div className="mx-auto max-w-3xl">
+    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900 overflow-x-hidden`}>
+      <div className="mx-auto max-w-3xl w-full">
 
         {/* Page header */}
-        <div className={`mb-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4`}>
+        <div className={`mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4`}>
           <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>Scope Builder</h1>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100 text-xl sm:text-2xl`}>Scope Builder</h1>
             {project && (
               <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
                 <span className="font-medium text-[var(--text-secondary)] dark:text-gray-300">{project.name}</span> — define original scope and client additions
               </p>
             )}
-          </div>
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* Autosave indicator */}
+            {/* Autosave indicator - mobile: below title */}
             {autosaveStatus !== 'idle' && (
-              <div className={`flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
+              <div className={`mt-2 flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
+                {autosaveStatus === 'saving' && (
+                  <>
+                    <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
+                    <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
+                  </>
+                )}
+                {autosaveStatus === 'saved' && (
+                  <>
+                    <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
+                  </>
+                )}
+                {autosaveStatus === 'error' && (
+                  <>
+                    <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4 sm:ml-auto">
+            {/* Autosave indicator - desktop: inline with button */}
+            {autosaveStatus !== 'idle' && (
+              <div className={`hidden sm:flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
                 {autosaveStatus === 'saving' && (
                   <>
                     <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
@@ -461,7 +494,7 @@ export function ScopeBuilder() {
             <button
               onClick={() => navigate(`/create-project?edit=${projectId}`)}
               disabled={originalFeatures.length === 0}
-              className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-40`}
+              className={`w-full sm:w-auto flex items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-40 min-h-[44px]`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -473,10 +506,10 @@ export function ScopeBuilder() {
         </div>
 
         {/* Tab bar */}
-        <div className={`mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+        <div className={`mb-4 sm:mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <button
             onClick={() => handleTabSwitch('original')}
-            className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
               activeTab === 'original'
                 ? 'bg-[var(--color-primary)] text-white shadow-sm'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
@@ -484,33 +517,33 @@ export function ScopeBuilder() {
             aria-pressed={activeTab === 'original'}
             role="tab"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            Original Scope
-            <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-bold ${
-              activeTab === 'original' ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
+            <span className="truncate">Original Scope</span>
+            <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
+              activeTab === 'original' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-indigo-400'
             }`}>
               {originalFeatures.length}
             </span>
           </button>
           <button
             onClick={() => handleTabSwitch('new')}
-            className={`flex flex-1 items-center justify-center gap-2 ${BORDER_RADIUS.small} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold ${TRANSITION} ${
+            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
               activeTab === 'new'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-[var(--color-success)] text-white shadow-sm'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
             }`}
             aria-pressed={activeTab === 'new'}
             role="tab"
           >
-            <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className={`${ICON_SIZE.button} shrink-0`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            New Client Additions
+            <span className="truncate">New Client Additions</span>
             {newFeatures.length > 0 && (
-              <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-bold ${
-                activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+              <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
+                activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-[var(--color-success)]/20 text-[var(--color-success)] dark:bg-[var(--color-success)]/30 dark:text-emerald-400'
               }`}>
                 {newFeatures.length}
               </span>
@@ -520,8 +553,8 @@ export function ScopeBuilder() {
 
         {/* Context hint */}
         {activeTab === 'new' && (
-          <div className={`mb-4 flex items-start gap-3 ${BORDER_RADIUS.card} border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-900/20`}>
-            <svg className={`${ICON_SIZE.button} mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className={`mb-4 flex items-start gap-3 ${BORDER_RADIUS.card} border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 sm:px-4 py-3 dark:border-[var(--color-success)]/40 dark:bg-[var(--color-success)]/20`}>
+            <svg className={`${ICON_SIZE.button} mt-0.5 shrink-0 text-[var(--color-success)] dark:text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className={`${TYPOGRAPHY.caption} text-emerald-800 dark:text-emerald-200`}>
@@ -534,7 +567,7 @@ export function ScopeBuilder() {
         <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
 
           {/* Card header */}
-          <div className={`flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 dark:border-gray-700`}>
+          <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-b border-[var(--border-primary)] px-4 sm:px-6 py-4 dark:border-gray-700`}>
             <div>
               <h2 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
                 {activeTab === 'original' ? 'Original Scope Features' : 'Client-Requested Additions'}
@@ -547,8 +580,8 @@ export function ScopeBuilder() {
             </div>
             <button
               onClick={() => { setShowAddForm(true); setEditingId(null); setAddError('') }}
-              className={`flex items-center gap-2 ${BORDER_RADIUS.button} px-4 py-2 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} ${
-                activeTab === 'new' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
+              className={`w-full sm:w-auto flex items-center justify-center gap-2 ${BORDER_RADIUS.button} px-4 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} min-h-[44px] ${
+                activeTab === 'new' ? 'bg-[var(--color-success)] hover:bg-green-700' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]'
               }`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -559,7 +592,7 @@ export function ScopeBuilder() {
           </div>
 
           {/* Body */}
-          <div className={`px-6 py-5 space-y-4 ${SPACING.section.gap}`}>
+          <div className={`px-4 sm:px-6 py-4 sm:py-5 space-y-4 ${SPACING.section.gap}`}>
 
             {/* Inline add form */}
             {showAddForm && (
@@ -571,7 +604,7 @@ export function ScopeBuilder() {
                   tabType={activeTab}
                 />
                 {addError && (
-                  <div className={`${BORDER_RADIUS.small} border border-red-200 bg-red-50 px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--color-danger)]`}>
+                  <div className={`${BORDER_RADIUS.small} border border-[var(--color-danger)]/30 bg-[var(--color-danger)]/10 px-3 sm:px-4 py-2.5 ${TYPOGRAPHY.body} text-[var(--color-danger)]`}>
                     {addError}
                   </div>
                 )}
@@ -606,24 +639,25 @@ export function ScopeBuilder() {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t border-[var(--border-primary)] px-6 py-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)]"
-            >
-              Back
-            </button>
-            <div className="flex items-center gap-3">
-              {newFeatures.length > 0 && (
-                <span className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  {newFeatures.length} new addition{newFeatures.length !== 1 ? 's' : ''} — scope creep analysis ready
-                </span>
-              )}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[var(--border-primary)] px-4 sm:px-6 py-4">
+            {/* Mobile: Status Badge */}
+            {newFeatures.length > 0 && (
+              <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[var(--color-success)] order-1 sm:order-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
+                {newFeatures.length} new addition{newFeatures.length !== 1 ? 's' : ''} — scope creep analysis ready
+              </span>
+            )}
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto order-2 sm:order-1">
+              <button
+                onClick={() => navigate(-1)}
+                className="w-full sm:w-auto rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] min-h-[44px]"
+              >
+                Back
+              </button>
               <button
                 onClick={() => navigate(`/analyzing?project=${projectId}`)}
                 disabled={originalFeatures.length === 0}
-                className="flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50 min-h-[44px]"
               >
                 {newFeatures.length > 0 ? 'Run Scope Creep Analysis →' : 'Run Analysis →'}
               </button>
@@ -633,8 +667,8 @@ export function ScopeBuilder() {
 
       </div>
       {confirmDeleteId && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-800 dark:shadow-gray-900/20">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="w-full max-w-md rounded-2xl bg-white p-4 sm:p-6 shadow-xl dark:bg-gray-800 dark:shadow-gray-900/20">
 
       <h2 className="text-lg font-semibold text-[var(--text-primary)] dark:text-gray-100">
         Delete Feature?
@@ -644,10 +678,10 @@ export function ScopeBuilder() {
         This action cannot be undone.
       </p>
 
-      <div className="mt-6 flex justify-end gap-3">
+      <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button
           onClick={() => setConfirmDeleteId(null)}
-          className="rounded-lg border border-[var(--border-primary)] px-4 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+          className="w-full sm:w-auto rounded-lg border border-[var(--border-primary)] px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 min-h-[44px]"
         >
           Cancel
         </button>
@@ -657,7 +691,7 @@ export function ScopeBuilder() {
             await handleDelete(confirmDeleteId)
             setConfirmDeleteId(null)
           }}
-          className="rounded-lg bg-[var(--color-danger)] px-4 py-2 text-sm text-white hover:bg-red-700"
+          className="w-full sm:w-auto rounded-lg bg-[var(--color-danger)] px-4 py-2.5 text-sm text-white hover:bg-red-700 min-h-[44px]"
         >
           Delete
         </button>

@@ -7,6 +7,7 @@ import {
 } from 'react'
 
 import { api } from '../services/api'
+import { useAuth } from './AuthContext'
 
 interface DashboardStats {
   stats: {
@@ -43,6 +44,7 @@ interface DashboardContextValue {
 const DashboardContext = createContext<DashboardContextValue | null>(null)
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -62,8 +64,10 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    // Only fetch dashboard stats when auth is ready and user is authenticated
+    if (authLoading || !isAuthenticated) return
     fetchDashboardStats()
-  }, [])
+  }, [authLoading, isAuthenticated])
 
   const value: DashboardContextValue = {
     dashboardStats,

@@ -27,9 +27,9 @@ const RISK_COLORS: Record<RiskLevel, { bg: string; text: string; badge: string }
 }
 
 const COMPLEXITY_STROKE: Record<RiskLevel, string> = {
-  Low:    '#22c55e',
-  Medium: '#f59e0b',
-  High:   '#ef4444',
+  Low:    'var(--chart-success)',
+  Medium: 'var(--chart-warning)',
+  High:   'var(--chart-danger)',
 }
 
 function DonutChart({ level, score }: { level: RiskLevel; score: number }) {
@@ -41,7 +41,7 @@ function DonutChart({ level, score }: { level: RiskLevel; score: number }) {
   return (
     <div className="relative flex h-36 w-36 items-center justify-center">
       <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="var(--chart-background)" strokeWidth="10" />
         <circle
           cx="50"
           cy="50"
@@ -63,9 +63,9 @@ function DonutChart({ level, score }: { level: RiskLevel; score: number }) {
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm">
+    <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] px-5 py-4 text-center shadow-sm dark:bg-gray-800">
       <p className="text-xs font-medium text-[var(--text-soft)] uppercase tracking-wide">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-indigo-700">{value}</p>
+      <p className="mt-1 text-2xl font-bold text-[var(--color-primary)]">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-[var(--text-subtle)]">{sub}</p>}
     </div>
   )
@@ -115,8 +115,8 @@ export function AnalysisResultsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-8">
-      <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className={`min-h-screen bg-[var(--bg-page)] p-4 sm:p-6 lg:p-8 dark:bg-gray-900`}>
+      <div className="w-full max-w-6xl mx-auto space-y-4 sm:space-y-6">
 
         {/* Header */}
         <div>
@@ -127,16 +127,16 @@ export function AnalysisResultsPage() {
         </div>
 
         {/* Main card */}
-        <div className="rounded-xl border border-[var(--border-primary)] bg-white p-8 shadow-sm">
+        <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-gray-800">
           <h2 className="text-base font-semibold text-[var(--text-primary)]">Impact Analysis Summary</h2>
           <p className="mt-0.5 text-sm text-[var(--text-soft)]">Here's how the scope affects your project</p>
 
           {/* Top stats row */}
-          <div className="mt-6 grid grid-cols-4 gap-4">
+          <div className="mt-4 sm:mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatCard label="Scope" value={`${scopeScore}%`} />
             <StatCard label="Estimated Effort" value={`${estimatedHours} hrs`} />
             <StatCard label="Estimated Timeline" value={`${estimatedWeeks} ${estimatedWeeks === 1 ? 'week' : 'weeks'}`} />
-            <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm">
+            <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] px-5 py-4 text-center shadow-sm dark:bg-gray-800">
               <p className="text-xs font-medium text-[var(--text-soft)] uppercase tracking-wide">Risk Level</p>
               <p className={`mt-1 text-2xl font-bold ${riskColors.text}`}>{riskLevel}</p>
               <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${riskColors.badge}`}>
@@ -146,7 +146,7 @@ export function AnalysisResultsPage() {
           </div>
 
           {/* Bottom three-column section */}
-          <div className="mt-8 grid grid-cols-3 gap-6">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
             {/* Effort Breakdown */}
             <div className="col-span-1">
@@ -159,8 +159,8 @@ export function AnalysisResultsPage() {
                   </div>
                 ))}
                 <div className="mt-3 border-t border-[var(--border-primary)] pt-3 flex items-center justify-between text-sm font-semibold">
-                  <span className="text-gray-800">Total</span>
-                  <span className="text-indigo-700">+{total} hrs</span>
+                  <span className="text-[var(--text-secondary)]">Total</span>
+                  <span className="text-[var(--color-primary)]">+{total} hrs</span>
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ export function AnalysisResultsPage() {
         <div className="flex justify-end">
           <button
             onClick={() => navigate(`/reports/${projectId}`)}
-            className="rounded-lg bg-[var(--color-primary)] px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
+            className="rounded-lg bg-[var(--color-primary)] px-5 sm:px-7 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
           >
             View Detailed Report
           </button>

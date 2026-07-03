@@ -19,6 +19,7 @@ import type {
 } from '../types'
 
 import { api } from '../services/api'
+import { useAuth } from './AuthContext'
 
 interface State {
   projects: Project[]
@@ -47,6 +48,7 @@ const ProjectContext = createContext<ProjectContextValue | null>(null)
 const INITIAL: State = { projects: [], features: [], analyses: [], loading: false }
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [state, setState] = useState<State>(INITIAL)
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
   const loadedFeatureProjects = useRef<Set<string>>(new Set())
@@ -61,12 +63,15 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    // Only fetch projects when auth is ready and user is authenticated
+    if (authLoading || !isAuthenticated) return
+
     setLoading(true)
     api.get<Project[]>('/projects')
       .then((projects) => setState((prev) => ({ ...prev, projects })))
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [])
+  }, [authLoading, isAuthenticated])
 
   useEffect(() => {
     if (!activeProjectId) return

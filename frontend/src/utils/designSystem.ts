@@ -16,21 +16,21 @@ export const BORDER_RADIUS = {
 // Spacing
 export const SPACING = {
   page: {
-    padding: 'px-8 py-10',
-    headerPadding: 'px-8 py-6',
+    padding: 'px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10',
+    headerPadding: 'px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6',
   },
   section: {
-    gap: 'gap-6',
-    marginTop: 'mt-8',
+    gap: 'gap-4 sm:gap-6',
+    marginTop: 'mt-6 sm:mt-8',
   },
   card: {
-    padding: 'p-6',
-    compactPadding: 'p-5',
+    padding: 'p-4 sm:p-5 lg:p-6',
+    compactPadding: 'p-3 sm:p-4 lg:p-5',
   },
   button: {
-    primary: 'px-5 py-2.5',
-    secondary: 'px-4 py-2.5',
-    small: 'px-3 py-2',
+    primary: 'px-4 py-2 sm:px-5 sm:py-2.5',
+    secondary: 'px-3 py-2 sm:px-4 sm:py-2.5',
+    small: 'px-2.5 py-1.5 sm:px-3 sm:py-2',
   },
 } as const
 

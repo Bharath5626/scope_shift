@@ -119,12 +119,21 @@ function WarningIcon() {
 
 function CheckIcon() {
   return (
-    <svg className="h-4 w-4 text-indigo-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg
+      className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-success)] dark:text-green-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
     </svg>
   )
 }
-
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
     <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
@@ -156,7 +165,7 @@ function SummaryTab({ analysis }: { analysis: Analysis }) {
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-3 rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm sm:flex-row sm:gap-8 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+      <div className="flex flex-col lg:flex-row items-center gap-6">
         <DonutChart level={complexity} score={score} />
         <div>
           <p className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Complexity Level</p>
@@ -184,7 +193,7 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
   const maxHours = Math.max(...rows.map((r) => r.hours), 1)
 
   return (
-    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm space-y-5 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm space-y-5 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
       <h3 className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Hours by Category</h3>
       {rows.map(({ label, hours }) => {
         const pct = Math.round((hours / maxHours) * 100)
@@ -217,30 +226,32 @@ function RiskTab({ riskLevel, riskFactors, complexity }: { riskLevel: string | n
   const factors = riskFactors ?? []
 
   return (
-    <div className="space-y-5">
-      <div data-risk-section="true" className={`flex items-center gap-4 rounded-xl border p-5 ${riskColors.bg} ${riskColors.border}`} style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold ${riskColors.text}`} style={{ backgroundColor: '#ffffff' }}>
+    <div className="space-y-4">
+      <div data-risk-section="true" 
+  className={`flex items-center gap-4 rounded-xl border border-[var(--border-primary)] bg-white p-5 dark:border-gray-700 dark:bg-gray-800`}
+>
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold ${riskColors.text}`} >
           {risk[0]}
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-800" style={{ color: '#000000' }}>Overall Risk: {risk}</p>
-          <p className="text-xs text-[var(--text-soft)] mt-0.5" style={{ color: '#000000' }}>Complexity level: {complexity || 'Unknown'}</p>
+         <p className="text-sm font-semibold text-[var(--text-primary)] dark:text-gray-100">Overall Risk: {risk}</p>
+          <p className="mt-0.5 text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Complexity level: {complexity || 'Unknown'}</p>
         </div>
         <span className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${riskColors.badge}`}>
           {risk} Risk
         </span>
       </div>
 
-      <div data-risk-section="true" className="rounded-xl border border-[var(--border-primary)] p-6 shadow-sm" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
-        <h3 className="mb-4 text-sm font-semibold" style={{ color: '#000000' }}>Identified Risk Factors</h3>
+      <div data-risk-section="true" className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Identified Risk Factors</h3>
         {factors.length === 0 ? (
-          <p className="text-sm" style={{ color: '#000000' }}>No risk factors recorded for this analysis.</p>
+          <p className="text-sm text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No risk factors recorded for this analysis.</p>
         ) : (
           <div className="space-y-3">
             {factors.map((factor, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg border px-4 py-3" style={{ backgroundColor: '#fef3c7', borderColor: '#fcd34d' }}>
+              <div key={i} className="flex items-start gap-3 rounded-lg border-l-4 border-red-500 bg-[var(--bg-section)] px-4 py-3 dark:bg-gray-700">
                 <WarningIcon />
-                <span className="text-sm" style={{ color: '#000000' }}>{factor}</span>
+                <span className="text-sm text-[var(--text-secondary)] dark:text-gray-200">{factor}</span>
               </div>
             ))}
           </div>
@@ -253,17 +264,22 @@ function RiskTab({ riskLevel, riskFactors, complexity }: { riskLevel: string | n
 function RecommendationsTab({ recommendations }: { recommendations: string[] | null }) {
   const items = recommendations ?? []
   return (
-    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+    <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
       <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">AI Recommendations</h3>
       {items.length === 0 ? (
         <p className="text-sm text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No recommendations recorded for this analysis.</p>
       ) : (
         <div className="space-y-3">
           {items.map((rec, i) => (
-            <div key={i} className="flex items-start gap-3 rounded-lg bg-indigo-50 border border-indigo-100 px-4 py-3 dark:bg-indigo-900/30 dark:border-indigo-800">
-              <CheckIcon />
-              <span className="text-sm text-[var(--text-secondary)] dark:text-gray-200">{rec}</span>
-            </div>
+           <div
+  key={i}
+  className="flex items-start gap-3 rounded-lg border-l-4 border-green-500 bg-[var(--bg-section)] px-4 py-3 dark:bg-gray-700"
+>
+  <CheckIcon />
+  <span className="text-sm text-[var(--text-secondary)] dark:text-gray-200">
+    {rec}
+  </span>
+</div>
           ))}
         </div>
       )}
@@ -286,7 +302,7 @@ function ProjectDetailsTab({ project }: { project: Project }) {
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Description</p>
             <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.description || 'No description provided'}</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Type</p>
               <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{PROJECT_TYPE_LABELS[project.type] ?? project.type}</p>
@@ -410,7 +426,7 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
       ) : (
         auditLogs.map((log) => (
           <div key={log.id} className="rounded-xl border border-[var(--border-primary)] bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-            <div className="flex items-center justify-between p-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 gap-3">
               <div className="flex items-center gap-4">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                   log.action === 'created' 
@@ -650,11 +666,11 @@ export function ReportDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] p-8 dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--bg-page)] p-4 sm:p-6 lg:p-8 dark:bg-gray-900">
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <button
               onClick={() => navigate('/reports')}
@@ -695,23 +711,42 @@ export function ReportDetailPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-[var(--border-primary)] dark:border-gray-700">
-          <nav className="-mb-px flex gap-0">
-            {TABS.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab
-                    ? 'border-indigo-600 text-indigo-700 dark:text-indigo-400'
-                    : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:border-[var(--border-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:border-gray-600'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </nav>
-        </div>
+<div className="border-b border-[var(--border-primary)] dark:border-gray-700">
+  
+  {/* MOBILE: dropdown */}
+  <div className="sm:hidden p-3">
+    <select
+      value={activeTab}
+      onChange={(e) => setActiveTab(e.target.value as Tab)}
+      className="w-full rounded-lg border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:border-gray-600"
+    >
+      {TABS.map((tab) => (
+        <option key={tab} value={tab}>
+          {tab}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  {/* DESKTOP: tabs */}
+  <nav className="-mb-px hidden sm:flex gap-0 overflow-x-auto">
+    {TABS.map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+       className={`px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition
+  ${
+    activeTab === tab
+      ? 'border-[var(--color-primary)] text-white'
+      : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-primary)]'
+  }
+`}
+      >
+        {tab}
+      </button>
+    ))}
+  </nav>
+</div>
 
         {/* Tab content */}
         <div>

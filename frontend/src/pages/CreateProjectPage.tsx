@@ -102,24 +102,101 @@ export function CreateProjectPage() {
   const [isCustomProjectType, setIsCustomProjectType] = useState(false)
   const [isCustomMethodology, setIsCustomMethodology] = useState(false)
 
-  const [techStackInput, setTechStackInput] = useState('')
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
-  const [logoPreview, setLogoPreview] = useState<string | null>(null)
   const navigate = useNavigate()
 
+  // Load draft data from localStorage for initialization (only for new projects)
+  const getInitialFormData = () => {
+    if (editProjectId) {
+      return {
+        name: '',
+        description: '',
+        teamSize: '',
+        deadline: '',
+        startDate: '',
+        projectType: '',
+        methodology: '',
+        workingHours: '',
+        selectedSkills: [] as string[],
+        logoPreview: null as string | null,
+        customProjectTypes: [] as string[],
+        customMethodologies: [] as string[]
+      }
+    }
+    
+    try {
+      const savedDraft = localStorage.getItem('createProjectDraft')
+      if (savedDraft) {
+        const formData = JSON.parse(savedDraft)
+        return {
+          name: formData.name || '',
+          description: formData.description || '',
+          teamSize: formData.teamSize || '',
+          deadline: formData.deadline || '',
+          startDate: formData.startDate || '',
+          projectType: formData.projectType || '',
+          methodology: formData.methodology || '',
+          workingHours: formData.workingHours || '',
+          selectedSkills: formData.selectedSkills || [],
+          logoPreview: formData.logoPreview || null,
+          customProjectTypes: formData.customProjectTypes || [],
+          customMethodologies: formData.customMethodologies || []
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load draft data:', err)
+      localStorage.removeItem('createProjectDraft')
+    }
+    
+    return {
+      name: '',
+      description: '',
+      teamSize: '',
+      deadline: '',
+      startDate: '',
+      projectType: '',
+      methodology: '',
+      workingHours: '',
+      selectedSkills: [] as string[],
+      logoPreview: null as string | null,
+      customProjectTypes: [] as string[],
+      customMethodologies: [] as string[]
+    }
+  }
+
+  const initialFormData = getInitialFormData()
+
+  const [techStackInput, setTechStackInput] = useState('')
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialFormData.selectedSkills)
+  const [logoPreview, setLogoPreview] = useState<string | null>(initialFormData.logoPreview)
+
   // 🧠 CORE
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
+  const [name, setName] = useState(initialFormData.name)
+  const [description, setDescription] = useState(initialFormData.description)
 
   // ⚙️ CONTEXT
-  const [teamSize, setTeamSize] = useState('')
-  const [deadline, setDeadline] = useState('')
-  const [startDate, setStartDate] = useState('')
+  const [teamSize, setTeamSize] = useState(initialFormData.teamSize)
+  const [deadline, setDeadline] = useState(initialFormData.deadline)
+  const [startDate, setStartDate] = useState(initialFormData.startDate)
 
   // 🟡 OPTIONAL
-  const [projectType, setProjectType] = useState('')
-  const [methodology, setMethodology] = useState('')
-  const [workingHours, setWorkingHours] = useState('')
+  const [projectType, setProjectType] = useState(initialFormData.projectType)
+  const [methodology, setMethodology] = useState(initialFormData.methodology)
+  const [workingHours, setWorkingHours] = useState(initialFormData.workingHours)
+
+  const [step, setStep] = useState<Step>('form')
+  const [error, setError] = useState('')
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(!!editProjectId === false && initialFormData.name !== '')
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string
+    techStack?: string
+  }>({})
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+  const techStackInputRef = useRef<HTMLInputElement>(null)
+
+  // Custom values state (initialized from draft)
+  const [customProjectTypes, setCustomProjectTypes] = useState<string[]>(initialFormData.customProjectTypes)
+  const [customMethodologies, setCustomMethodologies] = useState<string[]>(initialFormData.customMethodologies)
 
   // Load project data if editing
   useEffect(() => {
@@ -149,28 +226,10 @@ export function CreateProjectPage() {
     }
   }, [editProjectId])
 
-  // Load saved form data from localStorage on mount (only for new projects, not editing)
+  // Save form data to localStorage whenever it changes (only for new projects, not editing)
   useEffect(() => {
-    if (editProjectId) return // Skip loading draft data when editing
+    if (editProjectId) return // Don't save draft when editing
     
-    // Clear draft data on mount for new projects to start fresh
-    localStorage.removeItem('createProjectDraft')
-    
-    // Reset form fields
-    setName('')
-    setDescription('')
-    setTeamSize('')
-    setDeadline('')
-    setStartDate('')
-    setProjectType('')
-    setMethodology('')
-    setWorkingHours('')
-    setSelectedSkills([])
-    setLogoPreview(null)
-  }, [editProjectId])
-
-  // Save form data to localStorage whenever it changes
-  useEffect(() => {
     const formData = {
       name,
       description,
@@ -184,18 +243,7 @@ export function CreateProjectPage() {
       logoPreview
     }
     localStorage.setItem('createProjectDraft', JSON.stringify(formData))
-  }, [name, description, teamSize, deadline, startDate, projectType, methodology, workingHours, selectedSkills, logoPreview])
-
-  const [step, setStep] = useState<Step>('form')
-  const [error, setError] = useState('')
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<{
-    name?: string
-    techStack?: string
-  }>({})
-  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
-  const techStackInputRef = useRef<HTMLInputElement>(null)
+  }, [name, description, teamSize, deadline, startDate, projectType, methodology, workingHours, selectedSkills, logoPreview, editProjectId])
 
   // Track unsaved changes
   const handleFieldChange = (field?: string) => {
@@ -379,8 +427,8 @@ const filteredSkills = SKILLS.filter(
 
   if (step === 'generating') {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
-        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+      <div className={`min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8 dark:bg-gray-900`}>
+        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-8 sm:p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
           <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-50 dark:bg-indigo-900/30`}>
             <svg className={`h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -401,10 +449,10 @@ const filteredSkills = SKILLS.filter(
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
-      <div className={`mx-auto max-w-5xl ${SPACING.page.padding} py-10`}>
+      <div className={`mx-auto max-w-5xl ${SPACING.page.padding} py-6 sm:py-8 lg:py-10`}>
 
         {/* Header */}
-        <div className={`mb-8 flex items-start justify-between`}>
+        <div className={`sticky top-0 z-10 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 bg-[var(--bg-page)] py-4 dark:bg-gray-900`}>
           <div>
             <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
               {editProjectId ? 'Edit Project Details' : 'Create New Project'}
@@ -431,7 +479,7 @@ const filteredSkills = SKILLS.filter(
             title="Project Identity"
             description="Core inputs drive AI Requirement generation quality."
           >
-            <div className={`grid gap-5 sm:grid-cols-2 ${SPACING.section.gap}`}>
+            <div className={`grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 ${SPACING.section.gap}`}>
               <div>
                 <label className={labelCls}>
                   Project Name <span className="text-red-500">*</span>
@@ -468,9 +516,9 @@ const filteredSkills = SKILLS.filter(
             </div>
 
             {/* Logo Upload */}
-            <div className="mt-5">
+            <div className="mt-4 sm:mt-5">
               <label className={labelCls}>Project Logo (Optional)</label>
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 {logoPreview ? (
                   <div className={`relative h-20 w-20 shrink-0 overflow-hidden ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700`}>
                     <img
@@ -525,7 +573,7 @@ const filteredSkills = SKILLS.filter(
   title="Team & Context"
   description="Helps AI understand constraints and complexity."
 >
-  <div className={`grid gap-5 sm:grid-cols-3 ${SPACING.section.gap}`}>
+  <div className={`grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
 
    <div>
   <label className={labelCls}>Tech Stack <span className="text-red-500">*</span></label>
@@ -713,7 +761,7 @@ const filteredSkills = SKILLS.filter(
 
    
     {/* hidden until hover */}
-    <div className={`grid gap-5 sm:grid-cols-3 ${TRANSITION} duration-300 ${SPACING.section.gap}`}>
+    <div className={`grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${TRANSITION} duration-300 ${SPACING.section.gap}`}>
 
 <div>
   <label className={labelCls}>Project Type</label>
@@ -727,6 +775,21 @@ const filteredSkills = SKILLS.filter(
         onChange={(e) => {
           setProjectType(e.target.value)
           handleFieldChange()
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && projectType.trim()) {
+            e.preventDefault()
+            if (!customProjectTypes.includes(projectType.trim())) {
+              setCustomProjectTypes([...customProjectTypes, projectType.trim()])
+            }
+            setIsCustomProjectType(false)
+            handleFieldChange()
+          }
+        }}
+        onBlur={() => {
+          if (projectType.trim() && !customProjectTypes.includes(projectType.trim())) {
+            setCustomProjectTypes([...customProjectTypes, projectType.trim()])
+          }
         }}
       />
 
@@ -764,6 +827,12 @@ const filteredSkills = SKILLS.filter(
           </option>
         ))}
 
+        {customProjectTypes.map((t) => (
+          <option key={t} value={t}>
+            {t}
+          </option>
+        ))}
+
         <option value="other">Other</option>
       </select>
     </SelectWrapper>
@@ -782,6 +851,21 @@ const filteredSkills = SKILLS.filter(
         onChange={(e) => {
           setMethodology(e.target.value)
           handleFieldChange()
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && methodology.trim()) {
+            e.preventDefault()
+            if (!customMethodologies.includes(methodology.trim())) {
+              setCustomMethodologies([...customMethodologies, methodology.trim()])
+            }
+            setIsCustomMethodology(false)
+            handleFieldChange()
+          }
+        }}
+        onBlur={() => {
+          if (methodology.trim() && !customMethodologies.includes(methodology.trim())) {
+            setCustomMethodologies([...customMethodologies, methodology.trim()])
+          }
         }}
       />
 
@@ -816,6 +900,13 @@ const filteredSkills = SKILLS.filter(
         <option value="scrum">Scrum</option>
         <option value="kanban">Kanban</option>
         <option value="waterfall">Waterfall</option>
+
+        {customMethodologies.map((m) => (
+          <option key={m} value={m}>
+            {m}
+          </option>
+        ))}
+
         <option value="other">Other</option>
       </select>
     </SelectWrapper>
@@ -849,12 +940,12 @@ const filteredSkills = SKILLS.filter(
         </div>
 
         {/* Footer */}
-        <div className={`mt-8 flex items-center justify-between ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-          <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
+        <div className={`mt-6 sm:mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white px-4 sm:px-6 py-4 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+          <div className={`flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)] text-center sm:text-left`}>
             AI will generate 6–10 Requirements based on your inputs
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             {hasUnsavedChanges && (
               <button
                 onClick={handleCancel}
@@ -875,7 +966,7 @@ const filteredSkills = SKILLS.filter(
 }
               className={`flex items-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-50`}
             >
-              {editProjectId ? 'Update & Regenerate Features' : 'Generate Requirements & Continue'}
+              {editProjectId ? 'Update & Regenerate Features' : 'Create Project & Generate Requirements'}
             </button>
           </div>
         </div>

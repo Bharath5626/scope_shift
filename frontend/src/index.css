@@ -29,6 +29,13 @@
 
   /* Semantic UI Colors */
   --color-info: #4f46e5;
+
+  /* Chart Colors */
+  --chart-success: #22c55e;
+  --chart-warning: #f59e0b;
+  --chart-danger: #ef4444;
+  --chart-info: #4f46e5;
+  --chart-background: #f3f4f6;
 }
 
 * {
@@ -78,22 +85,17 @@ body {
 
   /* Semantic UI Colors */
   --color-info: #818cf8;
+
+  /* Chart Colors */
+  --chart-success: #4ade80;
+  --chart-warning: #fbbf24;
+  --chart-danger: #f87171;
+  --chart-info: #818cf8;
+  --chart-background: #1f2937;
 }
 
 .dark .bg-white {
   background-color: #1f2937;
-}
-
-/* Exclude risk analysis section from global dark mode text overrides */
-.dark [data-risk-section="true"] {
-  background-color: #ffffff !important;
-  border-color: #e5e7eb !important;
-}
-
-.dark [data-risk-section="true"] h3,
-.dark [data-risk-section="true"] p,
-.dark [data-risk-section="true"] span {
-  color: #000000 !important;
 }
 
 .dark .bg-gray-50 {
@@ -128,14 +130,6 @@ body {
   color: #9ca3af;
 }
 
-/* Exclude risk analysis section from global dark mode text overrides */
-.dark #risk-analysis-container .text-gray-700,
-.dark #risk-analysis-container .text-gray-400,
-.dark #risk-analysis-container .text-gray-800,
-.dark #risk-analysis-container .text-gray-500 {
-  color: inherit;
-}
-
 .dark .border-gray-200 {
   border-color: #374151;
 }
@@ -159,16 +153,4 @@ body {
 
 .dark .shadow-sm {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
-/* Force black text in Risk Analysis section - must come after global rules */
-.dark [data-risk-section="true"] h3,
-.dark [data-risk-section="true"] p,
-.dark [data-risk-section="true"] span {
-  color: #000000 !important;
-}
-
-/* Also force the background to be white */
-.dark [data-risk-section="true"] {
-  background-color: #ffffff !important;
 }

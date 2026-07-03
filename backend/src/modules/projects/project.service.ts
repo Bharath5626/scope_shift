@@ -241,9 +241,12 @@ export const createProject = async (
   }
 };
 
-export const getProjects = async () => {
+export const getProjects = async (userId: string) => {
   try {
     const projects = await prisma.project.findMany({
+      where: {
+        createdById: userId,
+      },
       include: {
         createdBy: {
           select: { id: true, name: true },
@@ -260,7 +263,7 @@ export const getProjects = async () => {
   }
 };
 
-export const getProjectById = async (id: string) => {
+export const getProjectById = async (id: string, userId: string) => {
   try {
     const project = await prisma.project.findUnique({
       where: { id },
@@ -270,6 +273,11 @@ export const getProjectById = async (id: string) => {
     });
 
     if (!project) return null;
+
+    // Check ownership
+    if (project.createdById !== userId) {
+      return null;
+    }
 
     return syncProjectStatus(project);
   } catch (error) {
@@ -296,13 +304,20 @@ export const updateProject = async (
   userId?: string
 ) => {
   try {
-    // Get the existing project to detect changes
+    // Get the existing project to detect changes and check ownership
     const existingProject = await prisma.project.findUnique({
       where: { id },
     });
 
     if (!existingProject) {
       throw new Error("Project not found");
+    }
+
+    // Check ownership if userId is provided
+    if (userId && existingProject.createdById !== userId) {
+      const error = new Error("You don't have permission to update this project") as Error & { statusCode: number };
+      error.statusCode = 403;
+      throw error;
     }
 
     // Convert date strings to Date objects if provided
@@ -356,18 +371,39 @@ export const updateProject = async (
   }
 };
 
-export const deleteProject = async (id: string) => {
+export const deleteProject = async (id: string, userId: string) => {
   try {
+    // First check if project exists and belongs to user
+    const project = await prisma.project.findUnique({
+      where: { id },
+      select: { createdById: true },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (project.createdById !== userId) {
+      const error = new Error("You don't have permission to delete this project") as Error & { statusCode: number };
+      error.statusCode = 403;
+      throw error;
+    }
+
     return prisma.project.delete({ where: { id } });
   } catch (error) {
     throw handleDatabaseError(error);
   }
 };
 
-export const getAnalyzedProjects = async () => {
+export const getAnalyzedProjects = async (userId: string) => {
   try {
     const projects = await prisma.project.findMany({
-      where: { analyses: { some: {} } },
+      where: {
+        createdById: userId,
+        analyses: { some: {} },
+      },
       include: {
         createdBy: { select: { name: true } },
         analyses: {

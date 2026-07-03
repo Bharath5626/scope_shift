@@ -28,7 +28,11 @@ function PageLoader() {
 }
 
 export function AppRouter() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
+
+  if (isLoading) {
+    return <PageLoader />
+  }
 
   if (!isAuthenticated) {
     return (
@@ -57,11 +61,11 @@ export function AppRouter() {
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/reports/:projectId" element={<ReportDetailPage />} />
           <Route path="/history" element={<ProjectHistoryPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
           <Route
     path="/upcoming-deadlines"
     element={<UpcomingDeadlinesPage />}
 />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </AppLayout>

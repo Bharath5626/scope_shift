@@ -5,15 +5,17 @@ import { getProjectById, createProjectWithFeatures } from "../projects/project.s
 import prisma from "../../config/database";
 import { handleDatabaseError } from "../../utils/database-errors";
 import { createAuditLog } from "../auditLogs/auditLog.service";
+import { verifyToken } from "../../middlewares/auth.middleware";
 
 const router = Router({ mergeParams: true });
+router.use(verifyToken);
 
 router.post(
   "/analyze",
   asyncHandler(async (req: Request, res: Response) => {
     const { projectId } = req.params;
 
-    const project = await getProjectById(projectId);
+    const project = await getProjectById(projectId, req.user!.id);
     if (!project) {
       return res.status(404).json({ success: false, message: "Project not found" });
     }
@@ -90,7 +92,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const { projectId } = req.params;
 
-    const project = await getProjectById(projectId);
+    const project = await getProjectById(projectId, req.user!.id);
     if (!project) {
       return res.status(404).json({ success: false, message: "Project not found" });
     }

@@ -96,7 +96,7 @@ function AnalysisProjectCard({
 
       {/* Last analysis summary */}
       {lastAnalysis && risk ? (
-        <div className={`mx-6 mb-4 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-[var(--bg-section)] ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
+        <div className={`mx-3 sm:mx-6 mb-3 sm:mb-4 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-[var(--bg-section)] ${SPACING.card.compactPadding} dark:border-gray-700 dark:bg-gray-700`}>
           <div className="flex items-center justify-between mb-3">
             <p className={`${TYPOGRAPHY.caption} font-semibold text-[var(--text-soft)] uppercase tracking-wide dark:text-[var(--text-subtle)]`}>Last Analysis</p>
             <span className={`${BORDER_RADIUS.tag} px-2 py-0.5 ${TYPOGRAPHY.caption} font-semibold ${risk.badge}`}>
@@ -122,7 +122,7 @@ function AnalysisProjectCard({
           </p>
         </div>
       ) : (
-        <div className="mx-6 mb-4 rounded-xl border border-dashed border-[var(--border-primary)] bg-[var(--bg-section)]/50 px-4 py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
+        <div className="mx-3 sm:mx-6 mb-3 sm:mb-4 rounded-xl border border-dashed border-[var(--border-primary)] bg-[var(--bg-section)]/50 px-3 sm:px-4 py-2 sm:py-3 text-center dark:border-gray-600 dark:bg-gray-700/50">
           <p className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">No analysis run yet</p>
         </div>
       )}
@@ -197,10 +197,10 @@ export function AnalysisPage() {
   const analyzedCount = Object.values(analysisMap).filter(Boolean).length
 
   return (
-    <div className="h-screen bg-[var(--bg-page)] flex flex-col dark:bg-gray-900">
-  <div className={`w-full ${SPACING.page.padding} pt-10 pb-4`}>
+    <div className="min-h-screen bg-[var(--bg-page)] flex flex-col dark:bg-gray-900">
+  <div className={`w-full ${SPACING.page.padding} pt-6 sm:pt-10 pb-4 overflow-x-hidden`}>
 
-<div className="sticky top-0 z-30 bg-[var(--bg-page)] py-4 flex items-start justify-between gap-4 border-b border-[var(--border-primary)] dark:bg-gray-900 dark:border-gray-700">
+<div className="sticky top-0 z-30 bg-[var(--bg-page)] py-3 sm:py-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 border-b border-[var(--border-primary)] dark:bg-gray-900 dark:border-gray-700 -mx-4 sm:mx-0 px-4 sm:px-0">
   
   {/* LEFT SIDE */}
   <div>
@@ -217,10 +217,10 @@ export function AnalysisPage() {
   </div>
 
   {/* RIGHT SIDE — SAME FILTER UI */}
-  <div className="flex flex-wrap items-center justify-end gap-3 min-w-[420px]">
+  <div className="flex flex-col sm:flex-row sm:flex-nowrap items-stretch sm:items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto">
 
     {/* SEARCH (slightly wider + left spacing fix) */}
-    <div className="relative flex-1 min-w-56">
+    <div className="relative w-full sm:flex-none sm:w-[200px] md:w-[240px]">
       <svg
         className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-subtle)] dark:text-[var(--text-soft)]"
         fill="none"
@@ -244,7 +244,7 @@ export function AnalysisPage() {
     <select
       value={statusFilter}
       onChange={(e) => setStatusFilter(e.target.value as any)}
-      className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+      className={`w-full sm:w-auto ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
     >
       <option value={ALL}>All Statuses</option>
       {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
@@ -256,7 +256,7 @@ export function AnalysisPage() {
     <select
       value={typeFilter}
       onChange={(e) => setTypeFilter(e.target.value as any)}
-      className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+      className={`w-full sm:w-auto ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
     >
       <option value={ALL}>All Types</option>
       {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
@@ -272,7 +272,7 @@ export function AnalysisPage() {
           setStatusFilter(ALL)
           setTypeFilter(ALL)
         }}
-        className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
+        className={`w-full sm:w-auto ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
       >
         Clear
       </button>
@@ -281,12 +281,24 @@ export function AnalysisPage() {
 </div>
           
         {/* How it works */}
-        <div className={`${SPACING.section.marginTop} ${BORDER_RADIUS.card} border border-indigo-100 bg-indigo-50/60 ${SPACING.page.padding} py-6 dark:border-indigo-800 dark:bg-indigo-900/20`}>
-  <p className={`mb-5 ${TYPOGRAPHY.caption} font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-400`}>
+       <div
+  className={`${SPACING.section.marginTop} ${BORDER_RADIUS.card}
+  border border-[var(--border-primary)]
+  bg-[var(--bg-card)]
+  p-4 sm:p-6
+  dark:border-gray-700
+  dark:bg-gray-800`}
+>
+ <p
+  className={`mb-3 sm:mb-5 ${TYPOGRAPHY.caption}
+  font-semibold uppercase tracking-wide
+  text-[var(--color-primary)]
+  dark:text-indigo-400`}
+>
     How it works
   </p>
 
-  <div className={`grid gap-5 sm:grid-cols-3 ${SPACING.section.gap}`}>
+  <div className={`grid gap-3 sm:gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
     <Step
       number={1}
       title="Define your scope"
@@ -311,7 +323,7 @@ export function AnalysisPage() {
 
           {/* Loading skeletons */}
           {loading && (
-            <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
+            <div className={`grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
               {[1, 2, 3].map((i) => (
                 <CardSkeleton key={i} />
               ))}
@@ -334,12 +346,12 @@ export function AnalysisPage() {
           {/* Projects grid */}
           {!loading && projects.length > 0 && (
             <>
-              <p className={`mb-4 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
+              <p className={`mb-3 sm:mb-4 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                 {analyzedCount > 0
                   ? `${analyzedCount} project${analyzedCount === 1 ? '' : 's'} with past results — hover "Report" to revisit, or re-run the analysis`
                   : 'Click "Run AI Analysis" on any project to get started'}
               </p>
-              <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
+              <div className={`grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
                 {filteredProjects.map((project) => (
                   <AnalysisProjectCard
                     key={project.id}

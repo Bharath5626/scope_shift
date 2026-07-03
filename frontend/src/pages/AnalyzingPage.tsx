@@ -119,8 +119,8 @@ export function AnalyzingPage() {
   }, [projectId])
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
-      <div className="relative overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm w-full max-w-md px-10 py-12 text-center dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+    <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8 dark:bg-gray-900">
+      <div className="relative overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm w-full max-w-md px-6 sm:px-10 py-8 sm:py-12 text-center dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
 
         {/* Decorative left accent */}
         <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-indigo-400 to-violet-600 rounded-l-2xl" />

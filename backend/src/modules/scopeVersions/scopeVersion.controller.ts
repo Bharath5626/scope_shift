@@ -5,9 +5,10 @@ import { asyncHandler } from "../../utils/asyncHandler";
 export const createScopeVersion = asyncHandler(
   async (req: Request, res: Response) => {
     const scopeVersion =
-      await ScopeVersionService.createScopeVersion(
-        req.body
-      );
+      await ScopeVersionService.createScopeVersion({
+        ...req.body,
+        userId: req.user!.id,
+      });
 
     res.status(201).json({
       success: true,
@@ -22,7 +23,8 @@ export const getScopeVersionsByProject = asyncHandler(
 
     const versions =
       await ScopeVersionService.getScopeVersionsByProject(
-        projectId
+        projectId,
+        req.user!.id
       );
 
     res.json({
@@ -36,7 +38,8 @@ export const getScopeVersionById = asyncHandler(
   async (req: Request, res: Response) => {
     const version =
       await ScopeVersionService.getScopeVersionById(
-        req.params.id as string
+        req.params.id as string,
+        req.user!.id
       );
 
     res.json({
@@ -49,7 +52,8 @@ export const getScopeVersionById = asyncHandler(
 export const deleteScopeVersion = asyncHandler(
   async (req: Request, res: Response) => {
     await ScopeVersionService.deleteScopeVersion(
-          req.params.id as string
+          req.params.id as string,
+          req.user!.id
     );
 
     res.json({

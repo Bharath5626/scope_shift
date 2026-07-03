@@ -36,8 +36,22 @@ cron.schedule("*/10 * * * *", async () => {
   }
 });
 
-export const getAnalysesByProject = async (projectId: string) => {
+export const getAnalysesByProject = async (projectId: string, userId: string) => {
   try {
+    // Verify project ownership
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     return prisma.analysis.findMany({
       where: { projectId },
       orderBy: { createdAt: "desc" },
@@ -47,8 +61,22 @@ export const getAnalysesByProject = async (projectId: string) => {
   }
 };
 
-export const getLatestAnalysis = async (projectId: string) => {
+export const getLatestAnalysis = async (projectId: string, userId: string) => {
   try {
+    // Verify project ownership
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     return prisma.analysis.findFirst({
       where: { projectId },
       orderBy: { createdAt: "desc" },
@@ -101,6 +129,22 @@ export const createAnalysis = async (data: {
 }) => {
   const startTime = Date.now();
   logDatabaseTransactionStart('createAnalysis', data.projectId);
+
+  // Verify project ownership if userId is provided
+  if (data.userId) {
+    const project = await prisma.project.findFirst({
+      where: {
+        id: data.projectId,
+        createdById: data.userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found or you don't have permission") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+  }
 
   // Generate analysis hash from feature estimates for duplicate detection
   const analysisHash = data.featureEstimates
@@ -263,8 +307,24 @@ export const createAnalysis = async (data: {
 };
 
 
-export const deleteAnalysis = async (id: string) => {
+export const deleteAnalysis = async (id: string, userId: string) => {
   try {
+    // Verify analysis ownership through project relationship
+    const analysis = await prisma.analysis.findFirst({
+      where: {
+        id,
+        project: {
+          createdById: userId,
+        },
+      },
+    });
+
+    if (!analysis) {
+      const error = new Error("Analysis not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     return prisma.analysis.delete({ where: { id } });
   } catch (error) {
     throw handleDatabaseError(error);

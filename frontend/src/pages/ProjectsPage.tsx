@@ -8,10 +8,10 @@ export function ProjectsPage() {
     <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
 
       {/* Page container */}
-      <div className="mx-auto max-w-6xl px-8 py-10">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
 
         {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-[var(--text-primary)] dark:text-gray-100">
               Projects
@@ -30,11 +30,11 @@ export function ProjectsPage() {
         </div>
 
         {/* Content */}
-        <div className="mt-10">
+        <div className="mt-6 sm:mt-10">
 
           {/* Empty state */}
           {projects.length === 0 ? (
-            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-14 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-8 sm:p-14 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                 📁
               </div>
@@ -56,7 +56,7 @@ export function ProjectsPage() {
             </div>
           ) : (
             /* Grid */
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 
               {projects.map((project) => (
                 <Link

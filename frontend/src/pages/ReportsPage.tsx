@@ -59,8 +59,8 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
-        <div className="w-full px-8 py-10 space-y-8">
-          <div className="flex flex-col gap-4 border-b border-[var(--border-primary)] pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+        <div className={`w-full ${SPACING.page.padding} py-6 sm:py-10 space-y-6 sm:space-y-8`}>
+          <div className="flex flex-col gap-3 sm:gap-4 border-b border-[var(--border-primary)] pb-4 sm:pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
             <div className="space-y-2">
               <LoadingSkeleton className="h-8 w-48" />
               <LoadingSkeleton className="h-4 w-64" />
@@ -70,7 +70,7 @@ const [riskFilter, setRiskFilter] = useState<'all' | 'Low' | 'Medium' | 'High'>(
               <LoadingSkeleton className="h-10 w-32 rounded-xl" />
             </div>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={`grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
             {[1, 2, 3].map((i) => (
               <CardSkeleton key={i} />
             ))}
@@ -135,11 +135,11 @@ const matchesRisk =
 })
  return (
   <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
-    <div className={`w-full ${SPACING.page.padding} py-10 space-y-8`}>
+    <div className={`w-full ${SPACING.page.padding} pt-6 sm:pt-10 pb-4 overflow-x-hidden`}>
 
       {/* HEADER + SEARCH ROW */}
 {/* HEADER + FILTERS */}
-<div className="flex flex-col gap-4 border-b border-[var(--border-primary)] pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700">
+<div className="sticky top-0 z-10 flex flex-col gap-3 sm:gap-4 border-b border-[var(--border-primary)] bg-[var(--bg-page)] pb-4 sm:pb-6 sm:flex-row sm:items-center sm:justify-between dark:bg-gray-900 dark:border-gray-700 -mx-4 sm:mx-0 px-4 sm:px-0">
 
   {/* LEFT TITLE */}
   <div>
@@ -152,7 +152,7 @@ const matchesRisk =
   </div>
 
   {/* RIGHT CONTROLS */}
-  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:items-center">
+  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto sm:items-center">
 
     {/* SEARCH (slightly left aligned, not full right stick) */}
     <div className="relative w-full sm:w-[260px]">
@@ -184,7 +184,7 @@ const matchesRisk =
     <select
   value={riskFilter}
   onChange={(e) => setRiskFilter(e.target.value as any)}
-  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+  className={`w-full sm:w-auto ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
 >
   <option value="all">All Risk</option>
   <option value="Low">Low Risk</option>
@@ -196,7 +196,7 @@ const matchesRisk =
     {filteredProjects.length > 0 && (
       <button
         onClick={handleExportCSV}
-        className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+        className={`w-full sm:w-auto flex items-center justify-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
         title="Export to CSV"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -212,7 +212,7 @@ const matchesRisk =
       setSearch('')
       setRiskFilter('all')
     }}
-    className={`${TYPOGRAPHY.body} font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300`}
+    className={`w-full sm:w-auto ${TYPOGRAPHY.body} font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300`}
   >
     Clear filters
   </button>
@@ -221,7 +221,7 @@ const matchesRisk =
  
 </div>
       {/* CONTENT */}
-
+<div className="mt-6 sm:mt-10">
       {projects.length === 0 ? (
         <EmptyState
           title="No reports yet"
@@ -233,7 +233,7 @@ const matchesRisk =
           size="md"
         />
       ) : (
-        <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
+        <div className={`grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
           {filteredProjects.map((project) => {
             const analysis = project.analyses[0]
             const risk = (analysis?.riskLevel ?? 'Medium') as RiskLevel
@@ -267,7 +267,7 @@ const matchesRisk =
                 )}
 
                 {analysis && (
-                  <div className={`mt-4 grid grid-cols-3 gap-3 ${SPACING.section.gap}`}>
+                  <div className={`mt-3 sm:mt-4 grid grid-cols-3 gap-2 sm:gap-3 ${SPACING.section.gap}`}>
                     <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
                       <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Scope Score</p>
                       <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
@@ -291,7 +291,7 @@ const matchesRisk =
                   </div>
                 )}
 
-                <div className={`mt-4 flex items-center justify-between pt-4 border-t border-[var(--border-primary)] dark:border-gray-700`}>
+                <div className={`mt-3 sm:mt-4 flex items-center justify-between pt-3 sm:pt-4 border-t border-[var(--border-primary)] dark:border-gray-700`}>
                   <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                     Report created on {formatDate(analysis?.createdAt || project.createdAt)}
                   </p>
@@ -301,6 +301,7 @@ const matchesRisk =
           })}
         </div>
       )}
+      </div>
 
     </div>
   </div>

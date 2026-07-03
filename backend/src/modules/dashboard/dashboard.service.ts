@@ -1,8 +1,23 @@
 import prisma from "../../config/database";
 
 export const getDashboard = async (
-  projectId: string
+  projectId: string,
+  userId: string
 ) => {
+  // Verify project ownership
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      createdById: userId,
+    },
+  });
+
+  if (!project) {
+    const error = new Error("Project not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
+
   const analyses = await prisma.analysis.findMany({
     where: {
       projectId,
@@ -25,8 +40,11 @@ export const getDashboard = async (
   };
 };
 
-export const getOverallDashboardStats = async () => {
+export const getOverallDashboardStats = async (userId: string) => {
   const projects = await prisma.project.findMany({
+    where: {
+      createdById: userId,
+    },
     include: {
       analyses: true,
     },

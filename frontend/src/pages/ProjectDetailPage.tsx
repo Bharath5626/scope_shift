@@ -95,7 +95,7 @@ export function ProjectDetailPage() {
     <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900`}>
       <div className={`max-w-6xl mx-auto space-y-6 ${SPACING.section.gap}`}>
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <button
               onClick={() => navigate('/history')}
@@ -109,7 +109,7 @@ export function ProjectDetailPage() {
             <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>{project.name}</h1>
             <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{project.description || 'No description'}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
               className={`inline-flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
@@ -141,7 +141,7 @@ export function ProjectDetailPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-4 ${SPACING.section.gap}`}>
+        <div className={`grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4 ${SPACING.section.gap}`}>
           <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
             <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Status</p>
             <p className={`mt-1 text-sm font-semibold ${statusStyles[project.status]}`}>
@@ -175,7 +175,7 @@ export function ProjectDetailPage() {
         </div>
 
         {/* Project Details */}
-        <div className={`grid gap-6 lg:grid-cols-2 ${SPACING.section.gap}`}>
+        <div className={`grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 ${SPACING.section.gap}`}>
           {/* Information */}
           <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800`}>
             <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Project Information</h2>
@@ -204,7 +204,7 @@ export function ProjectDetailPage() {
             <h2 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Latest Analysis</h2>
             {latestAnalysis ? (
               <div className={`mt-4 space-y-4 ${SPACING.section.gap}`}>
-                <div className={`grid grid-cols-2 gap-4 ${SPACING.section.gap}`}>
+                <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${SPACING.section.gap}`}>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Scope Increase</p>
                     <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.scopeIncreasePercent}%</p>
@@ -316,7 +316,7 @@ export function ProjectDetailPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className={`${BORDER_RADIUS.modal} border border-[var(--border-primary)] bg-white ${SPACING.card.padding} shadow-lg dark:border-gray-700 dark:bg-gray-800 max-w-md w-full mx-auto`}>
             <h3 className={`${TYPOGRAPHY.sectionHeader} text-[var(--text-primary)] dark:text-gray-100`}>Delete Project</h3>
             <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>

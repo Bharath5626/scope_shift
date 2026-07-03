@@ -41,12 +41,12 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const getProjects = asyncHandler(async (req: Request, res: Response) => {
-  const projects = await ProjectService.getProjects();
+  const projects = await ProjectService.getProjects(req.user!.id);
   res.json({ success: true, data: projects });
 });
 
 export const getProjectById = asyncHandler(async (req: Request, res: Response) => {
-  const project = await ProjectService.getProjectById(req.params.id);
+  const project = await ProjectService.getProjectById(req.params.id, req.user!.id);
   if (!project) {
     return res.status(404).json({ success: false, message: "Project not found" });
   }
@@ -59,12 +59,12 @@ export const updateProject = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const deleteProject = asyncHandler(async (req: Request, res: Response) => {
-  await ProjectService.deleteProject(req.params.id);
+  await ProjectService.deleteProject(req.params.id, req.user!.id);
   res.json({ success: true, message: "Project deleted successfully" });
 });
 
-export const getAnalyzedProjects = asyncHandler(async (_req: Request, res: Response) => {
-  const projects = await ProjectService.getAnalyzedProjects();
+export const getAnalyzedProjects = asyncHandler(async (req: Request, res: Response) => {
+  const projects = await ProjectService.getAnalyzedProjects(req.user!.id);
   res.json({ success: true, data: projects });
 });
 

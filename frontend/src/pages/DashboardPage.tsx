@@ -100,7 +100,7 @@ const sortedProjects = dashboardStats?.recentProjects ?? [...projects]
       //   </Link>
       // }
     >
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <StatsCard label="Total Projects" value={totalProjects} icon={<FolderIcon />} accent="primary" />
         <StatsCard label="Active Projects" value={activeProjects} icon={<ActiveIcon />} accent="success" />
         <StatsCard label="Draft Projects" value={draftProjects} icon={<DraftIcon />} accent="warning" />
@@ -118,8 +118,8 @@ label="Completed Projects"
 />
       </div>
 
-      <section className="mt-8">
-        <div className="mb-6 flex items-center justify-between">
+      <section className="mt-6 sm:mt-8">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Recent Projects</h2>
           <Link
   to="/history"
@@ -146,22 +146,22 @@ label="Completed Projects"
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {sortedProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         )}
       </section>
-     <section className="mt-8">
-  <h2 className="mb-6 text-lg font-semibold text-[var(--text-primary)]">
+     <section className="mt-6 sm:mt-8">
+  <h2 className="mb-4 sm:mb-6 text-lg font-semibold text-[var(--text-primary)]">
     Scope Health Analytics
   </h2>
 
-  <div className="grid gap-6 lg:grid-cols-2">
+  <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
     {/* Health Score */}
-    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm">
+      <div className="mb-3 sm:mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-[var(--text-primary)]">Scope Health Score</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${
           (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
@@ -174,8 +174,8 @@ label="Completed Projects"
         </span>
       </div>
 
-      <div className="flex items-center gap-6">
-        <div className="relative flex h-32 w-32 items-center justify-center">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-4">
+        <div className="relative flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center mx-auto sm:mx-0">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
             <path
               className="text-gray-100"
@@ -235,8 +235,8 @@ label="Completed Projects"
     </div>
 
     {/* Risk Distribution */}
-    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
-      <h3 className="mb-4 font-semibold text-[var(--text-primary)]">Risk Distribution</h3>
+    <div className="rounded-2xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm">
+      <h3 className="mb-3 sm:mb-4 font-semibold text-[var(--text-primary)]">Risk Distribution</h3>
 
 {!dashboardStats || dashboardStats.riskDistribution.total === 0 ? (
   <div className="flex h-40 items-center justify-center">
@@ -294,9 +294,9 @@ label="Completed Projects"
   </div>
 </section>
 
-<section className="mt-8">
-  <div className="rounded-3xl border border-[var(--border-primary)] bg-white p-6 shadow-sm">
-    <div className="mb-6 flex items-center justify-between">
+<section className="mt-6 sm:mt-8">
+  <div className="rounded-3xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm">
+    <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
       <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Upcoming Deadlines
       </h2>
@@ -322,9 +322,9 @@ label="Completed Projects"
           return (
             <div
               key={project.id}
-              className="flex items-center justify-between rounded-2xl border border-[var(--border-primary)] p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-[var(--border-primary)] p-3 sm:p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
             >
-              <div>
+              <div className="text-center sm:text-left">
                 <h3 className="font-medium text-[var(--text-primary)]">
                   {project.name}
                 </h3>
@@ -335,7 +335,7 @@ label="Completed Projects"
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-end">
                 {!hasStarted && project.startDate && (
                   <span className="text-xs text-[var(--text-soft)]">
                     Starts {new Date(project.startDate).toLocaleDateString()}

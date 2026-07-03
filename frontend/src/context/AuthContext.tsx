@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -20,6 +21,7 @@ interface AuthContextValue {
   user: AuthUser | null
   token: string | null
   isAuthenticated: boolean
+  isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => void
@@ -56,9 +58,17 @@ function loadStoredAuth(): { token: string | null; user: AuthUser | null } {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const stored = loadStoredAuth()
-  const [token, setToken] = useState<string | null>(stored.token)
-  const [user, setUser] = useState<AuthUser | null>(stored.user)
+  const [isLoading, setIsLoading] = useState(true)
+  const [token, setToken] = useState<string | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
+
+  // Initialize auth state from localStorage
+  useEffect(() => {
+    const stored = loadStoredAuth()
+    setToken(stored.token)
+    setUser(stored.user)
+    setIsLoading(false)
+  }, [])
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await apiFetch<{ token: string }>('/auth/login', {
@@ -70,6 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('scopeai_token', res.token)
     setToken(res.token)
     setUser(decoded)
+    // Dispatch event to notify ThemeContext to reload theme
+    window.dispatchEvent(new Event('user-login'))
   }, [])
 
   const register = useCallback(async (name: string, email: string, password: string) => {
@@ -91,8 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, token, isAuthenticated: !!user, login, register, logout, updateUser }),
-    [user, token, login, register, logout, updateUser]
+    () => ({ user, token, isAuthenticated: !!user, isLoading, login, register, logout, updateUser }),
+    [user, token, isLoading, login, register, logout, updateUser]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

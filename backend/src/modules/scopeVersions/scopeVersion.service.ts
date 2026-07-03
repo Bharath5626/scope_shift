@@ -5,6 +5,7 @@ export const createScopeVersion = async (data: {
   versionNumber: number;
   title: string;
   description?: string;
+  userId: string;
 
   features?: {
     title: string;
@@ -12,7 +13,21 @@ export const createScopeVersion = async (data: {
     priority?: string;
   }[];
 }) => {
-  const { features = [], ...scopeVersionData } = data;
+  const { features = [], userId, ...scopeVersionData } = data;
+
+  // Verify project ownership
+  const project = await prisma.project.findFirst({
+    where: {
+      id: data.projectId,
+      createdById: userId,
+    },
+  });
+
+  if (!project) {
+    const error = new Error("Project not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
 
   return prisma.scopeVersion.create({
     data: {
@@ -29,8 +44,23 @@ export const createScopeVersion = async (data: {
   });
 };
 export const getScopeVersionsByProject = async (
-  projectId: string
+  projectId: string,
+  userId: string
 ) => {
+  // Verify project ownership
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      createdById: userId,
+    },
+  });
+
+  if (!project) {
+    const error = new Error("Project not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
+
   return prisma.scopeVersion.findMany({
     where: {
       projectId,
@@ -42,18 +72,68 @@ export const getScopeVersionsByProject = async (
 };
 
 export const getScopeVersionById = async (
-  id: string
+  id: string,
+  userId: string
 ) => {
-  return prisma.scopeVersion.findUnique({
+  const scopeVersion = await prisma.scopeVersion.findUnique({
     where: {
       id,
     },
+    include: {
+      project: {
+        select: {
+          createdById: true,
+        },
+      },
+    },
   });
+
+  if (!scopeVersion) {
+    const error = new Error("Scope version not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Verify project ownership
+  if (scopeVersion.project.createdById !== userId) {
+    const error = new Error("You don't have permission to access this scope version") as Error & { statusCode: number };
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return scopeVersion;
 };
 
 export const deleteScopeVersion = async (
-  id: string
+  id: string,
+  userId: string
 ) => {
+  const scopeVersion = await prisma.scopeVersion.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      project: {
+        select: {
+          createdById: true,
+        },
+      },
+    },
+  });
+
+  if (!scopeVersion) {
+    const error = new Error("Scope version not found") as Error & { statusCode: number };
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Verify project ownership
+  if (scopeVersion.project.createdById !== userId) {
+    const error = new Error("You don't have permission to delete this scope version") as Error & { statusCode: number };
+    error.statusCode = 403;
+    throw error;
+  }
+
   return prisma.scopeVersion.delete({
     where: {
       id,

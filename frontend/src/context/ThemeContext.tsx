@@ -6,12 +6,14 @@ type Theme = 'light' | 'dark';
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
   loading: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
   toggleTheme: () => {},
+  setTheme: () => {},
   loading: false,
 });
 
@@ -24,7 +26,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
   const [loading, setLoading] = useState(false);
 
-  // Load theme from database on mount
+  // Load theme from database on mount and when token changes
   useEffect(() => {
     const loadThemeFromDB = async () => {
       try {
@@ -35,15 +37,39 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setTheme(userProfile.theme);
             localStorage.setItem('theme', userProfile.theme);
           }
+        } else {
+          // No token, reset to light mode
+          setTheme('light');
+          localStorage.setItem('theme', 'light');
         }
       } catch (error) {
         console.error('Failed to load theme from database:', error);
-        // Fall back to localStorage theme
+        // If user not found or auth error, clear token and fall back to localStorage
+        const err = error as any;
+        const errorMessage = err.message || err.toString() || '';
+        const isAuthError = err.status === 401 || err.status === 404;
+        const isUserNotFoundError = errorMessage === 'User not found' || errorMessage.includes('User not found');
+        
+        if (isAuthError || isUserNotFoundError) {
+          console.log('Clearing invalid token due to auth/user error:', errorMessage);
+          localStorage.removeItem('scopeai_token');
+          setTheme('light');
+          localStorage.setItem('theme', 'light');
+        }
+        // Fall back to localStorage theme for other errors
       }
     };
 
     loadThemeFromDB();
-  }, []);
+
+    // Listen for login event to reload theme
+    const handleLogin = () => {
+      loadThemeFromDB();
+    };
+
+    window.addEventListener('user-login', handleLogin);
+    return () => window.removeEventListener('user-login', handleLogin);
+  }, []); // Run on mount only - token changes handled by custom event
 
   // Apply theme to DOM
   useEffect(() => {
@@ -80,8 +106,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const setThemeDirectly = (newTheme: Theme) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, loading }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme: setThemeDirectly, loading }}>
       {children}
     </ThemeContext.Provider>
   );

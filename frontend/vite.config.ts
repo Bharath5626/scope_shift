@@ -12,7 +12,7 @@ export default defineConfig({
       '/api': {
 
         target: 'http://localhost:5000',
-        // target: 'http://172.20.5.248:3000',
+        // target: 'http://172.20.5.248:5000',
         changeOrigin: true,
       },
     },

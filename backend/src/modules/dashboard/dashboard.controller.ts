@@ -6,7 +6,8 @@ export const getDashboard = async (
   res: Response
 ) => {
   const data = await service.getDashboard(
-    req.params.projectId
+    req.params.projectId,
+    req.user!.id
   );
 
   res.json({
@@ -19,7 +20,7 @@ export const getOverallDashboardStats = async (
   req: Request,
   res: Response
 ) => {
-  const data = await service.getOverallDashboardStats();
+  const data = await service.getOverallDashboardStats(req.user!.id);
 
   res.json({
     success: true,

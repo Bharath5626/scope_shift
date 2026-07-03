@@ -7,6 +7,7 @@ import analysisRoutes from "../modules/analysis/analysis.routes";
 import aiRoutes from "../modules/ai/ai.routes";
 import dashboardRoutes from "../modules/dashboard/dashboard.routes";
 import userRoutes from "../modules/users/user.routes";
+import scopeVersionRoutes from "../modules/scopeVersions/scopeVersion.routes";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/projects/:projectId/features", featureRoutes);
 router.use("/projects/:projectId/analyses", analysisRoutes);
 router.use("/projects/:projectId", aiRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/scope-versions", scopeVersionRoutes);
 
 export default router;

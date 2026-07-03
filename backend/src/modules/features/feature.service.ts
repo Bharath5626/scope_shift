@@ -7,8 +7,22 @@ import {
 } from "../../utils/database-logging";
 import { createAuditLog } from "../auditLogs/auditLog.service";
 
-export const getFeaturesByProject = async (projectId: string, type?: string) => {
+export const getFeaturesByProject = async (projectId: string, userId: string, type?: string) => {
   try {
+    // Verify project ownership
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     return prisma.feature.findMany({
       where: { projectId, ...(type ? { type } : {}) },
       orderBy: { order: "asc" },
@@ -28,9 +42,23 @@ export const addFeature = async (
     type?: string;
     order?: number;
   },
-  userId?: string
+  userId: string
 ) => {
   try {
+    // Verify project ownership
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     const count = await prisma.feature.count({ where: { projectId } });
     const feature = await prisma.feature.create({
       data: {
@@ -62,28 +90,93 @@ export const updateFeature = async (
     priority: string;
     type: string;
     order: number;
-  }>
+  }>,
+  userId: string
 ) => {
   try {
+    // Verify feature's project ownership
+    const feature = await prisma.feature.findUnique({
+      where: { id },
+      select: { projectId: true },
+    });
+
+    if (!feature) {
+      const error = new Error("Feature not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const project = await prisma.project.findFirst({
+      where: {
+        id: feature.projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("You don't have permission to update this feature") as Error & { statusCode: number };
+      error.statusCode = 403;
+      throw error;
+    }
+
     return prisma.feature.update({ where: { id }, data });
   } catch (error) {
     throw handleDatabaseError(error);
   }
 };
 
-export const deleteFeature = async (id: string) => {
+export const deleteFeature = async (id: string, userId: string) => {
   try {
+    // Verify feature's project ownership
+    const feature = await prisma.feature.findUnique({
+      where: { id },
+      select: { projectId: true },
+    });
+
+    if (!feature) {
+      const error = new Error("Feature not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const project = await prisma.project.findFirst({
+      where: {
+        id: feature.projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("You don't have permission to delete this feature") as Error & { statusCode: number };
+      error.statusCode = 403;
+      throw error;
+    }
+
     return prisma.feature.delete({ where: { id } });
   } catch (error) {
     throw handleDatabaseError(error);
   }
 };
 
-export const reorderFeatures = async (projectId: string, orderedIds: string[]) => {
+export const reorderFeatures = async (projectId: string, userId: string, orderedIds: string[]) => {
   const startTime = Date.now();
   logDatabaseTransactionStart('reorderFeatures', projectId);
 
   try {
+    // Verify project ownership
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        createdById: userId,
+      },
+    });
+
+    if (!project) {
+      const error = new Error("Project not found") as Error & { statusCode: number };
+      error.statusCode = 404;
+      throw error;
+    }
+
     const updates = orderedIds.map((id, index) =>
       prisma.feature.update({ where: { id }, data: { order: index } })
     );

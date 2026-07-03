@@ -4,7 +4,7 @@ import { createAuditLog, getAuditLogsByProjectId } from "./auditLog.service";
 export const getProjectAuditLogs = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     console.log('Fetching audit logs for projectId:', id);
     console.log('Full req.params:', req.params);
 
@@ -15,10 +15,10 @@ export const getProjectAuditLogs = async (req: Request, res: Response) => {
       });
     }
 
-    const auditLogs = await getAuditLogsByProjectId(id);
-    
+    const auditLogs = await getAuditLogsByProjectId(id, req.user!.id);
+
     console.log('Found audit logs:', auditLogs.length);
-    
+
     // Log each audit log's features for debugging
     auditLogs.forEach((log: any, idx) => {
       console.log(`Log ${idx + 1} (${log.action}):`, {
