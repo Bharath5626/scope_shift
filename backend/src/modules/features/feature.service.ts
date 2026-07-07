@@ -9,11 +9,14 @@ import { createAuditLog } from "../auditLogs/auditLog.service";
 
 export const getFeaturesByProject = async (projectId: string, userId: string, type?: string) => {
   try {
-    // Verify project ownership
+    // Verify project ownership or team membership
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        createdById: userId,
+        OR: [
+          { createdById: userId },
+          { projectMembers: { some: { userId } } },
+        ],
       },
     });
 

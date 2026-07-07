@@ -9,6 +9,7 @@ export const createProjectSchema = z.object({
   type: projectTypeEnum,
   deadline: z.string().optional(),
   status: projectStatusEnum.optional(),
+  teamMembers: z.array(z.string()).optional(),
 });
 
 export const updateProjectSchema = z.object({
@@ -17,4 +18,5 @@ export const updateProjectSchema = z.object({
   type: projectTypeEnum.optional(),
   deadline: z.string().optional(),
   status: projectStatusEnum.optional(),
+  teamMembers: z.array(z.string()).optional(),
 });

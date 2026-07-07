@@ -8,10 +8,10 @@ interface StatsCardProps {
 }
 
 const accentStyles = {
-  primary: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-  success: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-  warning: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
-  danger: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+  primary: 'bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]',
+  success: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
+  warning: 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400',
+  danger: 'bg-[var(--color-danger-bg)] text-[var(--color-danger)] dark:bg-[var(--color-danger)]/20 dark:text-[var(--color-danger-light)]',
 }
 
 export function StatsCard({
@@ -21,7 +21,7 @@ export function StatsCard({
   accent = 'primary',
 }: StatsCardProps) {
   return (
-    <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:shadow-gray-900/30">
+    <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all duration-200 hover:shadow-md hover:border-[var(--color-primary)]/50 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-surface)] dark:hover:border-[var(--color-primary-light)]">
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{label}</p>

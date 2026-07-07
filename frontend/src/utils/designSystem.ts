@@ -1,16 +1,16 @@
 /**
  * Design System Constants
- * Centralized design tokens for consistent UI across the application
+ * Enterprise-grade design tokens for corporate professional UI
  */
 
-// Border Radius
+// Border Radius - Refined corporate aesthetic
 export const BORDER_RADIUS = {
-  card: 'rounded-2xl',
-  button: 'rounded-xl',
-  input: 'rounded-xl',
+  card: 'rounded-xl',
+  button: 'rounded-lg',
+  input: 'rounded-md',
   modal: 'rounded-2xl',
   tag: 'rounded-full',
-  small: 'rounded-lg',
+  small: 'rounded-md',
 } as const
 
 // Spacing
@@ -62,17 +62,18 @@ export const ICON_SIZE = {
   large: 'h-8 w-8',
 } as const
 
-// Button Variants
+// Button Variants - New Teal/Coral palette
 export const BUTTON_VARIANTS = {
-  primary: 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-50 text-white',
-  secondary: 'border border-[var(--border-primary)] bg-[var(--bg-surface)] hover:bg-[var(--bg-section)] disabled:opacity-50 text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600',
-  danger: 'bg-[var(--color-danger)] hover:bg-red-700 disabled:opacity-50 text-white',
-  ghost: 'text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-gray-200 dark:hover:bg-gray-700',
-  success: 'bg-[var(--color-success)] hover:bg-green-700 disabled:opacity-50 text-white',
+  primary: 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] disabled:opacity-50 text-white shadow-sm hover:shadow-md transition-all',
+  secondary: 'border border-[var(--border-primary)] bg-[var(--bg-surface)] hover:bg-[var(--bg-hover)] disabled:opacity-50 text-[var(--text-secondary)] dark:border-[var(--border-secondary)] dark:bg-[var(--bg-surface)] dark:text-gray-200 dark:hover:bg-[var(--bg-hover)] transition-all',
+  danger: 'bg-[var(--color-danger)] hover:bg-[var(--color-danger-light)] disabled:opacity-50 text-white shadow-sm transition-all',
+  ghost: 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] dark:text-gray-200 dark:hover:bg-[var(--bg-hover)] transition-all',
+  success: 'bg-[var(--color-success)] hover:bg-[var(--color-success-light)] disabled:opacity-50 text-white shadow-sm transition-all',
+  accent: 'bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] disabled:opacity-50 text-white shadow-sm transition-all',
 } as const
 
 // Focus Ring
-export const FOCUS_RING = 'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:focus:ring-indigo-400'
+export const FOCUS_RING = 'focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2'
 
 // Transition
 export const TRANSITION = 'transition-all duration-200'

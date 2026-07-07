@@ -18,6 +18,8 @@ const ReportDetailPage = lazy(() => import('../pages/ReportDetailPage').then(m =
 const ProjectHistoryPage = lazy(() => import('../pages/ProjectHistoryPage').then(m => ({ default: m.ProjectHistoryPage })))
 const AnalysisPage = lazy(() => import('../pages/AnalysisPage').then(m => ({ default: m.AnalysisPage })))
 const UpcomingDeadlinesPage = lazy(() => import('../pages/UpcomingDeadlinesPage').then(m => ({ default: m.UpcomingDeadlinesPage })))
+const SharedProjectsPage = lazy(() => import('../pages/SharedProjectsPage').then(m => ({ default: m.SharedProjectsPage })))
+const SharedProjectDetailPage = lazy(() => import('../pages/SharedProjectDetailPage').then(m => ({ default: m.SharedProjectDetailPage })))
 
 function PageLoader() {
   return (
@@ -51,6 +53,8 @@ export function AppRouter() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/shared-projects" element={<SharedProjectsPage />} />
+          <Route path="/shared-projects/:projectId" element={<SharedProjectDetailPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/new" element={<CreateProjectPage />} />
           <Route path="/create-project" element={<CreateProjectPage />} />

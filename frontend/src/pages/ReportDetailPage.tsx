@@ -77,9 +77,9 @@ interface Project {
 }
 
 const RISK_COLORS: Record<string, { bg: string; text: string; badge: string; border: string }> = {
-  Low:    { bg: 'bg-green-50',  text: 'text-[var(--color-success)]',  badge: 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',  border: 'border-green-200 dark:border-green-800' },
-  Medium: { bg: 'bg-amber-50',  text: 'text-[var(--color-warning)]',  badge: 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400',  border: 'border-amber-200 dark:border-amber-800' },
-  High:   { bg: 'bg-red-50',    text: 'text-[var(--color-danger)]',    badge: 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',      border: 'border-red-200 dark:border-red-800' },
+  Low:    { bg: 'bg-green-50',  text: 'text-[var(--color-success)] dark:text-white',  badge: 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',  border: 'border-green-200 dark:border-green-800' },
+  Medium: { bg: 'bg-amber-50',  text: 'text-[var(--color-warning)] dark:text-white',  badge: 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400',  border: 'border-amber-200 dark:border-amber-800' },
+  High:   { bg: 'bg-red-50',    text: 'text-[var(--color-danger)] dark:text-white',    badge: 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',      border: 'border-red-200 dark:border-red-800' },
 }
 
 const COMPLEXITY_STROKE: Record<string, string> = {
@@ -138,7 +138,7 @@ function StatCard({ label, value, sub, color }: { label: string; value: string; 
   return (
     <div className="rounded-xl border border-[var(--border-primary)] bg-white px-5 py-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${color ?? 'text-indigo-700 dark:text-indigo-400'}`}>{value}</p>
+      <p className={`mt-1 text-2xl font-bold ${color ?? 'text-[var(--color-primary-dark)] dark:text-[var(--color-primary-light)]'}`}>{value}</p>
       {sub && <p className="mt-0.5 text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">{sub}</p>}
     </div>
   )
@@ -205,7 +205,7 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
             </div>
             <div className="h-2 w-full rounded-full bg-[var(--bg-section)] dark:bg-gray-700">
               <div
-                className="h-2 rounded-full bg-indigo-500 transition-all"
+                className="h-2 rounded-full bg-[var(--color-primary)] transition-all"
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -214,7 +214,7 @@ function EffortTab({ breakdown }: { breakdown: EffortBreakdown | null }) {
       })}
       <div className="border-t border-[var(--border-primary)] pt-4 flex items-center justify-between text-sm font-bold dark:border-gray-700">
         <span className="text-gray-800 dark:text-black">Total</span>
-        <span className="text-indigo-700 dark:text-indigo-400">{total} hrs</span>
+        <span className="text-[var(--color-primary-dark)] dark:text-[var(--color-primary-light)]">{total} hrs</span>
       </div>
     </div>
   )
@@ -386,7 +386,7 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'created':
-        return <span className="text-[var(--color-info)] dark:text-indigo-400">C</span>
+        return <span className="text-[var(--color-info)] dark:text-[var(--color-info-light)]">C</span>
       case 'updated':
         return <span className="text-[var(--color-warning)] dark:text-amber-400">U</span>
       case 'analysis_created':
@@ -394,7 +394,7 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
       case 'analysis_retrieved':
         return <span className="text-blue-600 dark:text-blue-400">R</span>
       case 'feature_added':
-        return <span className="text-purple-600 dark:text-purple-400">F</span>
+        return <span className="text-[var(--color-accent)] dark:text-[var(--color-accent-light)]">F</span>
       default:
         return <span className="text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{action.charAt(0).toUpperCase()}</span>
     }
@@ -430,13 +430,13 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
               <div className="flex items-center gap-4">
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                   log.action === 'created' 
-                    ? 'bg-indigo-100 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400'
+                    ? 'bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]'
                     : log.action === 'updated'
                     ? 'bg-amber-100 text-[var(--color-warning)] dark:bg-amber-900/30 dark:text-amber-400'
                     : log.action === 'analysis_created'
                     ? 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400'
                     : log.action === 'feature_added'
-                    ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                    ? 'bg-orange-100 text-[var(--color-accent)] dark:bg-orange-900/30 dark:text-[var(--color-accent-light)]'
                     : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                 }`}>
                   {getActionIcon(log.action)}
@@ -455,7 +455,7 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
               </div>
               <button
                 onClick={() => handleShowFeatures(log.id)}
-                className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600 transition hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50"
+                className="rounded-lg border border-[var(--color-primary)]/20 bg-[var(--color-primary-50)] px-4 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary-100)] dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)] dark:hover:bg-[var(--color-primary-dark)]/30"
               >
                 Features
               </button>
@@ -642,7 +642,7 @@ export function ReportDetailPage() {
     return (
       <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center dark:bg-gray-900">
         <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
           <p className="mt-3 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Loading report…</p>
         </div>
       </div>
@@ -689,7 +689,7 @@ export function ReportDetailPage() {
           <button
             onClick={handleExportPDF}
             disabled={exporting}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-700 hover:to-violet-800 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-[var(--color-primary-hover)] hover:to-[var(--color-primary-dark)] disabled:opacity-50"
           >
             {exporting ? (
               <>
@@ -718,7 +718,7 @@ export function ReportDetailPage() {
     <select
       value={activeTab}
       onChange={(e) => setActiveTab(e.target.value as Tab)}
-      className="w-full rounded-lg border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:border-gray-600"
+      className="w-full rounded-lg border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-white"
     >
       {TABS.map((tab) => (
         <option key={tab} value={tab}>
@@ -736,9 +736,9 @@ export function ReportDetailPage() {
         onClick={() => setActiveTab(tab)}
        className={`px-5 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition
   ${
-    activeTab === tab
-      ? 'border-[var(--color-primary)] text-white'
-      : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-primary)]'
+   activeTab === tab
+  ? 'border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary)] dark:text-white'
+  : 'border-transparent text-[var(--text-soft)] hover:text-[var(--text-primary)]'
   }
 `}
       >

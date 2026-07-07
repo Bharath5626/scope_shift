@@ -176,7 +176,7 @@ const matchesRisk =
   value={search}
   onChange={(e) => setSearch(e.target.value)}
   className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} ${SHADOW.card}
-             focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+             focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white`}
 />
     </div>
 
@@ -184,7 +184,7 @@ const matchesRisk =
     <select
   value={riskFilter}
   onChange={(e) => setRiskFilter(e.target.value as any)}
-  className={`w-full sm:w-auto ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+  className={`w-full sm:w-auto ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`}
 >
   <option value="all">All Risk</option>
   <option value="Low">Low Risk</option>
@@ -212,7 +212,7 @@ const matchesRisk =
       setSearch('')
       setRiskFilter('all')
     }}
-    className={`w-full sm:w-auto ${TYPOGRAPHY.body} font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300`}
+    className={`w-full sm:w-auto ${TYPOGRAPHY.body} font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]`}
   >
     Clear filters
   </button>
@@ -270,21 +270,21 @@ const matchesRisk =
                   <div className={`mt-3 sm:mt-4 grid grid-cols-3 gap-2 sm:gap-3 ${SPACING.section.gap}`}>
                     <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
                       <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Scope Score</p>
-                      <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
+                      <p className="mt-0.5 text-sm font-bold text-[var(--color-primary-dark)] dark:text-[var(--color-primary-light)]">
                         {analysis.complexityScore ?? Math.round(analysis.scopeIncreasePercent)}%
                       </p>
                     </div>
 
                     <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
                       <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Hours</p>
-                      <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
+                      <p className="mt-0.5 text-sm font-bold text-[var(--color-primary-dark)] dark:text-[var(--color-primary-light)]">
                         {analysis.additionalHours} hrs
                       </p>
                     </div>
 
                     <div className={`${BORDER_RADIUS.small} bg-[var(--bg-section)] px-3 py-2 text-center dark:bg-gray-700`}>
                       <p className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>Timeline</p>
-                      <p className="mt-0.5 text-sm font-bold text-indigo-700 dark:text-indigo-400">
+                      <p className="mt-0.5 text-sm font-bold text-[var(--color-primary-dark)] dark:text-[var(--color-primary-light)]">
                         {analysis.estimatedWeeks}w
                       </p>
                     </div>

@@ -7,6 +7,7 @@ import {
   sendPasswordOTP,
   resetPasswordWithOTP,
   uploadAvatar,
+  getAllUsers,
 } from "./user.service";
 
 interface AuthRequest extends Request {
@@ -97,6 +98,18 @@ export const resetPassword = asyncHandler(
     res.status(200).json({
       success: true,
       message: result.message,
+    });
+  }
+);
+
+export const getAllUsersList = asyncHandler(
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const currentUserId = req.user!.id;
+    const searchQuery = req.query.search as string | undefined;
+    const users = await getAllUsers(currentUserId, searchQuery);
+    res.status(200).json({
+      success: true,
+      data: users,
     });
   }
 );

@@ -15,9 +15,9 @@ const SectionCard = ({
   children: React.ReactNode
 }) => {
   return (
-    <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+    <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} ${SHADOW.card} dark:border-[var(--border-secondary)] dark:bg-[var(--bg-surface)]`}>
       <div className="mb-4">
-        <h3 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>{title}</h3>
+        <h3 className={`${TYPOGRAPHY.body} font-semibold text-[var(--text-primary)] dark:text-[var(--text-primary)]`}>{title}</h3>
         {description && <p className={`mt-1 ${TYPOGRAPHY.caption} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{description}</p>}
       </div>
       {children}
@@ -26,12 +26,12 @@ const SectionCard = ({
 }
 
 const inputCls =
-  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
+  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 ${TRANSITION} dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white dark:placeholder-[var(--text-subtle)]`
 
 const selectCls =
-  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3  pr-10 ${TYPOGRAPHY.body} text-[var(--text-secondary)] focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 appearance-none cursor-pointer ${TRANSITION} dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`
+  `w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-surface)] px-4 py-3  pr-10 ${TYPOGRAPHY.body} text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 appearance-none cursor-pointer ${TRANSITION} dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`
 
-const labelCls = `block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`
+const labelCls = `block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-[var(--text-muted)]`
 
 const TYPE_MAP: Record<string, 'landing_page' | 'chatbot' | 'saas' | 'ecommerce'> = {
   'Web App': 'saas',
@@ -119,7 +119,8 @@ export function CreateProjectPage() {
         selectedSkills: [] as string[],
         logoPreview: null as string | null,
         customProjectTypes: [] as string[],
-        customMethodologies: [] as string[]
+        customMethodologies: [] as string[],
+        teamMembers: [] as string[]
       }
     }
     
@@ -139,7 +140,8 @@ export function CreateProjectPage() {
           selectedSkills: formData.selectedSkills || [],
           logoPreview: formData.logoPreview || null,
           customProjectTypes: formData.customProjectTypes || [],
-          customMethodologies: formData.customMethodologies || []
+          customMethodologies: formData.customMethodologies || [],
+          teamMembers: formData.teamMembers || []
         }
       }
     } catch (err) {
@@ -159,7 +161,8 @@ export function CreateProjectPage() {
       selectedSkills: [] as string[],
       logoPreview: null as string | null,
       customProjectTypes: [] as string[],
-      customMethodologies: [] as string[]
+      customMethodologies: [] as string[],
+      teamMembers: [] as string[]
     }
   }
 
@@ -197,6 +200,40 @@ export function CreateProjectPage() {
   // Custom values state (initialized from draft)
   const [customProjectTypes, setCustomProjectTypes] = useState<string[]>(initialFormData.customProjectTypes)
   const [customMethodologies, setCustomMethodologies] = useState<string[]>(initialFormData.customMethodologies)
+
+  // Team members state
+  const [teamMembers, setTeamMembers] = useState<string[]>(initialFormData.teamMembers || [])
+  const [availableUsers, setAvailableUsers] = useState<any[]>([])
+  const [userSearchQuery, setUserSearchQuery] = useState('')
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const userDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Fetch available users
+  useEffect(() => {
+    if (!editProjectId) {
+      // Only fetch users for new projects
+      api.get('/users')
+        .then((response: any) => {
+          const users = Array.isArray(response) ? response : (response.data?.data || response.data || [])
+          setAvailableUsers(users)
+        })
+        .catch((err) => {
+          console.error('Failed to fetch users:', err)
+        })
+    }
+  }, [editProjectId])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Load project data if editing
   useEffect(() => {
@@ -240,10 +277,13 @@ export function CreateProjectPage() {
       methodology,
       workingHours,
       selectedSkills,
-      logoPreview
+      logoPreview,
+      customProjectTypes,
+      customMethodologies,
+      teamMembers
     }
     localStorage.setItem('createProjectDraft', JSON.stringify(formData))
-  }, [name, description, teamSize, deadline, startDate, projectType, methodology, workingHours, selectedSkills, logoPreview, editProjectId])
+  }, [name, description, teamSize, deadline, startDate, projectType, methodology, workingHours, selectedSkills, logoPreview, customProjectTypes, customMethodologies, teamMembers, editProjectId])
 
   // Track unsaved changes
   const handleFieldChange = (field?: string) => {
@@ -376,6 +416,7 @@ const handleCreate = async () => {
         methodology: methodology.trim() || null,
         workingHours: workingHours ? Number(workingHours) : null,
         logo: logoPreview,
+        teamMembers: teamMembers.length > 0 ? teamMembers : undefined,
       })
     } else {
       // Create new project
@@ -391,6 +432,7 @@ const handleCreate = async () => {
         methodology: methodology.trim() || null,
         workingHours: workingHours ? Number(workingHours) : null,
         logo: logoPreview,
+        teamMembers: teamMembers.length > 0 ? teamMembers : undefined,
       })
     }
 
@@ -427,10 +469,10 @@ const filteredSkills = SKILLS.filter(
 
   if (step === 'generating') {
     return (
-      <div className={`min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8 dark:bg-gray-900`}>
-        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-8 sm:p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-          <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-50 dark:bg-indigo-900/30`}>
-            <svg className={`h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
+      <div className={`min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8`}>
+        <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-8 sm:p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-[var(--border-secondary)] dark:bg-[var(--bg-surface)]`}>
+          <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-[var(--bg-accent-subtle)] dark:bg-indigo-900/30`}>
+            <svg className={`h-8 w-8 animate-spin text-[var(--color-primary)] dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -454,7 +496,7 @@ const filteredSkills = SKILLS.filter(
         {/* Header */}
         <div className={`sticky top-0 z-10 mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 bg-[var(--bg-page)] py-4 dark:bg-gray-900`}>
           <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-[var(--text-primary)]`}>
               {editProjectId ? 'Edit Project Details' : 'Create New Project'}
             </h1>
             <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
@@ -584,7 +626,7 @@ const filteredSkills = SKILLS.filter(
       {selectedSkills.map((skill) => (
         <span
           key={skill}
-          className={`flex items-center gap-1 ${BORDER_RADIUS.tag} bg-indigo-100 px-3 py-1 ${TYPOGRAPHY.body} text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400`}
+          className={`flex items-center gap-1 ${BORDER_RADIUS.tag} bg-[var(--color-primary-50)] px-3 py-1 ${TYPOGRAPHY.body} text-[var(--color-primary-dark)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]`}
         >
           {skill}
 
@@ -747,6 +789,110 @@ const filteredSkills = SKILLS.filter(
         }}
         min={startDate || new Date().toISOString().split('T')[0]}
       />
+    </div>
+
+    <div className="lg:col-span-3">
+      <label className={labelCls}>Team Members (Optional)</label>
+      <div className="relative" ref={userDropdownRef}>
+        <div className={`flex flex-wrap gap-2 ${BORDER_RADIUS.input} border p-3 min-h-[52px] border-[var(--border-primary)] dark:border-gray-600`}>
+          {teamMembers.map((memberId) => {
+            const user = availableUsers.find((u: any) => u.id === memberId)
+            return (
+              <span
+                key={memberId}
+                className={`flex items-center gap-2 ${BORDER_RADIUS.tag} bg-indigo-100 px-3 py-1 ${TYPOGRAPHY.body} text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400`}
+              >
+                {user?.profileImage && (
+                  <img
+                    src={user.profileImage}
+                    alt={user.name}
+                    className="h-5 w-5 rounded-full object-cover"
+                  />
+                )}
+                {user?.name || 'Unknown'}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTeamMembers(teamMembers.filter((id) => id !== memberId))
+                    handleFieldChange()
+                  }}
+                >
+                  ×
+                </button>
+              </span>
+            )
+          })}
+          <input
+            type="text"
+            value={userSearchQuery}
+            onChange={(e) => {
+              setUserSearchQuery(e.target.value)
+              setShowUserDropdown(true)
+            }}
+            onFocus={() => setShowUserDropdown(true)}
+            placeholder={teamMembers.length ? '' : 'Search team members...'}
+            className={`flex-1 min-w-[120px] outline-none ${TYPOGRAPHY.body}`}
+          />
+        </div>
+
+        {showUserDropdown && (
+          <div className={`absolute z-10 mt-1 w-full ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:shadow-gray-900/30 max-h-64 overflow-y-auto`}>
+            {availableUsers
+              .filter((user: any) => {
+                const searchLower = userSearchQuery.toLowerCase()
+                return (
+                  !teamMembers.includes(user.id) &&
+                  (user.name?.toLowerCase().includes(searchLower) ||
+                   user.email?.toLowerCase().includes(searchLower))
+                )
+              })
+              .slice(0, 10)
+              .map((user: any) => (
+                <button
+                  key={user.id}
+                  type="button"
+                  onClick={() => {
+                    setTeamMembers([...teamMembers, user.id])
+                    setUserSearchQuery('')
+                    setShowUserDropdown(false)
+                    handleFieldChange()
+                  }}
+                  className={`block w-full px-4 py-3 text-left ${TYPOGRAPHY.body} hover:bg-[var(--bg-section)] dark:hover:bg-gray-700 dark:text-gray-200 flex items-center gap-3`}
+                >
+                  {user.profileImage ? (
+                    <img
+                      src={user.profileImage}
+                      alt={user.name}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {user.name?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{user.name || 'Unknown'}</p>
+                    <p className={`text-xs truncate text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{user.email}</p>
+                  </div>
+                </button>
+              ))}
+            {availableUsers.filter((user: any) => {
+              const searchLower = userSearchQuery.toLowerCase()
+              return (
+                !teamMembers.includes(user.id) &&
+                (user.name?.toLowerCase().includes(searchLower) ||
+                 user.email?.toLowerCase().includes(searchLower))
+              )
+            }).length === 0 && (
+              <div className={`px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
+                No users found
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
 
   </div>

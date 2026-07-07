@@ -15,6 +15,7 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
   methodology,
   workingHours,
   logo,
+  teamMembers,
 } = req.body;
 
  const project =await ProjectService.createProject(
@@ -30,6 +31,7 @@ export const createProject = asyncHandler(async (req: Request, res: Response) =>
     methodology,
     workingHours,
     logo,
+    teamMembers,
   },
   req.user!.id
 );
@@ -54,7 +56,8 @@ export const getProjectById = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const updateProject = asyncHandler(async (req: Request, res: Response) => {
-  const project = await ProjectService.updateProject(req.params.id, req.body, req.user!.id);
+  const { teamMembers, ...otherData } = req.body;
+  const project = await ProjectService.updateProject(req.params.id, { ...otherData, teamMembers }, req.user!.id);
   res.json({ success: true, data: project });
 });
 

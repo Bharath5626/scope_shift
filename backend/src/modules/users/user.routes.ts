@@ -6,6 +6,7 @@ import {
   sendOTP,
   resetPassword,
   uploadProfileAvatar,
+  getAllUsersList,
 } from "./user.controller";
 import { verifyToken } from "../../middlewares/auth.middleware";
 import { validate } from "../../middlewares/validate.middleware";
@@ -25,6 +26,7 @@ router.get("/profile", verifyToken, getProfile);
 router.put("/profile", verifyToken, validate(updateProfileSchema), updateProfile);
 router.post("/upload-avatar", verifyToken, uploadAvatar, uploadProfileAvatar);
 router.post("/change-password", verifyToken, validate(changePasswordSchema), changeUserPassword);
+router.get("/", verifyToken, getAllUsersList);
 
 // OTP endpoints don't require authentication (for password reset)
 router.post("/send-otp", otpRateLimit, validate(sendOTPSchema), sendOTP);

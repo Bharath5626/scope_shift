@@ -6,9 +6,9 @@ interface AnalysisCardProps {
 }
 
 const riskStyles: Record<Analysis['riskLevel'], string> = {
-  low: 'text-green-600 dark:text-green-400',
-  medium: 'text-yellow-600 dark:text-yellow-400',
-  high: 'text-red-600 dark:text-red-400',
+  low: 'text-emerald-600 dark:text-emerald-400',
+  medium: 'text-amber-600 dark:text-amber-400',
+  high: 'text-[var(--color-danger)] dark:text-red-400',
 }
 
 export function AnalysisCard({ analysis, projectName }: AnalysisCardProps) {

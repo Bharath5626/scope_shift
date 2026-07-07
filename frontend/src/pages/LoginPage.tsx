@@ -27,73 +27,82 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-2/5 flex-col justify-between bg-gradient-to-br from-indigo-600 to-violet-700 p-12 text-white">
-        <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.card} bg-white/20 font-bold text-white`}>
-            S
-          </div>
-          <div>
-            <p className={`font-semibold text-white ${TYPOGRAPHY.body}`}>ScopeAI</p>
-            <p className={`${TYPOGRAPHY.caption} text-indigo-200`}>Scope Creep Analyzer</p>
+    <div className="flex min-h-screen bg-[var(--bg-page)]">
+      {/* Left panel - Brand & Marketing */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-12 text-white relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[var(--color-primary)]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[var(--color-accent)]/10 rounded-full blur-3xl"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center ${BORDER_RADIUS.card} bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] font-bold text-white text-xl shadow-lg`}>
+              S
+            </div>
+            <div>
+              <p className={`font-bold text-white text-lg`}>ScopeAI</p>
+              <p className={`${TYPOGRAPHY.caption} text-slate-400`}>Enterprise Scope Management</p>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h1 className="text-4xl font-bold leading-tight text-white">
-            Detect scope creep<br />before it derails<br />your project.
+        <div className="relative z-10">
+          <h1 className="text-5xl font-bold leading-tight text-white mb-6">
+            Prevent scope creep.<br />
+            <span className="text-[var(--color-primary-light)]">Ship on time.</span>
           </h1>
-          <p className={`mt-4 text-indigo-200 ${TYPOGRAPHY.body} leading-relaxed`}>
-            AI-powered analysis that monitors your project scope in real time and flags risks early.
+          <p className={`text-slate-300 ${TYPOGRAPHY.body} leading-relaxed text-lg max-w-md`}>
+            AI-powered project analysis that identifies risks, predicts delays, and keeps your team on track.
           </p>
 
-          <ul className={`mt-10 space-y-4 ${SPACING.section.gap}`}>
+          <div className="mt-12 grid grid-cols-2 gap-6">
             {[
-              'AI-powered scope analysis',
-              'Real-time risk detection',
-              'Smart recommendations',
-              'Full project history',
+              { icon: '📊', label: 'AI Analysis', desc: 'Smart scope evaluation' },
+              { icon: '⚠️', label: 'Risk Detection', desc: 'Early warning system' },
+              { icon: '💡', label: 'Insights', desc: 'Actionable recommendations' },
+              { icon: '📈', label: 'Analytics', desc: 'Project health metrics' },
             ].map((item) => (
-              <li key={item} className={`flex items-center gap-3 ${TYPOGRAPHY.body} text-indigo-100`}>
-                <span className={`flex h-5 w-5 items-center justify-center ${BORDER_RADIUS.tag} bg-white/20 text-white`}>
-                  <svg className={`h-3 w-3`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </span>
-                {item}
-              </li>
+              <div key={item.label} className={`p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10`}>
+                <div className="text-2xl mb-2">{item.icon}</div>
+                <p className={`font-semibold text-white ${TYPOGRAPHY.body}`}>{item.label}</p>
+                <p className={`${TYPOGRAPHY.caption} text-slate-400 mt-1`}>{item.desc}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
-        <p className={`${TYPOGRAPHY.caption} text-indigo-300`}>© 2026 ScopeAI. All rights reserved.</p>
+        <p className={`relative z-10 ${TYPOGRAPHY.caption} text-slate-500`}>© 2026 ScopeAI. All rights reserved.</p>
       </div>
 
-      {/* Right panel */}
-      <div className="flex flex-1 items-center justify-center bg-[var(--bg-page)] px-6 py-12 dark:bg-gray-900">
+      {/* Right panel - Login Form */}
+      <div className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className={`mb-8 flex items-center gap-3 lg:hidden`}>
-            <div className={`flex h-9 w-9 items-center justify-center ${BORDER_RADIUS.card} bg-indigo-600 font-bold text-white`}>
+            <div className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.card} bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] font-bold text-white`}>
               S
             </div>
-            <span className={`font-semibold text-[var(--text-primary)] dark:text-gray-100 ${TYPOGRAPHY.body}`}>ScopeAI</span>
+            <span className={`font-bold text-[var(--text-primary)] text-lg`}>ScopeAI</span>
           </div>
 
-          <div className={`${BORDER_RADIUS.modal} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-            <h2 className={`${TYPOGRAPHY.pageTitle} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>Welcome back</h2>
-            <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>Sign in to your account to continue</p>
+          <div className={`${BORDER_RADIUS.modal} border border-[var(--border-primary)] bg-[var(--bg-surface)] p-8 ${SHADOW.elevated}`}>
+            <div className="mb-8">
+              <h2 className={`text-2xl font-bold text-[var(--text-primary)]`}>Welcome back</h2>
+              <p className={`mt-2 ${TYPOGRAPHY.body} text-[var(--text-muted)]`}>Sign in to your account to continue</p>
+            </div>
 
             {error && (
-              <div className={`mt-4 ${BORDER_RADIUS.card} bg-red-50 border border-red-200 px-4 py-3 ${TYPOGRAPHY.body} text-red-600 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400`}>
+              <div className={`mb-6 ${BORDER_RADIUS.card} bg-[var(--color-danger-bg)] border border-[var(--color-danger)]/20 px-4 py-3 ${TYPOGRAPHY.body} text-[var(--color-danger)] flex items-start gap-3`}>
+                <svg className="h-5 w-5 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className={`mt-6 space-y-5 ${SPACING.section.gap}`}>
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-2`}>
                   Email address
                 </label>
                 <input
@@ -101,13 +110,13 @@ export function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  placeholder="you@company.com"
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-input)] px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 ${TRANSITION}`}
                 />
               </div>
 
               <div>
-                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-1.5 dark:text-gray-300`}>
+                <label className={`block ${TYPOGRAPHY.body} font-medium text-[var(--text-secondary)] mb-2`}>
                   Password
                 </label>
                 <input
@@ -116,25 +125,35 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] px-3.5 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-[var(--bg-input)] px-4 py-3 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 ${TRANSITION}`}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full ${BORDER_RADIUS.button} bg-[var(--color-primary)] py-2.5 ${TYPOGRAPHY.body} font-medium text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-60`}
+                className={`w-full ${BORDER_RADIUS.button} bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] py-3.5 ${TYPOGRAPHY.body} font-semibold text-white shadow-lg hover:shadow-xl disabled:opacity-50 ${TRANSITION}`}
               >
-                {loading ? 'Signing in…' : 'Login '}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : 'Sign in'}
               </button>
             </form>
 
-            <p className={`mt-6 text-center ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
-              Don't have an account?{' '}
-              <Link to="/signup" className={`font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 ${TRANSITION}`}>
-                Sign up
-              </Link>
-            </p>
+            <div className="mt-8 pt-6 border-t border-[var(--border-primary)]">
+              <p className={`text-center ${TYPOGRAPHY.body} text-[var(--text-muted)]`}>
+                Don't have an account?{' '}
+                <Link to="/signup" className={`font-semibold text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] ${TRANSITION}`}>
+                  Create account
+                </Link>
+              </p>
+            </div>
           </div>
         </div>
       </div>

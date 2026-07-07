@@ -53,6 +53,11 @@ function NavIcon({ icon }: { icon: string }) {
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
+    shared: (
+      <svg className={ICON_SIZE.navigation} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
   }
   return <>{icons[icon] ?? icons.dashboard}</>
 }
@@ -140,7 +145,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
       )}
       
       <aside
-  className={`fixed left-0 top-0 z-40 flex h-screen flex-col bg-gradient-to-b from-indigo-600 to-violet-700 text-white transition-all duration-300 lg:z-20 ${
+  className={`fixed left-0 top-0 z-40 flex h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white border-r border-slate-700/50 transition-all duration-300 lg:z-20 ${
     collapsed ? 'lg:w-20 w-64' : 'w-64'
   } ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
 >
@@ -155,7 +160,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
 
       <div>
         <p className={`${TYPOGRAPHY.body} font-semibold text-white`}>ScopeAI</p>
-        <p className={`${TYPOGRAPHY.caption} text-indigo-100`}>Scope Creep Analyzer</p>
+        <p className={`${TYPOGRAPHY.caption} text-slate-400`}>Scope Creep Analyzer</p>
       </div>
     </>
   )}
@@ -169,7 +174,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
         setCollapsed((prev) => !prev) // Desktop: toggle collapse
       }
     }}
-    className={`${BORDER_RADIUS.small} p-2 text-indigo-100 hover:bg-white/10 hover:text-white ${TRANSITION}`}
+    className={`${BORDER_RADIUS.small} p-2 text-slate-400 hover:bg-slate-700/50 hover:text-white ${TRANSITION}`}
     title={isMobile ? "Close menu" : "Toggle sidebar"}
     aria-label={isMobile ? "Close menu" : "Toggle sidebar collapse"}
   >
@@ -208,8 +213,8 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
       collapsed ? 'justify-center' : 'gap-3'
     } ${BORDER_RADIUS.card} px-3 py-2.5 ${TYPOGRAPHY.body} font-medium ${TRANSITION} duration-200 ${
       active
-        ? 'bg-white text-[var(--text-primary)] shadow-lg dark:bg-white dark:!text-white'
-        : 'text-indigo-100 hover:bg-white/10 hover:text-white'
+        ? 'bg-[var(--color-primary)] text-white shadow-lg'
+        : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
     } group`
   }}
 >
@@ -247,7 +252,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
           <p className={`truncate ${TYPOGRAPHY.body} font-medium text-white`}>
             {user?.name ?? 'User'}
           </p>
-          <p className={`truncate ${TYPOGRAPHY.caption} text-indigo-300`}>
+          <p className={`truncate ${TYPOGRAPHY.caption} text-slate-400`}>
             {user?.email ?? ''}
           </p>
         </div>
@@ -316,7 +321,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
               </button>
               <button
                 onClick={handleLogout}
-                className={`${BORDER_RADIUS.button} bg-indigo-600 px-4 py-2 ${TYPOGRAPHY.body} font-medium text-white ${TRANSITION} hover:bg-indigo-700`}
+                className={`${BORDER_RADIUS.button} bg-[var(--color-primary)] px-4 py-2 ${TYPOGRAPHY.body} font-medium text-white ${TRANSITION} hover:bg-[var(--color-primary-hover)]`}
               >
                 Sign out
               </button>

@@ -167,9 +167,9 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     if (/[0-9]/.test(password)) score++
     if (/[^a-zA-Z0-9]/.test(password)) score++
 
-    if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500' }
-    if (score <= 3) return { score, label: 'Medium', color: 'bg-yellow-500' }
-    if (score <= 4) return { score, label: 'Strong', color: 'bg-green-500' }
+    if (score <= 2) return { score, label: 'Weak', color: 'bg-[var(--color-danger)]' }
+    if (score <= 3) return { score, label: 'Medium', color: 'bg-[var(--color-warning)]' }
+    if (score <= 4) return { score, label: 'Strong', color: 'bg-[var(--color-success)]' }
     return { score, label: 'Very Strong', color: 'bg-emerald-500' }
   }, [])
 
@@ -357,10 +357,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     >
       <div
         ref={modalRef}
-        className="w-full max-w-lg rounded-2xl bg-[var(--bg-surface)] shadow-2xl dark:bg-gray-800 transition-all animate-in zoom-in-95 duration-200"
+        className="w-full max-w-lg rounded-2xl bg-[var(--bg-surface)] shadow-2xl dark:bg-[var(--bg-elevated)] transition-all animate-in zoom-in-95 duration-200"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 dark:border-gray-700">
+        <div className="flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 dark:border-[var(--border-secondary)]">
           <div>
             <h2 id="settings-title" className="text-xl font-semibold text-[var(--text-primary)] dark:text-white">⚙️ Settings</h2>
             <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Manage your account settings</p>
@@ -368,7 +368,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           <button
             onClick={onClose}
             aria-label="Close settings"
-            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-gray-700 dark:hover:text-gray-300"
+            className="rounded-lg p-2 text-[var(--text-subtle)] hover:bg-[var(--bg-section)] hover:text-[var(--text-muted)] dark:hover:bg-[var(--bg-hover)] dark:hover:text-gray-300"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -377,12 +377,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[var(--border-primary)] px-6 dark:border-gray-700">
+        <div className="flex border-b border-[var(--border-primary)] px-6 dark:border-[var(--border-secondary)]">
           <button
             onClick={() => setActiveTab('profile')}
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'profile'
-                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
@@ -392,7 +392,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             onClick={() => setActiveTab('security')}
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'security'
-                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
@@ -402,7 +402,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             onClick={() => setActiveTab('preferences')}
             className={`px-4 py-3 text-sm font-medium transition ${
               activeTab === 'preferences'
-                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
@@ -440,7 +440,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         className="h-24 w-24 rounded-full object-cover"
                       />
                       <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
-                        <label className="cursor-pointer text-white hover:text-gray-200 transition" title="Change avatar">
+                        <label className="cursor-pointer text-white hover:text-gray-100 transition" title="Change avatar">
                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -467,10 +467,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     </>
                   ) : (
                     <>
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-indigo-100 text-2xl font-semibold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--color-primary-50)] text-2xl font-semibold text-[var(--color-primary-dark)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]">
                         {initials}
                       </div>
-                      <label className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition" title="Upload avatar">
+                      <label className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-lg hover:bg-[var(--color-primary-hover)] transition" title="Upload avatar">
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -499,7 +499,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                   />
                 </div>
 
@@ -509,7 +509,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     type="email"
                     value={user?.email || ''}
                     readOnly
-                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-soft)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700/50 dark:text-[var(--text-subtle)]"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-soft)] bg-[var(--bg-section)] dark:border-[var(--border-secondary)] dark:bg-[var(--bg-section)] dark:text-[var(--text-subtle)]"
                   />
                 </div>
               </div>
@@ -576,9 +576,9 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Active Sessions</h3>
                 <div className="space-y-3">
                   {/* Current Session */}
-                  <div className="flex items-center justify-between rounded-lg border-2 border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-900/20">
+                  <div className="flex items-center justify-between rounded-lg border-2 border-[var(--color-primary)]/20 bg-[var(--color-primary-50)] p-4 dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary-dark)]/20">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-800 dark:text-indigo-400">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary-100)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/30 dark:text-[var(--color-primary-light)]">
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
@@ -662,7 +662,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       type="password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                     />
                   </div>
 
@@ -672,7 +672,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                     />
                     {newPassword && (
                       <div className="mt-2">
@@ -697,7 +697,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                      className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                     />
                     {confirmPassword && newPassword && (
                       <p className={`mt-1 text-xs ${confirmPassword === newPassword ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
@@ -763,7 +763,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="Enter the 6-digit code"
-                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                       />
                     </div>
 
@@ -773,7 +773,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         type="password"
                         value={otpNewPassword}
                         onChange={(e) => setOtpNewPassword(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                       />
                       {otpNewPassword && (
                         <div className="mt-2">
@@ -798,7 +798,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         type="password"
                         value={otpConfirmPassword}
                         onChange={(e) => setOtpConfirmPassword(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-indigo-500 dark:focus:ring-indigo-500"
+                        className="mt-1 w-full rounded-lg border border-[var(--border-secondary)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white"
                       />
                       {otpConfirmPassword && otpNewPassword && (
                         <p className={`mt-1 text-xs ${otpConfirmPassword === otpNewPassword ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>

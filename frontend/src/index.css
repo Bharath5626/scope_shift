@@ -1,41 +1,85 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-border: #e5e7eb;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --radius-card: 14px;
-  --color-mode: class;
-
-  /* Semantic Backgrounds */
-  --bg-page: #f9fafb;
+  /* Corporate Enterprise Design System - Premium Dark-First */
+  
+  /* Primary Brand - Sophisticated Teal-Cyan (trust, innovation, corporate) */
+  --color-primary: #0891b2;
+  --color-primary-hover: #0e7490;
+  --color-primary-light: #22d3ee;
+  --color-primary-dark: #155e75;
+  --color-primary-50: #ecfeff;
+  --color-primary-100: #cffafe;
+  
+  /* Secondary - Deep Slate (professional, stable) */
+  --color-secondary: #475569;
+  --color-secondary-hover: #334155;
+  --color-secondary-light: #64748b;
+  
+  /* Accent - Vibrant Coral (action, energy, memorable) */
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-accent-light: #fb923c;
+  
+  /* Status Colors - Refined Corporate Palette */
+  --color-success: #059669;
+  --color-success-light: #10b981;
+  --color-success-bg: #d1fae5;
+  --color-warning: #d97706;
+  --color-warning-light: #f59e0b;
+  --color-warning-bg: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-light: #ef4444;
+  --color-danger-bg: #fee2e2;
+  --color-info: #0284c7;
+  --color-info-light: #0ea5e9;
+  --color-info-bg: #e0f2fe;
+  
+  /* Light Mode - Clean, Professional */
+  --bg-page: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-section: #f3f4f6;
-
-  /* Semantic Text */
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-muted: #6b7280;
-  --text-soft: #6b7280;
-  --text-subtle: #9ca3af;
-
-  /* Semantic Borders */
-  --border-primary: #e5e7eb;
-  --border-secondary: #d1d5db;
-
-  /* Semantic UI Colors */
-  --color-info: #4f46e5;
-
+  --bg-section: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-accent-subtle: #f0fdfa;
+  --bg-elevated: #ffffff;
+  --bg-input: #ffffff;
+  
+  /* Text Hierarchy */
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: #475569;
+  --text-soft: #64748b;
+  --text-subtle: #94a3b8;
+  --text-inverse: #ffffff;
+  
+  /* Borders */
+  --border-primary: #cbd5e1;
+  --border-secondary: #e2e8f0;
+  --border-focus: #0891b2;
+  --border-light: #f1f5f9;
+  
+  /* Shadows - Soft, Professional */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+  --shadow-elevated: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
   /* Chart Colors */
-  --chart-success: #22c55e;
-  --chart-warning: #f59e0b;
-  --chart-danger: #ef4444;
-  --chart-info: #4f46e5;
-  --chart-background: #f3f4f6;
+  --chart-success: #059669;
+  --chart-warning: #d97706;
+  --chart-danger: #dc2626;
+  --chart-info: #0891b2;
+  --chart-accent: #f97316;
+  --chart-background: #f1f5f9;
+  
+  /* Spacing & Radius */
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --radius-input: 8px;
+  
+  --color-mode: class;
 }
 
 * {
@@ -59,59 +103,83 @@ body {
   min-height: 100vh;
 }
 
-/* Global dark mode overrides for class-based dark mode */
+/* Dark Mode - Premium Enterprise Dark */
 .dark body {
-  background-color: #111827;
-  color: #f3f4f6;
+  background-color: #0a0f1a;
+  color: #f1f5f9;
 }
 
-/* Dark mode semantic variable overrides */
 .dark {
-  /* Semantic Backgrounds */
-  --bg-page: #0b1220;
+  /* Primary in Dark - Brighter for visibility */
+  --color-primary: #22d3ee;
+  --color-primary-hover: #06b6d4;
+  --color-primary-light: #67e8f9;
+  --color-primary-dark: #0891b2;
+  
+  /* Dark Mode Backgrounds - Rich, Layered */
+  --bg-page: #0a0f1a;
   --bg-surface: #111827;
-  --bg-section: #0f172a;
-
-  /* Semantic Text */
+  --bg-section: #1f2937;
+  --bg-hover: #374151;
+  --bg-accent-subtle: #134e4a;
+  --bg-elevated: #1a2332;
+  --bg-input: #1a2332;
+  
+  /* Text in Dark */
   --text-primary: #f9fafb;
   --text-secondary: #e5e7eb;
   --text-muted: #9ca3af;
   --text-soft: #9ca3af;
   --text-subtle: #6b7280;
-
-  /* Semantic Borders */
+  
+  /* Borders in Dark */
   --border-primary: #1f2937;
   --border-secondary: #374151;
-
-  /* Semantic UI Colors */
-  --color-info: #818cf8;
-
-  /* Chart Colors */
-  --chart-success: #4ade80;
+  --border-focus: #22d3ee;
+  --border-light: #111827;
+  
+  /* Status Colors - Brighter for dark bg */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #f87171;
+  --color-info: #38bdf8;
+  
+  /* Chart Colors for Dark */
+  --chart-success: #34d399;
   --chart-warning: #fbbf24;
   --chart-danger: #f87171;
-  --chart-info: #818cf8;
+  --chart-info: #22d3ee;
+  --chart-accent: #fb923c;
   --chart-background: #1f2937;
+  
+  /* Shadows for Dark */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 4px -1px rgba(0, 0, 0, 0.6), 0 1px 2px -1px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.7);
+  --shadow-elevated: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
 }
 
+/* Utility Class Overrides */
 .dark .bg-white {
-  background-color: #1f2937;
-}
-
-.dark .bg-gray-50 {
   background-color: #111827;
 }
 
+.dark .bg-gray-50 {
+  background-color: #0a0f1a;
+}
+
 .dark .bg-gray-100 {
-  background-color: #374151;
+  background-color: #1f2937;
 }
 
 .dark .text-gray-900 {
-  color: #f3f4f6;
+  color: #f9fafb;
 }
 
 .dark .text-gray-800 {
-  color: #f3f4f6;
+  color: #f9fafb;
 }
 
 .dark .text-gray-700 {
@@ -119,11 +187,11 @@ body {
 }
 
 .dark .text-gray-600 {
-  color: #d1d5db;
+  color: #9ca3af;
 }
 
 .dark .text-gray-500 {
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .dark .text-gray-400 {
@@ -131,26 +199,31 @@ body {
 }
 
 .dark .border-gray-200 {
-  border-color: #374151;
+  border-color: #1f2937;
 }
 
 .dark .border-gray-300 {
-  border-color: #4b5563;
+  border-color: #374151;
 }
 
+/* Form Elements in Dark */
 .dark input,
 .dark textarea,
 .dark select {
-  background-color: #374151;
-  border-color: #4b5563;
-  color: #f3f4f6;
+  background-color: #1a2332;
+  border-color: #374151;
+  color: #f9fafb;
 }
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #9ca3af;
+  color: #6b7280;
 }
 
-.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #22d3ee;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
 }

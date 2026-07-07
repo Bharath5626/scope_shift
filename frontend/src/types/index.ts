@@ -26,6 +26,7 @@ export interface Project {
   workingHours?: number | null
   techStack?: string | null
   startDate?: string | null
+  teamMembers?: string[]
 
   createdBy: {
     id: string
@@ -76,6 +77,7 @@ export interface CreateProjectInput {
   methodology?: string | null
   workingHours?: number | null
   logo?: string | null
+  teamMembers?: string[]
 }
 
 export interface CreateFeatureInput {

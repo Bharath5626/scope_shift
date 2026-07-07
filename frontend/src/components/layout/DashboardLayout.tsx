@@ -15,12 +15,12 @@ export function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-[var(--bg-page)] dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--bg-page)]">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-[var(--border-primary)] bg-[var(--bg-page)] backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900">
+      <header className="sticky top-0 z-10 border-b border-[var(--border-primary)] bg-[var(--bg-page)]/80 backdrop-blur-md dark:bg-[var(--bg-page)]/80">
         <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${SPACING.page.headerPadding}`}>
           <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} font-semibold text-[var(--text-primary)] dark:text-gray-100`}>
+            <h1 className={`${TYPOGRAPHY.pageTitle} font-bold text-[var(--text-primary)] dark:text-[var(--text-primary)]`}>
               {title}
             </h1>
 

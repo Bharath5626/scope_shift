@@ -77,10 +77,10 @@ function ProjectCard({ project }: { project: Project }) {
         <span
           className={`${BORDER_RADIUS.tag} px-3 py-1 ${TYPOGRAPHY.caption} font-medium ${
             daysLeft <= 3
-              ? 'bg-red-100 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400'
+              ? 'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400'
               : daysLeft <= 7
-              ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-              : 'bg-green-100 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400'
+              ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+              : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
           }`}
         >
           {daysLeft} days left

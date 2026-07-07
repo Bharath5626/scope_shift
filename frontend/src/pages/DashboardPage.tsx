@@ -4,6 +4,7 @@ import { StatsCard } from '../components/cards/StatsCard'
 import { DashboardLayout } from '../components/layout/DashboardLayout'
 import { useProjects } from '../context/ProjectContext'
 import { useDashboard } from '../context/DashboardContext'
+import { useAuth } from '../context/AuthContext'
 
 function FolderIcon() {
   return (
@@ -32,10 +33,10 @@ function ActiveIcon() {
   )
 }
 
-function DraftIcon() {
+function SharedIcon() {
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
   )
 }
@@ -60,6 +61,7 @@ function RiskIcon() {
 export function DashboardPage() {
   const { projects } = useProjects()
   const { dashboardStats } = useDashboard()
+  const { user } = useAuth()
   const upcomingProjects = dashboardStats?.upcomingDeadlines ?? [...projects]
   .filter((p) => p.deadline && p.status !== "completed")
   .sort(
@@ -71,7 +73,11 @@ export function DashboardPage() {
   .slice(0, 3)
   const totalProjects = dashboardStats?.stats.totalProjects ?? projects.length
   const activeProjects = dashboardStats?.stats.activeProjects ?? projects.filter((p) => p.status === 'active').length
-  const draftProjects = dashboardStats?.stats.draftProjects ?? projects.filter((p) => p.status === 'draft').length
+  const sharedProjects = projects.filter((p) => {
+    const isTeamMember = p.teamMembers?.includes(user?.id || '')
+    const isNotCreator = p.createdBy.id !== user?.id
+    return isTeamMember && isNotCreator
+  }).length
   const completedProjects = projects.filter(
   (p) => p.status === "completed"
 ).length
@@ -103,7 +109,7 @@ const sortedProjects = dashboardStats?.recentProjects ?? [...projects]
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         <StatsCard label="Total Projects" value={totalProjects} icon={<FolderIcon />} accent="primary" />
         <StatsCard label="Active Projects" value={activeProjects} icon={<ActiveIcon />} accent="success" />
-        <StatsCard label="Draft Projects" value={draftProjects} icon={<DraftIcon />} accent="warning" />
+        <StatsCard label="Shared with me" value={sharedProjects} icon={<SharedIcon />} accent="warning" />
         <StatsCard
 label="Completed Projects"
   value={completedProjects}
@@ -121,9 +127,9 @@ label="Completed Projects"
       <section className="mt-6 sm:mt-8">
         <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">Recent Projects</h2>
-          <Link
+            <Link
   to="/history"
-  className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+  className="text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors"
 >
   Show All  →
 </Link> 
@@ -131,7 +137,7 @@ label="Completed Projects"
 
         {sortedProjects.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--border-secondary)] bg-white p-12 text-center shadow-sm">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]">
               <FolderIcon />
             </div>
             <h3 className="mt-4 text-base font-semibold text-[var(--text-primary)]">No projects yet</h3>
@@ -140,7 +146,7 @@ label="Completed Projects"
             </p>
             <Link
               to="/projects/new"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-[var(--color-primary-hover)] hover:shadow-md"
             >
               Create Project
             </Link>
@@ -165,10 +171,10 @@ label="Completed Projects"
         <h3 className="font-semibold text-[var(--text-primary)]">Scope Health Score</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${
           (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
-            ? 'bg-green-100 text-[var(--color-success)]'
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
             : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
-            ? 'bg-yellow-100 text-yellow-700'
-            : 'bg-red-100 text-red-700'
+            ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'
+            : 'bg-[var(--color-danger-bg)] text-[var(--color-danger)] dark:bg-[var(--color-danger)]/20 dark:text-[var(--color-danger-light)]'
         }`}>
           {(dashboardStats?.scopeHealth.healthScore ?? 78) >= 70 ? 'Healthy' : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40 ? 'Warning' : 'Critical'}
         </span>
@@ -189,7 +195,7 @@ label="Completed Projects"
                 (dashboardStats?.scopeHealth.healthScore ?? 78) >= 70
                   ? 'text-[var(--color-success)]'
                   : (dashboardStats?.scopeHealth.healthScore ?? 78) >= 40
-                  ? 'text-yellow-500'
+                  ? 'text-[var(--color-warning)]'
                   : 'text-[var(--color-danger)]'
               }`}
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
@@ -209,7 +215,7 @@ label="Completed Projects"
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.totalAnalyses ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
-              <div className="h-full rounded-full bg-indigo-500" style={{ width: '100%' }} />
+              <div className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-500" style={{ width: '100%' }} />
             </div>
           </div>
           <div>
@@ -218,7 +224,7 @@ label="Completed Projects"
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.warnings ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
-              <div className="h-full rounded-full bg-orange-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.warnings / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
+              <div className="h-full rounded-full bg-[var(--color-warning)] transition-all duration-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.warnings / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
             </div>
           </div>
           <div>
@@ -227,7 +233,7 @@ label="Completed Projects"
               <span className="text-sm font-semibold text-[var(--text-primary)]">{dashboardStats?.scopeHealth.healthy ?? 0}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-section)]">
-              <div className="h-full rounded-full bg-green-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.healthy / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
+              <div className="h-full rounded-full bg-[var(--color-success)] transition-all duration-500" style={{ width: `${dashboardStats?.scopeHealth.totalAnalyses ? (dashboardStats.scopeHealth.healthy / dashboardStats.scopeHealth.totalAnalyses) * 100 : 0}%` }} />
             </div>
           </div>
         </div>
@@ -251,25 +257,25 @@ label="Completed Projects"
       label: 'Low',
       value: dashboardStats.riskDistribution.low,
       percentage: Math.round((dashboardStats.riskDistribution.low / dashboardStats.riskDistribution.total) * 100),
-      color: 'bg-green-500',
+      color: 'bg-[var(--color-success)]',
     },
     {
       label: 'Medium',
       value: dashboardStats.riskDistribution.medium,
       percentage: Math.round((dashboardStats.riskDistribution.medium / dashboardStats.riskDistribution.total) * 100),
-      color: 'bg-yellow-500',
+      color: 'bg-[var(--color-warning)]',
     },
     {
       label: 'High',
       value: dashboardStats.riskDistribution.high,
       percentage: Math.round((dashboardStats.riskDistribution.high / dashboardStats.riskDistribution.total) * 100),
-      color: 'bg-orange-500',
+      color: 'bg-[var(--color-accent)]',
     },
     {
       label: 'Critical',
       value: dashboardStats.riskDistribution.critical,
       percentage: Math.round((dashboardStats.riskDistribution.critical / dashboardStats.riskDistribution.total) * 100),
-      color: 'bg-red-500',
+      color: 'bg-[var(--color-danger)]',
     },
   ].map((risk) => (
     <div key={risk.label} className="flex items-center gap-3">
@@ -303,7 +309,7 @@ label="Completed Projects"
 
       <Link
   to="/upcoming-deadlines"
-  className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+  className="text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] transition-colors"
 >
   Show All →
 </Link>
@@ -322,7 +328,7 @@ label="Completed Projects"
           return (
             <div
               key={project.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-[var(--border-primary)] p-3 sm:p-4 transition hover:border-indigo-200 hover:bg-indigo-50/50"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-[var(--border-primary)] p-3 sm:p-4 transition-all duration-200 hover:border-[var(--color-primary)] hover:bg-[var(--bg-hover)] hover:shadow-md"
             >
               <div className="text-center sm:text-left">
                 <h3 className="font-medium text-[var(--text-primary)]">
@@ -344,10 +350,10 @@ label="Completed Projects"
                 <div
                   className={`rounded-full px-3 py-1 text-xs font-medium ${
                     daysLeft <= 3
-                      ? "bg-red-100 text-[var(--color-danger)]"
+                      ? "bg-red-50 text-[var(--color-danger)] dark:bg-red-900/20 dark:text-red-400"
                       : daysLeft <= 7
-                    ? "bg-yellow-100 text-yellow-700"
-                    : "bg-green-100 text-[var(--color-success)]"
+                    ? "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+                    : "bg-green-50 text-[var(--color-success)] dark:bg-green-900/20 dark:text-green-400"
                 }`}
               >
                 {daysLeft} days left

@@ -21,12 +21,13 @@ model User {
   profileImage  String?
   theme         UserTheme @default(light)
 
-  
+
   // OTP for password reset
   otpCode       String?
   otpExpiresAt  DateTime?
 
   projects      Project[]
+  projectMembers ProjectMember[]
   auditLogs     AuditLog[]
 
   createdAt     DateTime @default(now())
@@ -61,6 +62,7 @@ model Project {
   features      Feature[]
   analyses      Analysis[]
   auditLogs     AuditLog[]
+  projectMembers ProjectMember[]
 }
 model Feature {
   id          String @id @default(uuid())
@@ -137,5 +139,21 @@ model AuditLog {
 
   @@index([projectId])
   @@index([createdAt])
+  @@index([userId])
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("member") // owner, admin, member, viewer
+
+  createdAt DateTime @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
   @@index([userId])
 }

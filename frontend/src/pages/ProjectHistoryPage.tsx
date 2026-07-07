@@ -29,7 +29,7 @@ interface AuditLog {
 const statusStyles: Record<Project['status'], string> = {
   draft:     'bg-gray-100 text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active:    'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  completed: 'bg-[var(--color-primary-50)] text-[var(--color-primary-dark)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]',
   at_risk:   'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 }
 
@@ -118,7 +118,7 @@ function ProjectDetailsModal({
             onClick={() => setActiveTab('details')}
             className={`px-6 py-3 text-sm font-medium transition ${
               activeTab === 'details'
-                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
@@ -128,7 +128,7 @@ function ProjectDetailsModal({
             onClick={() => setActiveTab('logs')}
             className={`px-6 py-3 text-sm font-medium transition ${
               activeTab === 'logs'
-                ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
             }`}
           >
@@ -215,7 +215,7 @@ function ProjectDetailsModal({
             <div className="space-y-4">
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+                  <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
                 </div>
               ) : auditLogs.length === 0 ? (
                 <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
@@ -239,7 +239,7 @@ function ProjectDetailsModal({
                           <div className="mt-3">
                             <button
                               onClick={() => setShowFeaturesForLog(log.id)}
-                              className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                              className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]"
                             >
                               Show Features {log.features.length > 0 ? `(${log.features.length})` : ''}
                             </button>
@@ -364,7 +364,7 @@ function ProjectCard({
   const createdBy = project.createdBy && user?.id === project.createdBy.id ? 'you' : project.createdBy?.name || 'Unknown'
 
   return (
-    <div className="group relative flex flex-col rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30">
+    <div className="group relative flex flex-col rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)]/50 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-[var(--color-primary-light)] dark:hover:shadow-gray-900/30">
 
       {/* Delete button — appears on hover */}
       <button
@@ -402,7 +402,7 @@ function ProjectCard({
               />
             </div>
           ) : (
-            <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+            <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -412,7 +412,7 @@ function ProjectCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-4 pr-12">
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-base font-semibold text-[var(--text-primary)] transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
+                <h3 className="truncate text-base font-semibold text-[var(--text-primary)] transition group-hover:text-[var(--color-primary)] dark:text-[var(--text-primary)] dark:group-hover:text-[var(--color-primary-light)]">
                   {project.name}
                 </h3>
                 <p className="mt-1 line-clamp-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
@@ -543,14 +543,14 @@ export function ProjectHistoryPage() {
                     placeholder="Search projects…"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                    className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white py-2.5 pl-9 pr-4 ${TYPOGRAPHY.body} text-[var(--text-primary)] placeholder-[var(--text-subtle)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-white dark:placeholder-[var(--text-subtle)]`}
                   />
                 </div>
 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | typeof ALL)}
-                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`}
                 >
                   <option value={ALL}>All Statuses</option>
                   {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
@@ -561,7 +561,7 @@ export function ProjectHistoryPage() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value as ProjectType | typeof ALL)}
-                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:focus:border-indigo-500 dark:focus:ring-indigo-500`}
+                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`}
                 >
                   <option value={ALL}>All Types</option>
                   {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
@@ -618,7 +618,7 @@ export function ProjectHistoryPage() {
               <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>Try adjusting your search or filter criteria</p>
               <button
                 onClick={() => { setSearch(''); setStatusFilter(ALL); setTypeFilter(ALL) }}
-                className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                className="mt-4 text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]"
               >
                 Clear all filters
               </button>

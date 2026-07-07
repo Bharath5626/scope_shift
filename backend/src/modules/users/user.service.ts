@@ -240,3 +240,38 @@ export const resetPasswordWithOTP = async (
 
   return { message: "Password reset successfully" };
 };
+
+export const getAllUsers = async (currentUserId: string, searchQuery?: string) => {
+  const users = await prisma.user.findMany({
+    where: {
+      id: {
+        not: currentUserId, // Exclude current user
+      },
+      ...(searchQuery && {
+        OR: [
+          {
+            name: {
+              contains: searchQuery,
+            },
+          },
+          {
+            email: {
+              contains: searchQuery,
+            },
+          },
+        ],
+      }),
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profileImage: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
+
+  return users;
+};

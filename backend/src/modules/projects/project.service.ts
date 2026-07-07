@@ -42,6 +42,7 @@ export const createProjectWithFeatures = async (
     methodology?: string | null;
     workingHours?: number | null;
     logo?: string | null;
+    teamMembers?: string[];
   },
   userId: string,
   features?: Array<{
@@ -127,6 +128,19 @@ export const createProjectWithFeatures = async (
         });
       }
 
+      // Add team members if provided
+      if (data.teamMembers && data.teamMembers.length > 0) {
+        const memberData = data.teamMembers.map((memberId) => ({
+          projectId: project.id,
+          userId: memberId,
+          role: "member",
+        }));
+
+        await tx.projectMember.createMany({
+          data: memberData,
+        });
+      }
+
       // Create audit log with feature snapshot
       await createAuditLog({
         projectId: project.id,
@@ -165,6 +179,7 @@ export const createProject = async (
     methodology?: string | null;
     workingHours?: number | null;
     logo?: string | null;
+    teamMembers?: string[];
   },
   userId: string
 ) => {
@@ -220,6 +235,19 @@ export const createProject = async (
       },
     });
 
+    // Add team members if provided
+    if (data.teamMembers && data.teamMembers.length > 0) {
+      const memberData = data.teamMembers.map((memberId) => ({
+        projectId: project.id,
+        userId: memberId,
+        role: "member",
+      }));
+
+      await prisma.projectMember.createMany({
+        data: memberData,
+      });
+    }
+
     // Fetch features for snapshot
     const features = await prisma.feature.findMany({
       where: { projectId: project.id },
@@ -245,11 +273,21 @@ export const getProjects = async (userId: string) => {
   try {
     const projects = await prisma.project.findMany({
       where: {
-        createdById: userId,
+        OR: [
+          { createdById: userId },
+          { projectMembers: { some: { userId } } },
+        ],
       },
       include: {
         createdBy: {
           select: { id: true, name: true },
+        },
+        projectMembers: {
+          include: {
+            user: {
+              select: { id: true, name: true },
+            },
+          },
         },
       },
       orderBy: {
@@ -257,7 +295,12 @@ export const getProjects = async (userId: string) => {
       },
     });
 
-    return Promise.all(projects.map(syncProjectStatus));
+    const transformedProjects = projects.map((project) => ({
+      ...project,
+      teamMembers: project.projectMembers.map((member) => member.userId),
+    }));
+
+    return Promise.all(transformedProjects.map(syncProjectStatus));
   } catch (error) {
     throw handleDatabaseError(error);
   }
@@ -269,17 +312,29 @@ export const getProjectById = async (id: string, userId: string) => {
       where: { id },
       include: {
         createdBy: { select: { id: true, name: true } },
+        projectMembers: {
+          include: {
+            user: {
+              select: { id: true, name: true },
+            },
+          },
+        },
       },
     });
 
     if (!project) return null;
 
-    // Check ownership
-    if (project.createdById !== userId) {
+    // Check ownership or team membership
+    if (project.createdById !== userId && !project.projectMembers.some((member) => member.userId === userId)) {
       return null;
     }
 
-    return syncProjectStatus(project);
+    const transformedProject = {
+      ...project,
+      teamMembers: project.projectMembers.map((member) => member.userId),
+    };
+
+    return syncProjectStatus(transformedProject);
   } catch (error) {
     throw handleDatabaseError(error);
   }
@@ -300,6 +355,7 @@ export const updateProject = async (
     methodology: string
     workingHours: number
     logo: string
+    teamMembers?: string[]
   }>,
   userId?: string
 ) => {
@@ -307,6 +363,9 @@ export const updateProject = async (
     // Get the existing project to detect changes and check ownership
     const existingProject = await prisma.project.findUnique({
       where: { id },
+      include: {
+        projectMembers: true,
+      },
     });
 
     if (!existingProject) {
@@ -339,12 +398,45 @@ export const updateProject = async (
     const changes = detectChanges(existingProject, updateData);
 
     // Only update and create audit log if there are actual changes
-    if (Object.keys(changes).length === 0) {
+    if (Object.keys(changes).length === 0 && !data.teamMembers) {
       return existingProject; // No changes, return existing project
     }
 
     // Update the project
     const updatedProject = await prisma.project.update({ where: { id }, data: updateData });
+
+    // Handle team members update if provided
+    if (data.teamMembers !== undefined) {
+      const existingMemberIds = existingProject.projectMembers.map((m) => m.userId);
+      const newMemberIds = data.teamMembers;
+
+      // Find members to add (in new but not in existing)
+      const toAdd = newMemberIds.filter((id) => !existingMemberIds.includes(id));
+      
+      // Find members to remove (in existing but not in new)
+      const toRemove = existingMemberIds.filter((id) => !newMemberIds.includes(id));
+
+      // Add new members
+      if (toAdd.length > 0) {
+        await prisma.projectMember.createMany({
+          data: toAdd.map((userId) => ({
+            projectId: id,
+            userId,
+            role: "member",
+          })),
+        });
+      }
+
+      // Remove members
+      if (toRemove.length > 0) {
+        await prisma.projectMember.deleteMany({
+          where: {
+            projectId: id,
+            userId: { in: toRemove },
+          },
+        });
+      }
+    }
 
     // Fetch current features for snapshot
     const features = await prisma.feature.findMany({

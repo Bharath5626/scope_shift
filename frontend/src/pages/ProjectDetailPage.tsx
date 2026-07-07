@@ -8,10 +8,10 @@ import { SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } fro
 import type { Project } from '../types'
 
 const statusStyles: Record<Project['status'], string> = {
-  draft: 'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
-  active: 'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
-  at_risk: 'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
+  draft: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  active: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400',
+  completed: 'bg-[var(--color-primary-50)] text-[var(--color-primary-dark)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]',
+  at_risk: 'bg-[var(--color-danger-bg)] text-[var(--color-danger)] dark:bg-[var(--color-danger)]/20 dark:text-[var(--color-danger-light)]',
 }
 
 function formatDate(dateString: string | null) {
@@ -63,7 +63,7 @@ export function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] p-8">
         <div className="max-w-6xl mx-auto">
           <LoadingSkeleton className="h-12 w-64 mb-6" />
           <LoadingSkeleton className="h-64 w-full rounded-xl" />
@@ -74,7 +74,7 @@ export function ProjectDetailPage() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8 dark:bg-gray-900">
+      <div className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-8">
         <EmptyState
           title="Project not found"
           description="The project you're looking for doesn't exist or has been deleted."
@@ -92,21 +92,21 @@ export function ProjectDetailPage() {
   const newFeatures = features.filter((f) => f.type === 'new')
 
   return (
-    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900`}>
+    <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding}`}>
       <div className={`max-w-6xl mx-auto space-y-6 ${SPACING.section.gap}`}>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div>
             <button
               onClick={() => navigate('/history')}
-              className={`mb-4 flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200`}
+              className={`mb-4 flex items-center gap-2 ${TYPOGRAPHY.body} text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-[var(--text-muted)]`}
             >
               <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
               Back to Projects
             </button>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>{project.name}</h1>
+            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-[var(--text-primary)]`}>{project.name}</h1>
             <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>{project.description || 'No description'}</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -207,7 +207,7 @@ export function ProjectDetailPage() {
                 <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${SPACING.section.gap}`}>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Scope Increase</p>
-                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.scopeIncreasePercent}%</p>
+                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary-light)]`}>{latestAnalysis.scopeIncreasePercent}%</p>
                   </div>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Additional Hours</p>
@@ -285,7 +285,7 @@ export function ProjectDetailPage() {
                 onClick={() => navigate(`/reports/${project.id}`)}
                 className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
               >
-                <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400`}>
+                <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]`}>
                   <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
