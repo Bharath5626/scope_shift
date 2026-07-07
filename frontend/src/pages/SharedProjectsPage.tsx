@@ -18,6 +18,16 @@ export function SharedProjectsPage() {
   const { projects } = useProjects()
   const [activeTab, setActiveTab] = useState<'shared-with-me' | 'shared-by-me'>('shared-with-me')
 
+  const getInitials = (name: string) => {
+    let initials = ''
+
+    for (const part of name.split(' ')) {
+      if (part) initials += part[0]
+    }
+
+    return initials
+  }
+
   // Filter projects where current user is in teamMembers (but not the creator)
   const sharedWithMe = projects.filter((project: Project) => {
     const isTeamMember = project.teamMembers?.includes(user?.id || '')
@@ -151,7 +161,7 @@ export function SharedProjectsPage() {
                       {/* Shared by info */}
                       <div className="mt-4 flex items-center gap-2 text-xs">
                         <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
-                          {getUserName(project.createdBy.id).split(' ').map(n => n[0]).join('')}
+                          {getInitials(getUserName(project.createdBy.id))}
                         </div>
                         <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                           Shared by <span className="font-medium text-[var(--text-primary)] dark:text-gray-200">{getUserName(project.createdBy.id)}</span>
@@ -167,7 +177,7 @@ export function SharedProjectsPage() {
                               className="h-7 w-7 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center text-xs text-white font-medium dark:border-gray-800"
                               title={getUserName(memberId)}
                             >
-                              {memberId === user?.id ? 'Y' : getUserName(memberId).split(' ').map(n => n[0]).join('')}
+                              {memberId === user?.id ? 'Y' : getInitials(getUserName(memberId))}
                             </div>
                           ))}
                           {(project.teamMembers?.length || 0) > 3 && (
@@ -259,7 +269,7 @@ export function SharedProjectsPage() {
                                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/20"
                                 >
                                   <div className="h-5 w-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
-                                    {getUserName(memberId).split(' ').map(n => n[0]).join('')}
+                                    {getInitials(getUserName(memberId))}
                                   </div>
                                   <span className="text-xs text-[var(--text-primary)] dark:text-gray-200">
                                     {getUserName(memberId)}
