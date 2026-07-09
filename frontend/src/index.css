@@ -99,6 +99,48 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Hide scrollbar globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Show scrollbar for feature list in scope builder */
+.feature-list-scroll::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.feature-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.feature-list-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.feature-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark .feature-list-scroll::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+.dark .feature-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.feature-list-scroll {
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+}
+
 #root {
   min-height: 100vh;
 }

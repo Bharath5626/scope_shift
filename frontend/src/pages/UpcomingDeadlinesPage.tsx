@@ -9,7 +9,7 @@ import type { Project } from '../types'
 const statusStyles: Record<Project['status'], string> = {
   draft: 'bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-gray-300',
   active: 'bg-green-50 text-[var(--color-success)] dark:bg-green-900/30 dark:text-green-400',
-  completed: 'bg-indigo-50 text-[var(--color-info)] dark:bg-indigo-900/30 dark:text-indigo-400',
+  completed: 'bg-[var(--color-primary)]/10 text-[var(--color-info)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]',
   at_risk: 'bg-red-50 text-[var(--color-danger)] dark:bg-red-900/30 dark:text-red-400',
 }
 
@@ -32,11 +32,11 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <button
       onClick={handleOpen}
-      className={`group w-full ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} text-left ${SHADOW.card} ${TRANSITION} hover:-translate-y-0.5 hover:border-indigo-200 ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30`}
+      className={`group w-full ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-[var(--bg-surface)] ${SPACING.card.padding} text-left ${SHADOW.card} ${TRANSITION} hover:-translate-y-0.5 hover:border-[var(--color-primary)] ${SHADOW.cardHover} dark:border-gray-700 dark:bg-gray-800 dark:hover:border-[var(--color-primary)] dark:hover:shadow-gray-900/30`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-[var(--text-primary)] transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400`}>
+          <h3 className={`truncate ${TYPOGRAPHY.cardTitle} text-[var(--text-primary)] transition group-hover:text-[var(--color-primary)] dark:text-gray-100 dark:group-hover:text-[var(--color-primary)]`}>
             {project.name}
           </h3>
 

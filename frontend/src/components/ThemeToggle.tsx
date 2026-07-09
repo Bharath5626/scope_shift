@@ -6,7 +6,7 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="shrink-0 rounded-xl p-2.5 text-indigo-200 transition hover:bg-white/10 hover:text-white"
+      className="shrink-0 rounded-xl p-2.5 text-[var(--color-primary)]/40 transition hover:bg-white/10 hover:text-white"
       aria-label="Toggle dark mode"
       title="Toggle theme"
     >

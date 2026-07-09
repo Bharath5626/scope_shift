@@ -1,5 +1,6 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-import { GoogleGenAI } from "@google/genai";
+const { GoogleGenAI } = require("@google/genai");
+
 import {
   calculateCapacityMetricsNew,
   deriveConfidence,
@@ -505,18 +506,18 @@ Return ONLY valid JSON. No markdown, no commentary.
     const response = await withRetry(
       () => withTimeout(
         client.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.5-flash",
           contents: prompt,
           config: { responseMimeType: "application/json", temperature: 0.2 },
         }),
-        30000 // 30 second timeout
+        90000 // 90 second timeout
       ),
       {
         maxRetries: 3,
         retryableErrors: ['timeout', '429', '500', '503', 'ECONNRESET', 'ETIMEDOUT'],
         delays: [1000, 2000],
       }
-    );
+    ) as { text?: string };
 
     const text = response.text ?? "";
     
@@ -687,350 +688,527 @@ export const generateProjectFeatures = async (
 
   try {
     const client = new GoogleGenAI({ apiKey });
-    const prompt = `You are a Principal Software Architect with 15+ years of experience designing scalable, production-grade software systems for startups, SaaS platforms, internal business tools, mobile applications, and enterprise products.
+   const prompt = `
+You are a Principal Software Architect and Technical Project Manager with 15+ years of experience designing and estimating production-grade software systems.
 
-Your task is to generate a realistic, implementation-ready feature set based on the project details provided.
+Your task is to generate a realistic engineering scope breakdown for the software project described below.
 
-The generated features will be used as the initial project scope for planning, estimation, and development.
+The generated features will be used by an AI project estimation engine to calculate:
 
----
+- Development effort
+- Required productive hours
+- Timeline feasibility
+- Project risk
+- Scope creep impact
+- Delay prediction
 
-## Project Context
+Therefore, generate features as IMPLEMENTABLE SOFTWARE CAPABILITIES, not user stories.
 
-### Required Inputs
+Think like:
+- Software Architect
+- Engineering Manager
+- Technical Lead
 
-* Name: ${input.name}
-* Tech Stack: ${input.techStack}
-* Team Size: ${input.teamSize}
-* Start Date: ${input.startDate}
-* Deadline: ${input.deadline}
-
-### Additional Context
-
-* Description: ${input.description || "Not provided"}
-* Project Type: ${input.projectType || "Not specified"}
-* Methodology: ${input.methodology || "Not specified"}
-* Working Hours Per Day: ${input.workingHours || "Not specified"}
-
----
-
-## FEATURE GENERATION WORKFLOW
-
-You MUST think in terms of USER WORKFLOWS, BUSINESS GOALS, and REAL-WORLD PRODUCT BEHAVIOR.
-
-Do NOT think in terms of pages, screens, components, dashboards, or generic software modules.
+Do NOT think like:
+- UX designer
+- Marketing person
+- Product copywriter
 
 ---
 
-### Step 1: Identify Primary Actors
+# PROJECT CONTEXT
 
-Determine the real users involved in the system.
+## Required Information
+
+Project Name:
+${input.name}
+
+Project Description:
+${input.description || "Not provided"}
+
+Project Type:
+${input.projectType || "Not specified"}
+
+Technology Stack:
+${input.techStack}
+
+Team Size:
+${input.teamSize}
+
+Start Date:
+${input.startDate}
+
+Deadline:
+${input.deadline}
+
+Development Methodology:
+${input.methodology || "Not specified"}
+
+Working Hours Per Day:
+${input.workingHours || "Not specified"}
+
+---
+
+# CORE OBJECTIVE
+
+Generate the engineering scope required to build this product.
+
+Features must represent meaningful software capabilities such as:
+
+- Application modules
+- Backend capabilities
+- Frontend capabilities
+- Database capabilities
+- External integrations
+- Security capabilities
+- Infrastructure capabilities
+- Testing capabilities
+- Deployment capabilities
+
+The output will become the baseline scope for project estimation.
+
+---
+
+# FEATURE GENERATION PROCESS
+
+Before generating features, internally analyze:
+
+## 1. Identify Product Domain
+
+Understand what industry/business this software belongs to.
 
 Examples:
 
-* Customer
-* Admin
-* Employee
-* Manager
-* Vendor
-* Student
-* Teacher
-* Doctor
-* Patient
-* Delivery Partner
-* External System
+Healthcare:
+- Patient management
+- Medical records
+- Appointments
+- Billing
+- Pharmacy
+- Laboratory
+
+E-commerce:
+- Products
+- Inventory
+- Orders
+- Payments
+- Shipping
+- Customers
+
+Education:
+- Courses
+- Students
+- Enrollment
+- Assessments
+- Progress tracking
+
+Banking:
+- Accounts
+- Transactions
+- Loans
+- Compliance
+
+Do not allow generic software patterns to override the actual domain.
 
 ---
 
-### Step 2: Identify User Goals
+## 2. Identify Required Engineering Modules
 
-Determine what each actor is trying to accomplish.
+Break the product into:
+
+### Core Business Modules
+The main functionality that makes the product valuable.
 
 Examples:
+- Product Catalog
+- Patient Records
+- Course Management
+- Order Processing
 
-Food Delivery App:
 
-* Browse restaurants
-* Place orders
-* Track deliveries
-
-Hospital System:
-
-* Book appointments
-* Manage patient records
-* View prescriptions
-
-Learning Platform:
-
-* Browse courses
-* Enroll in courses
-* Track progress
-
----
-
-### Step 3: Convert Goals Into Workflows
-
-Identify the complete workflow users follow.
-
-Example:
-
-Customer
-→ Search Product
-→ View Details
-→ Add To Cart
-→ Checkout
-→ Pay
-→ Track Order
-
-Each meaningful workflow step can become a feature.
-
----
-
-### Step 4: Generate Features
-
-Generate features based on workflows.
-
-Each feature must:
-
-* Represent a real business capability
-* Deliver user value
-* Be implementable as a backlog item
-* Contribute to the product's core purpose
-
-Features should describe WHAT the system does, not HOW it is implemented.
-
----
-
-## REQUIRED FEATURE DISTRIBUTION
-
-Generate between 8 and 12 features.
-
-Prioritize:
-
-### Core Workflow Features (60-70%)
-
-Essential capabilities required for the product to function.
-
-### Supporting Workflow Features (20-30%)
-
-Features that help users complete tasks efficiently.
-
-### Administrative / Management Features (10-20%)
-
-Features needed for monitoring, management, or operational control.
-
----
-
-## TECH STACK AWARENESS
-
-Use the provided tech stack when deciding feature feasibility.
+### Supporting Modules
 
 Examples:
+- Notifications
+- Search
+- Reporting
+- Reviews
+- Communication
 
-React Native:
 
-* Mobile-first workflows
+### Technical Foundation Modules
 
-Node.js:
-
-* API-driven workflows
-
-PostgreSQL:
-
-* Structured data management
-
-MongoDB:
-
-* Flexible document workflows
-
-AWS:
-
-* Scalable cloud-based features
-
-Do NOT generate features requiring technology that conflicts with the supplied stack unless absolutely necessary.
+Examples:
+- Authentication & Authorization
+- Database Design
+- API Development
+- Frontend Development
+- Testing & Quality Assurance
+- Deployment & Configuration
 
 ---
 
-## DELIVERY CONSTRAINT AWARENESS
+# IMPORTANT DOMAIN RULE
+
+Generated features MUST belong to the actual project domain.
+
+Do NOT generate generic SaaS/project-management features unless the project itself is a project management system.
+
+Invalid example:
+
+Project:
+Hospital Management System
+
+Wrong:
+
+- Create Tasks
+- Manage Projects
+- Kanban Boards
+- Team Collaboration
+- Track Employee Progress
+
+
+Correct:
+
+- Patient Management
+- Doctor Management
+- Appointment Management
+- Electronic Medical Records
+- Prescription Management
+- Laboratory Management
+- Pharmacy Management
+- Billing Management
+
+---
+
+# FEATURE GRANULARITY RULE
+
+A feature represents an engineering scope item.
+
+A feature should be large enough to require meaningful development effort.
+
+Good:
+
+- Payment Gateway Integration
+- Inventory Management System
+- Authentication & Authorization
+- Patient Record Management
+- Search & Filtering Engine
+- Notification Service
+
+
+Bad:
+
+- Click Login Button
+- Appointment Page
+- Product Screen
+- Create Button Component
+- Database Table Creation
+
+---
+
+# TECH STACK AWARENESS
+
+Use the technology stack only to judge feasibility and complexity.
+
+Do NOT generate low-level implementation tasks.
+
+Bad:
+
+- Create React Components
+- Setup Express Routes
+- Configure MySQL Tables
+
+
+Good:
+
+- Frontend Application Development
+- API Development
+- Database Design & Migration
+
+---
+
+# DELIVERY CONSTRAINT AWARENESS
 
 Consider:
 
-* Team Size
-* Start Date
-* Deadline
-* Working Hours
+- Team size
+- Timeline
+- Deadline
+- Working hours
 
-If the timeline appears tight:
+If the timeline is short:
 
-* Prefer MVP-focused features
-* Avoid excessive enterprise functionality
-* Focus on core workflows first
+- Focus on MVP modules
+- Remove enterprise-level features
+- Avoid unnecessary integrations
 
-If the timeline appears generous:
 
-* Include additional supporting features
-* Include operational and reporting capabilities where relevant
+If the timeline is longer:
 
----
-
-## QUALITY FILTER (MANDATORY)
-
-Reject any feature that is:
-
-* Generic SaaS boilerplate
-* A page or screen name
-* A UI element
-* A technical implementation detail
-* A duplicate of another feature
-* Meaningless without user interaction
+- Include supporting capabilities
+- Include operational modules
+- Include reporting and automation where relevant
 
 ---
 
-## AVOID GENERATING THESE UNLESS CLEARLY REQUIRED
+# COMMON DOMAIN EXAMPLES
 
-* Dashboard
-* Admin Dashboard
-* Login
-* Signup
-* Authentication
-* Role-Based Access Control
-* Notifications
-* Analytics
-* Reports
-* Settings
-* Profile Management
+Use these only as guidance.
 
-Only include these if the project description explicitly requires them or the workflow cannot function without them.
+## E-Commerce
+
+Possible features:
+
+- Authentication & Authorization
+- User Management
+- Product Catalog Management
+- Category Management
+- Inventory Management
+- Shopping Cart
+- Order Processing
+- Payment Integration
+- Shipping & Delivery Management
+- Review & Rating System
+- Wishlist Management
+- Coupon & Discount Management
+- Notification Service
+- Admin Management
+- Reporting & Analytics
+- Search & Filtering
+- Database Design & Migration
+- API Development
+- Frontend Application Development
+- Testing & Quality Assurance
+- Deployment & Configuration
+
+
+## Hospital Management
+
+Possible features:
+
+- Authentication & Authorization
+- User and Staff Management
+- Patient Management
+- Doctor Management
+- Appointment Management
+- Electronic Medical Records
+- Prescription Management
+- Laboratory Management
+- Pharmacy Management
+- Billing Management
+- Insurance Management
+- Notification Service
+- Reporting & Analytics
+- Database Design & Migration
+- API Development
+- Frontend Application Development
+- Testing & Quality Assurance
+- Deployment & Configuration
+
+
+## SaaS Application
+
+Possible features:
+
+- Authentication & Authorization
+- User Management
+- Subscription Management
+- Core Application Module
+- Payment Integration
+- Notification Service
+- Analytics
+- Admin Management
+- API Development
+- Database Design
+- Frontend Development
+- Testing
+- Deployment
+
 
 ---
 
-## FEATURE TITLE RULES
+# FEATURE TITLE RULES
 
 Titles must:
 
-* Be action-oriented
-* Be concise
-* Contain 3–6 words
-* Prefer verb + object structure
+- Represent engineering capabilities
+- Be concise
+- Be understandable by developers and project managers
+- Usually contain 2-6 words
 
 Good:
 
-* Search Available Mentors
-* Schedule Consultation Session
-* Submit Service Request
-* Track Delivery Status
+- Payment Gateway Integration
+- Inventory Management System
+- User Authentication
+- Order Processing
+- Database Design & Migration
+
 
 Bad:
 
-* Dashboard
-* User Management
-* Settings Page
-* Authentication Module
+- Buy Product
+- Book Appointment
+- View Dashboard
+- Manage Things
 
 ---
 
-## DESCRIPTION RULES
+# DESCRIPTION RULES
 
 Descriptions must:
 
-* Be one sentence
-* Focus on user value
-* Explain the outcome
+- Explain the engineering capability
+- Be one sentence
+- Describe business value
+- Avoid low-level implementation details
+
 
 Good:
-"Customers can track the real-time status of their orders."
+
+"Enables customers to securely complete transactions using supported payment providers."
 
 Bad:
-"Uses WebSockets and Redis for tracking."
+
+"Uses Stripe API with webhook handlers."
 
 ---
 
-## CATEGORY RULES
+# CATEGORY RULES
 
-Use domain-focused categories.
+Categories should represent engineering scope areas.
 
-Examples:
+Allowed examples:
 
-* ordering
-* booking
-* scheduling
-* inventory
-* payments
-* communication
-* tracking
-* enrollment
-* delivery
-* consultation
+- authentication
+- user-management
+- core-module
+- database
+- api
+- frontend
+- backend
+- integration
+- security
+- notification
+- reporting
+- analytics
+- testing
+- deployment
+
 
 Avoid:
 
-* ui
-* frontend
-* backend
-* system
-* page
+- page
+- screen
+- button
+- ui-component
 
 ---
 
-## PRIORITY RULES
+# PRIORITY RULES
 
-high
+high:
+Required for the product's main functionality.
 
-* Essential for the product's primary workflow
+medium:
+Important supporting capability.
 
-medium
-
-* Supports or improves primary workflows
-
-low
-
-* Nice-to-have enhancements
+low:
+Optional enhancement.
 
 ---
 
-## OUTPUT FORMAT (STRICT)
+# COMPLEXITY RULES
 
-Return ONLY a valid JSON array.
+Estimate implementation complexity.
+
+Allowed values:
+
+low:
+Simple feature with limited dependencies.
+
+medium:
+Multiple workflows or moderate business logic.
+
+high:
+Complex business rules, external integrations, AI, payments, real-time systems, or large data processing.
+
+---
+
+# FINAL VALIDATION
+
+Before returning:
+
+Remove any feature that is:
+
+- Generic
+- Unrelated to the project domain
+- Only a UI element
+- A user action instead of a software capability
+- A duplicate
+- Too small to estimate separately
+
+Quality is more important than filling the list.
+
+Generate between 12 and 20 features.
+
+---
+
+# OUTPUT FORMAT
+
+Return ONLY valid JSON array.
+
+CRITICAL REQUIREMENTS:
+- NO markdown code blocks
+- NO explanations before or after the JSON
+- NO comments within the JSON
+- NO trailing commas
+- Ensure proper JSON syntax: use double quotes for strings, proper comma separation
+- The response must start with [ and end with ]
+- Each object must have all required fields: title, description, category, priority, complexity
+
+Format:
 
 [
-{
-"title": "Search Available Mentors",
-"description": "Users can discover mentors based on expertise and availability.",
-"category": "search",
-"priority": "high"
-}
+ {
+  "title":"Payment Gateway Integration",
+  "description":"Enables customers to securely complete transactions using supported payment providers.",
+  "category":"integration",
+  "priority":"high",
+  "complexity":"high"
+ }
 ]
-
-Do not include markdown.
-
-Do not include explanations.
-
-Do not include any text outside the JSON array.
 
 `;
 
     const response = await withRetry(
       () => withTimeout(
         client.models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3.5-flash",
           contents: prompt,
           config: { responseMimeType: "application/json", temperature: 0.3 },
         }),
-        30000 // 30 second timeout
+        90000 // 90 second timeout
       ),
       {
         maxRetries: 3,
         retryableErrors: ['timeout', '429', '500', '503', 'ECONNRESET', 'ETIMEDOUT'],
         delays: [1000, 2000],
       }
-    );
+    ) as { text?: string };
 
     const text = (response.text ?? "")
       .trim()
       .replace(/^```(?:json)?/i, "")
       .replace(/```$/i, "")
       .trim();
-    
+
+    // Log raw response for debugging
+    console.log("========== RAW AI RESPONSE ==========");
+    console.log(text.substring(0, 2000)); // Log first 2000 chars
+    console.log("====================================");
+
     // Use safe JSON parsing
     const parseResult = safeParseJson(text);
     if (!parseResult.success) {
@@ -1278,7 +1456,7 @@ If uncertain, assume higher impact rather than underestimating system complexity
 Ensure all changes are explicitly justified from the input scopes.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",

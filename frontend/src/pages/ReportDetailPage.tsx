@@ -68,6 +68,7 @@ interface Project {
   projectType: string | null
   methodology: string | null
   workingHours: number | null
+  teamMembers?: string[]
   createdBy: {
     id: string
     name: string
@@ -95,7 +96,7 @@ function DonutChart({ level, score }: { level: string; score: number }) {
   const filled = (Math.min(score, 100) / 100) * circ
   const color = COMPLEXITY_STROKE[level] ?? '#f59e0b'
   return (
-    <div className="relative flex h-36 w-36 items-center justify-center">
+    <div className="relative flex h-36 w-36 items-center justify-center rounded-full bg-white shadow-sm dark:bg-gray-800">
       <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" className="dark:stroke-gray-700" />
         <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="10"
@@ -165,14 +166,16 @@ function SummaryTab({ analysis }: { analysis: Analysis }) {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row items-center gap-6">
-        <DonutChart level={complexity} score={score} />
-        <div>
-          <p className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Complexity Level</p>
-          <p className={`mt-1 text-3xl font-bold ${riskColors.text}`}>{complexity}</p>
-          <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
-            Based on {analysis.additionalHours} hours of estimated effort across all categories.
-          </p>
+      <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-section)] p-6 shadow-sm dark:border-gray-700 dark:bg-gray-700/50 dark:shadow-gray-900/20">
+        <div className="flex flex-col lg:flex-row items-center gap-6">
+          <DonutChart level={complexity} score={score} />
+          <div>
+            <p className="text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Complexity Level</p>
+            <p className={`mt-1 text-3xl font-bold ${riskColors.text}`}>{complexity}</p>
+            <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
+              Based on {analysis.additionalHours} hours of estimated effort across all categories.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -287,7 +290,7 @@ function RecommendationsTab({ recommendations }: { recommendations: string[] | n
   )
 }
 
-function ProjectDetailsTab({ project }: { project: Project }) {
+function ProjectDetailsTab({ project, users }: { project: Project; users: any[] }) {
   return (
     <div className="space-y-6">
       {/* Basic Info */}
@@ -341,6 +344,41 @@ function ProjectDetailsTab({ project }: { project: Project }) {
           <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.techStack || 'Not specified'}</p>
         </div>
       </div>
+
+      {/* Team Members */}
+      {project.teamMembers && project.teamMembers.length > 0 && (
+        <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+          <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Team Members ({project.teamMembers.length})</h3>
+          <div className="space-y-3">
+            {project.teamMembers.map((memberId) => {
+              const member = users.find((u: any) => u.id === memberId)
+              const memberName = member?.name || 'Unknown User'
+              const memberImage = member?.profileImage || null
+              const initials = memberName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+              
+              return (
+                <div key={memberId} className="flex items-center gap-3">
+                  {memberImage ? (
+                    <img
+                      src={memberImage}
+                      alt={memberName}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                      {initials}
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">{memberName}</p>
+                    <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{member?.email || ''}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Timeline */}
       <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
@@ -453,18 +491,30 @@ function LogsTab({ auditLogs }: { auditLogs: AuditLog[] }) {
                   )}
                 </div>
               </div>
-              <button
-                onClick={() => handleShowFeatures(log.id)}
-                className="rounded-lg border border-[var(--color-primary)]/20 bg-[var(--color-primary-50)] px-4 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary-100)] dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)] dark:hover:bg-[var(--color-primary-dark)]/30"
-              >
-                Features
-              </button>
+              {expandedLogId === log.id ? (
+                <button
+                  onClick={() => handleShowFeatures(log.id)}
+                  className="flex items-center gap-1 rounded-lg border border-[var(--color-primary)]/20 bg-[var(--color-primary-50)] px-4 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary-100)] dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)] dark:hover:bg-[var(--color-primary-dark)]/30"
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                  </svg>
+                  Hide Features
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleShowFeatures(log.id)}
+                  className="rounded-lg border border-[var(--color-primary)]/20 bg-[var(--color-primary-50)] px-4 py-2 text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary-100)] dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)] dark:hover:bg-[var(--color-primary-dark)]/30"
+                >
+                  Features {log.features?.length ? `(${log.features.length})` : ''}
+                </button>
+              )}
             </div>
             
             {expandedLogId === log.id && (
               <div className="border-t border-[var(--border-primary)] bg-[var(--bg-section)] p-4 dark:border-gray-700 dark:bg-gray-700/50">
                 {log.features && log.features.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2 feature-list-scroll">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
                       Features ({log.features.length})
                     </p>
@@ -497,6 +547,7 @@ export function ReportDetailPage() {
   const [project, setProject] = useState<Project | null>(null)
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<Tab>('Summary')
@@ -628,11 +679,13 @@ export function ReportDetailPage() {
       api.get<Project>(`/projects/${projectId}`),
       api.get<Analysis>(`/projects/${projectId}/analyses/latest`),
       api.get<AuditLog[]>(`/projects/${projectId}/audit-logs`),
+      api.get<any[]>('/users'),
     ])
-      .then(([proj, anal, logs]) => {
+      .then(([proj, anal, logs, usersData]) => {
         setProject(proj)
         setAnalysis(anal)
         setAuditLogs(logs)
+        setUsers(Array.isArray(usersData) ? usersData : ((usersData as any).data?.data || (usersData as any).data || []))
       })
       .catch(() => setError('Failed to load report data'))
       .finally(() => setLoading(false))
@@ -764,7 +817,7 @@ export function ReportDetailPage() {
           {activeTab === 'Recommendations' && (
             <RecommendationsTab recommendations={analysis.recommendations as string[] | null} />
           )}
-          {activeTab === 'Project Details' && <ProjectDetailsTab project={project} />}
+          {activeTab === 'Project Details' && <ProjectDetailsTab project={project} users={users} />}
           {activeTab === 'Logs' && <LogsTab auditLogs={auditLogs} />}
         </div>
 

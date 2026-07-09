@@ -13,7 +13,6 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 const EXTRA_ACTIVE: Record<string, string[]> = {
   '/analysis': ['/analyzing', '/analysis-results'],
   '/reports': ['/reports/'],
-  '/scope-builder': ['/scope-builder'],
 }
 
 function NavIcon({ icon }: { icon: string }) {
@@ -154,10 +153,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
   <div className={`flex items-center gap-3`}>
   {!collapsed && (
     <>
-      <div className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.card} bg-white/20 font-bold text-white`}>
-        S
-      </div>
-
+      <img src="/logo.jpg" alt="ScopeAI" className={`h-10 w-10 ${BORDER_RADIUS.card} object-contain`} />
       <div>
         <p className={`${TYPOGRAPHY.body} font-semibold text-white`}>ScopeAI</p>
         <p className={`${TYPOGRAPHY.caption} text-slate-400`}>Scope Creep Analyzer</p>
@@ -244,9 +240,17 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
         aria-haspopup="true"
         aria-expanded={showSettingsDropdown}
       >
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center ${BORDER_RADIUS.tag} bg-white/20 ${TYPOGRAPHY.body} font-semibold text-white`}>
-          {initials}
-        </div>
+        {user?.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt={user.name}
+            className="h-9 w-9 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center ${BORDER_RADIUS.tag} bg-white/20 ${TYPOGRAPHY.body} font-semibold text-white`}>
+            {initials}
+          </div>
+        )}
 
         <div className="min-w-0 flex-1">
           <p className={`truncate ${TYPOGRAPHY.body} font-medium text-white`}>
@@ -257,7 +261,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
           </p>
         </div>
 
-        <svg className={`${ICON_SIZE.navigation} shrink-0 text-indigo-200`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className={`${ICON_SIZE.navigation} shrink-0 text-[var(--color-primary)]/30`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
         </svg>
       </button>
@@ -285,10 +289,18 @@ export function Sidebar({ mobileOpen, setMobileOpen }: { mobileOpen?: boolean; s
     >
       <button
         onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
-        className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.tag} bg-white/20 ${TYPOGRAPHY.body} font-semibold text-white ${TRANSITION} hover:bg-white/30 mx-auto`}
+        className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.tag} bg-white/20 ${TYPOGRAPHY.body} font-semibold text-white ${TRANSITION} hover:bg-white/30 mx-auto overflow-hidden`}
         title={user?.name ?? 'User'}
       >
-        {initials}
+        {user?.profileImage ? (
+          <img
+            src={user.profileImage}
+            alt={user.name}
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        ) : (
+          <span>{initials}</span>
+        )}
       </button>
 
       {/* User Dropdown */}

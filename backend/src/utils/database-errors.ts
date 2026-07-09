@@ -105,10 +105,10 @@ export function handleDatabaseError(error: unknown): DatabaseError {
     }
 
     // Generic database error - include code if available
-    return new DatabaseError(
-      'A database error occurred. Please try again.',
-      code || error.message
-    );
+   return new DatabaseError(
+  error.message,
+  code
+);
   }
 
   return new DatabaseError(

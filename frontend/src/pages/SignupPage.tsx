@@ -46,9 +46,7 @@ export function SignupPage() {
         
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className={`flex h-12 w-12 items-center justify-center ${BORDER_RADIUS.card} bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] font-bold text-white text-xl shadow-lg`}>
-              S
-            </div>
+            <img src="/logo.jpg" alt="ScopeAI" className={`h-12 w-12 ${BORDER_RADIUS.card} object-contain`} />
             <div>
               <p className={`font-bold text-white text-lg`}>ScopeAI</p>
               <p className={`${TYPOGRAPHY.caption} text-slate-400`}>Enterprise Scope Management</p>
@@ -58,27 +56,12 @@ export function SignupPage() {
 
         <div className="relative z-10">
           <h1 className="text-5xl font-bold leading-tight text-white mb-6">
-            Prevent scope creep.<br />
-            <span className="text-[var(--color-primary-light)]">Ship on time.</span>
+            Project Scope<br />
+            <span className="text-[var(--color-primary-light)]">Management Platform</span>
           </h1>
           <p className={`text-slate-300 ${TYPOGRAPHY.body} leading-relaxed text-lg max-w-md`}>
-            AI-powered project analysis that identifies risks, predicts delays, and keeps your team on track.
+            Streamline your project planning with intelligent scope analysis and team collaboration tools.
           </p>
-
-          <div className="mt-12 grid grid-cols-2 gap-6">
-            {[
-              { icon: '📊', label: 'AI Analysis', desc: 'Smart scope evaluation' },
-              { icon: '⚠️', label: 'Risk Detection', desc: 'Early warning system' },
-              { icon: '💡', label: 'Insights', desc: 'Actionable recommendations' },
-              { icon: '📈', label: 'Analytics', desc: 'Project health metrics' },
-            ].map((item) => (
-              <div key={item.label} className={`p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10`}>
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <p className={`font-semibold text-white ${TYPOGRAPHY.body}`}>{item.label}</p>
-                <p className={`${TYPOGRAPHY.caption} text-slate-400 mt-1`}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         <p className={`relative z-10 ${TYPOGRAPHY.caption} text-slate-500`}>© 2026 ScopeAI. All rights reserved.</p>
@@ -89,9 +72,7 @@ export function SignupPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className={`mb-8 flex items-center gap-3 lg:hidden`}>
-            <div className={`flex h-10 w-10 items-center justify-center ${BORDER_RADIUS.card} bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] font-bold text-white`}>
-              S
-            </div>
+            <img src="/logo.jpg" alt="ScopeAI" className={`h-10 w-10 ${BORDER_RADIUS.card} object-contain`} />
             <span className={`font-bold text-[var(--text-primary)] text-lg`}>ScopeAI</span>
           </div>
 

@@ -471,8 +471,8 @@ const filteredSkills = SKILLS.filter(
     return (
       <div className={`min-h-screen bg-[var(--bg-page)] flex items-center justify-center p-4 sm:p-8`}>
         <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-8 sm:p-14 text-center ${SHADOW.card} max-w-sm w-full dark:border-[var(--border-secondary)] dark:bg-[var(--bg-surface)]`}>
-          <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-[var(--bg-accent-subtle)] dark:bg-indigo-900/30`}>
-            <svg className={`h-8 w-8 animate-spin text-[var(--color-primary)] dark:text-indigo-400`} fill="none" viewBox="0 0 24 24">
+          <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center ${BORDER_RADIUS.card} bg-[var(--bg-accent-subtle)] dark:bg-[var(--color-primary)]/10`}>
+            <svg className={`h-8 w-8 animate-spin text-[var(--color-primary)] dark:text-[var(--color-primary)]`} fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
@@ -800,7 +800,7 @@ const filteredSkills = SKILLS.filter(
             return (
               <span
                 key={memberId}
-                className={`flex items-center gap-2 ${BORDER_RADIUS.tag} bg-indigo-100 px-3 py-1 ${TYPOGRAPHY.body} text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400`}
+                className={`flex items-center gap-2 ${BORDER_RADIUS.tag} bg-[var(--color-primary)]/10 px-3 py-1 ${TYPOGRAPHY.body} text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]`}
               >
                 {user?.profileImage && (
                   <img

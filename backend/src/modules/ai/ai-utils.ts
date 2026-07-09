@@ -70,8 +70,29 @@ export class AIUnavailableError extends Error {
 }
 
 /**
+ * Attempts to repair common JSON syntax errors.
+ * This is a best-effort repair function for malformed AI responses.
+ */
+function attemptJsonRepair(text: string): string {
+  let repaired = text;
+
+  // Remove trailing commas before closing brackets/braces
+  repaired = repaired.replace(/,\s*([}\]])/g, '$1');
+
+  // Fix missing commas between array elements
+  repaired = repaired.replace(/}\s*{/g, '},{');
+  repaired = repaired.replace(/]\s*\[/g, '],[');
+
+  // Fix missing commas between object properties
+  repaired = repaired.replace(/"\s*"/g, '","');
+
+  return repaired;
+}
+
+/**
  * Safe JSON parsing utility that never throws.
  * Handles empty strings, markdown wrapping, and malformed JSON.
+ * Includes attempt to repair common JSON syntax errors.
  */
 export function safeParseJson(text: string | undefined | null): SafeParseResult {
   if (!text || typeof text !== 'string') {
@@ -82,7 +103,7 @@ export function safeParseJson(text: string | undefined | null): SafeParseResult 
   }
 
   const trimmed = text.trim();
-  
+
   if (trimmed === '') {
     return {
       success: false,
@@ -103,6 +124,7 @@ export function safeParseJson(text: string | undefined | null): SafeParseResult 
     };
   }
 
+  // First attempt: parse as-is
   try {
     const parsed = JSON.parse(cleaned);
     return {
@@ -110,10 +132,20 @@ export function safeParseJson(text: string | undefined | null): SafeParseResult 
       data: parsed,
     };
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown parse error',
-    };
+    // Second attempt: try to repair common JSON errors
+    try {
+      const repaired = attemptJsonRepair(cleaned);
+      const parsed = JSON.parse(repaired);
+      return {
+        success: true,
+        data: parsed,
+      };
+    } catch (repairError) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown parse error',
+      };
+    }
   }
 }
 

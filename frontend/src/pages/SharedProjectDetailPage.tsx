@@ -5,6 +5,10 @@ import { useProjects } from '../context/ProjectContext'
 import { api } from '../services/api'
 import type { Feature, Analysis } from '../types'
 
+const getInitials = (name: string) => {
+  return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+}
+
 function BackIcon() {
   return (
     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -26,6 +30,11 @@ export function SharedProjectDetailPage() {
   const [availableUsers, setAvailableUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const getUserProfileImage = (userId: string) => {
+    const foundUser = availableUsers.find((u: any) => u.id === userId)
+    return foundUser?.profileImage || null
+  }
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -113,7 +122,7 @@ export function SharedProjectDetailPage() {
         <div className="mb-6">
           <Link
             to="/shared-projects"
-            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary)] dark:hover:text-[var(--color-primary-hover)]"
           >
             <BackIcon />
             Back to Shared Projects
@@ -125,7 +134,7 @@ export function SharedProjectDetailPage() {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-purple-500 text-white font-bold text-xl">
                   {project.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                 </div>
                 <div>
@@ -206,11 +215,11 @@ export function SharedProjectDetailPage() {
                   No features added yet.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2 feature-list-scroll">
                   {features.map((feature) => (
                     <div
                       key={feature.id}
-                      className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 dark:border-indigo-800/30 dark:bg-indigo-900/10"
+                      className="rounded-xl border border-[var(--color-primary)]/30 bg-[var(--bg-section)] p-4 dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary)]/10"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
@@ -232,10 +241,10 @@ export function SharedProjectDetailPage() {
                         </span>
                       </div>
                       <div className="mt-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-                        <span className="bg-indigo-100 px-2 py-0.5 rounded dark:bg-indigo-900/30 dark:text-indigo-400">
+                        <span className="bg-[var(--color-primary)]/10 px-2 py-0.5 rounded dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]">
                           {feature.category}
                         </span>
-                        <span className="bg-indigo-100 px-2 py-0.5 rounded dark:bg-indigo-900/30 dark:text-indigo-400">
+                        <span className="bg-[var(--color-primary)]/10 px-2 py-0.5 rounded dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]">
                           {feature.type === 'original' ? 'Original' : 'New'}
                         </span>
                       </div>
@@ -252,27 +261,27 @@ export function SharedProjectDetailPage() {
                   Latest Analysis
                 </h2>
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-                  <div className="rounded-xl bg-indigo-50 p-4 dark:bg-indigo-900/20">
+                  <div className="rounded-xl bg-[var(--bg-section)] p-4 dark:bg-[var(--color-primary)]/10">
                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Scope Increase</p>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                    <p className="text-xl font-bold text-[var(--color-primary)] dark:text-[var(--color-primary)]">
                       {analysis.scopeIncreasePercent}%
                     </p>
                   </div>
-                  <div className="rounded-xl bg-indigo-50 p-4 dark:bg-indigo-900/20">
+                  <div className="rounded-xl bg-[var(--bg-section)] p-4 dark:bg-[var(--color-primary)]/10">
                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Additional Hours</p>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                    <p className="text-xl font-bold text-[var(--color-primary)] dark:text-[var(--color-primary)]">
                       {analysis.additionalHours}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-indigo-50 p-4 dark:bg-indigo-900/20">
+                  <div className="rounded-xl bg-[var(--bg-section)] p-4 dark:bg-[var(--color-primary)]/10">
                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Delay (Weeks)</p>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+                    <p className="text-xl font-bold text-[var(--color-primary)] dark:text-[var(--color-primary)]">
                       {analysis.delayWeeks}
                     </p>
                   </div>
-                  <div className="rounded-xl bg-indigo-50 p-4 dark:bg-indigo-900/20">
+                  <div className="rounded-xl bg-[var(--bg-section)] p-4 dark:bg-[var(--color-primary)]/10">
                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Risk Level</p>
-                    <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400 capitalize">
+                    <p className="text-xl font-bold text-[var(--color-primary)] dark:text-[var(--color-primary)] capitalize">
                       {analysis.riskLevel}
                     </p>
                   </div>
@@ -293,10 +302,18 @@ export function SharedProjectDetailPage() {
               </h2>
               <div className="space-y-3">
                 {/* Creator */}
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
-                    {getUserName(project.createdBy.id).split(' ').map(n => n[0]).join('')}
-                  </div>
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-section)] dark:bg-[var(--color-primary)]/10">
+                  {getUserProfileImage(project.createdBy.id) ? (
+                    <img
+                      src={getUserProfileImage(project.createdBy.id)}
+                      alt={getUserName(project.createdBy.id)}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white font-medium">
+                      {getInitials(getUserName(project.createdBy.id))}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">
                       {getUserName(project.createdBy.id)}
@@ -313,47 +330,28 @@ export function SharedProjectDetailPage() {
                       key={memberId}
                       className="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-gray-700/50"
                     >
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center text-white font-medium">
-                        {getUserName(memberId).split(' ').map(n => n[0]).join('')}
-                      </div>
+                      {getUserProfileImage(memberId) ? (
+                        <img
+                          src={getUserProfileImage(memberId)}
+                          alt={getUserName(memberId)}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-[var(--color-primary)] flex items-center justify-center text-white font-medium">
+                          {getInitials(getUserName(memberId))}
+                        </div>
+                      )}
                       <div className="flex-1">
                         <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">
                           {getUserName(memberId)}
                         </p>
                         {memberId === user?.id && (
-                          <p className="text-xs text-indigo-600 dark:text-indigo-400">You</p>
+                          <p className="text-xs text-[var(--color-primary)] dark:text-[var(--color-primary)]">You</p>
                         )}
                       </div>
                     </div>
                   )
                 })}
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <h2 className="text-lg font-semibold text-[var(--text-primary)] dark:text-gray-100 mb-4">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <Link
-                  to={`/scope-builder?project=${project.id}`}
-                  className="flex items-center justify-between w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition hover:from-indigo-700 hover:to-purple-700"
-                >
-                  <span>Open in Scope Builder</span>
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-                <Link
-                  to={`/analysis?project=${project.id}`}
-                  className="flex items-center justify-between w-full rounded-xl border border-indigo-300 bg-white px-4 py-3 text-sm font-medium text-indigo-600 shadow-sm transition hover:bg-indigo-50 dark:border-indigo-700 dark:bg-gray-700 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
-                >
-                  <span>Run Analysis</span>
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
               </div>
             </div>
           </div>

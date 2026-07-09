@@ -97,7 +97,7 @@ const sortedProjects = dashboardStats?.recentProjects ?? [...projects]
       // action={
       //   <Link
       //     to="/projects/new"
-      //     className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700"
+      //     className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]"
       //   >
       //     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       //       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

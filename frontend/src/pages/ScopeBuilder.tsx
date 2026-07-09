@@ -86,7 +86,7 @@ function FeatureForm({
   }
 
   const inputCls =
-    'w-full rounded-lg border border-[var(--border-primary)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-indigo-500 dark:focus:ring-indigo-500'
+    'w-full rounded-lg border border-[var(--border-primary)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-subtle)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-[var(--text-subtle)] dark:focus:border-[var(--color-primary)] dark:focus:ring-[var(--color-primary)]'
 
   const accentBg = tabType === 'new' ? 'bg-[var(--color-success)]/10 border-[var(--color-success)]/30' : 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/30'
 
@@ -185,7 +185,8 @@ function FeatureList({
   const [dragId, setDragId] = useState<string | null>(null)
   const [dragOverId, setDragOverId] = useState<string | null>(null)
 
-  const handleDrop = (targetId: string) => {
+  const handleDrop = (e: React.DragEvent, targetId: string) => {
+    e.preventDefault()
     if (!dragId || dragId === targetId) return
     const ids = features.map((f) => f.id)
     const fromIdx = ids.indexOf(dragId)
@@ -217,12 +218,12 @@ function FeatureList({
 
 
   return (
-    <div className={`divide-y divide-gray-100 ${BORDER_RADIUS.card} border border-[var(--border-primary)] overflow-hidden`}>
-      {features.map((feature, index) => (
+    <div   className={`feature-list-scroll max-h-[500px] overflow-y-auto divide-y divide-gray-100 ${BORDER_RADIUS.card} border border-[var(--border-primary)]`}>
+      {features.map((feature) => (
         <div
           key={feature.id}
           onDragOver={(e) => { e.preventDefault(); setDragOverId(feature.id) }}
-          onDrop={() => handleDrop(feature.id)}
+          onDrop={(e) => handleDrop(e, feature.id)}
           onDragLeave={() => setDragOverId(null)}
           className={`transition-colors ${dragOverId === feature.id && dragId !== feature.id ? 'bg-[var(--color-primary)]/10 border-l-2 border-l-[var(--color-primary)]' : ''}`}
         >
@@ -249,7 +250,7 @@ function FeatureList({
                 <div className={`flex ${ICON_SIZE.button} shrink-0 items-center justify-center ${BORDER_RADIUS.tag} ${TYPOGRAPHY.caption} font-semibold ${
                   tabType === 'new' ? 'bg-[var(--color-success)]/20 text-[var(--color-success)]' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'
                 }`}>
-                  {index + 1}
+                  {feature.order + 1}
                 </div>
 
                 {/* Title + description */}
@@ -426,142 +427,149 @@ export function ScopeBuilder() {
     <div className={`min-h-screen bg-[var(--bg-page)] ${SPACING.page.padding} dark:bg-gray-900 overflow-x-hidden`}>
       <div className="mx-auto max-w-3xl w-full">
 
-        {/* Page header */}
-        <div className={`mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4`}>
-          <div>
-            <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100 text-xl sm:text-2xl`}>Scope Builder</h1>
-            {project && (
-              <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
-                <span className="font-medium text-[var(--text-secondary)] dark:text-gray-300">{project.name}</span> — define original scope and client additions
-              </p>
-            )}
-            {/* Autosave indicator - mobile: below title */}
-            {autosaveStatus !== 'idle' && (
-              <div className={`mt-2 flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
-                {autosaveStatus === 'saving' && (
-                  <>
-                    <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
-                    <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
-                  </>
+        {/* Sticky header container */}
+        <div className="sticky top-0 z-30 bg-[var(--bg-page)] pb-4 dark:bg-gray-900">
+          {/* Page header */}
+          <div className={`mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4`}>
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex-1">
+                <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100 text-xl sm:text-2xl`}>Scope Builder</h1>
+                {project && (
+                  <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
+                    <span className="font-medium text-[var(--text-secondary)] dark:text-gray-300">{project.name}</span> — define original scope and client additions
+                  </p>
                 )}
-                {autosaveStatus === 'saved' && (
-                  <>
-                    <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
-                  </>
-                )}
-                {autosaveStatus === 'error' && (
-                  <>
-                    <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
-                  </>
+                {/* Autosave indicator - mobile: below title */}
+                {autosaveStatus !== 'idle' && (
+                  <div className={`mt-2 flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
+                    {autosaveStatus === 'saving' && (
+                      <>
+                        <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent`} />
+                        <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
+                      </>
+                    )}
+                    {autosaveStatus === 'saved' && (
+                      <>
+                        <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
+                      </>
+                    )}
+                    {autosaveStatus === 'error' && (
+                      <>
+                        <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
+              <div className="flex items-center gap-3 sm:gap-4">
+                {/* Autosave indicator - desktop: inline with button */}
+                {autosaveStatus !== 'idle' && (
+                  <div className={`hidden sm:flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
+                    {autosaveStatus === 'saving' && (
+                      <>
+                        <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent`} />
+                        <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
+                      </>
+                    )}
+                    {autosaveStatus === 'saved' && (
+                      <>
+                        <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
+                      </>
+                    )}
+                    {autosaveStatus === 'error' && (
+                      <>
+                        <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
+                      </>
+                    )}
+                  </div>
+                )}
+                <button
+                  onClick={() => navigate(`/create-project?edit=${projectId}`)}
+                  disabled={originalFeatures.length === 0}
+                  className={`w-full sm:w-auto flex items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-40 min-h-[44px]`}
+                >
+                  <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  <span className="hidden sm:inline">Edit Project Details</span>
+                  <span className="sm:hidden">Edit Details</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-3 sm:gap-4 sm:ml-auto">
-            {/* Autosave indicator - desktop: inline with button */}
-            {autosaveStatus !== 'idle' && (
-              <div className={`hidden sm:flex items-center gap-2 ${TYPOGRAPHY.caption}`}>
-                {autosaveStatus === 'saving' && (
-                  <>
-                    <div className={`${ICON_SIZE.button} animate-spin rounded-full border-2 border-indigo-600 border-t-transparent`} />
-                    <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Saving...</span>
-                  </>
-                )}
-                {autosaveStatus === 'saved' && (
-                  <>
-                    <svg className={`${ICON_SIZE.button} text-[var(--color-success)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-[var(--color-success)] dark:text-green-400">Saved</span>
-                  </>
-                )}
-                {autosaveStatus === 'error' && (
-                  <>
-                    <svg className={`${ICON_SIZE.button} text-[var(--color-danger)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span className="text-[var(--color-danger)] dark:text-red-400">Error saving</span>
-                  </>
-                )}
-              </div>
-            )}
+
+          {/* Tab bar */}
+          <div className={`mb-4 sm:mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
             <button
-              onClick={() => navigate(`/create-project?edit=${projectId}`)}
-              disabled={originalFeatures.length === 0}
-              className={`w-full sm:w-auto flex items-center justify-center gap-2 ${BORDER_RADIUS.button} bg-[var(--color-primary)] ${SPACING.button.primary} ${TYPOGRAPHY.body} font-semibold text-white ${SHADOW.card} ${TRANSITION} hover:bg-[var(--color-primary-hover)] disabled:opacity-40 min-h-[44px]`}
+              onClick={() => handleTabSwitch('original')}
+              className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
+                activeTab === 'original'
+                  ? 'bg-[var(--color-primary)] text-white shadow-sm'
+                  : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
+              }`}
+              aria-pressed={activeTab === 'original'}
+              role="tab"
             >
-              <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <span className="hidden sm:inline">Edit Project Details</span>
-              <span className="sm:hidden">Edit Details</span>
+              <span className="truncate">Original Scope</span>
+              <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
+               activeTab === 'original'
+    ? 'bg-white/20 text-white'
+    : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-[var(--color-primary)]'
+              }`}>
+                {originalFeatures.length}
+              </span>
+            </button>
+            <button
+              onClick={() => handleTabSwitch('new')}
+              className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
+                activeTab === 'new'
+                  ? 'bg-[var(--color-success)] text-white shadow-sm'
+                  : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
+              }`}
+              aria-pressed={activeTab === 'new'}
+              role="tab"
+            >
+              <svg className={`${ICON_SIZE.button} shrink-0`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="truncate">New Client Additions</span>
+              {newFeatures.length > 0 && (
+                <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
+                  activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-[var(--color-success)]/20 text-[var(--color-success)] dark:bg-[var(--color-success)]/30 dark:text-emerald-400'
+                }`}>
+                  {newFeatures.length}
+                </span>
+              )}
             </button>
           </div>
-        </div>
 
-        {/* Tab bar */}
-        <div className={`mb-4 sm:mb-6 flex gap-1 ${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-1 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
-          <button
-            onClick={() => handleTabSwitch('original')}
-            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
-              activeTab === 'original'
-                ? 'bg-[var(--color-primary)] text-white shadow-sm'
-                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
-            }`}
-            aria-pressed={activeTab === 'original'}
-            role="tab"
-          >
-            <svg className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            <span className="truncate">Original Scope</span>
-            <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
-              activeTab === 'original' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-indigo-400'
-            }`}>
-              {originalFeatures.length}
-            </span>
-          </button>
-          <button
-            onClick={() => handleTabSwitch('new')}
-            className={`flex flex-1 items-center justify-center gap-1.5 sm:gap-2 ${BORDER_RADIUS.small} px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold ${TRANSITION} ${
-              activeTab === 'new'
-                ? 'bg-[var(--color-success)] text-white shadow-sm'
-                : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:text-[var(--text-subtle)] dark:hover:text-gray-200 dark:hover:bg-gray-700'
-            }`}
-            aria-pressed={activeTab === 'new'}
-            role="tab"
-          >
-            <svg className={`${ICON_SIZE.button} shrink-0`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="truncate">New Client Additions</span>
-            {newFeatures.length > 0 && (
-              <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
-                activeTab === 'new' ? 'bg-white/20 text-white' : 'bg-[var(--color-success)]/20 text-[var(--color-success)] dark:bg-[var(--color-success)]/30 dark:text-emerald-400'
-              }`}>
-                {newFeatures.length}
-              </span>
-            )}
-          </button>
+          {/* Context hint */}
+          {activeTab === 'new' && (
+            <div className={`mb-4 flex items-start gap-3 ${BORDER_RADIUS.card} border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 sm:px-4 py-3 dark:border-[var(--color-success)]/40 dark:bg-[var(--color-success)]/20`}>
+              <svg className={`${ICON_SIZE.button} mt-0.5 shrink-0 text-[var(--color-success)] dark:text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className={`${TYPOGRAPHY.caption} text-emerald-800 dark:text-emerald-200`}>
+                <span className="font-semibold">Scope Creep Analysis:</span> Features added here represent what the client requested <em>after</em> the original scope was agreed. Running the analysis will calculate the exact hours, delay weeks, and risk these additions introduce.
+              </p>
+            </div>
+          )}
         </div>
-
-        {/* Context hint */}
-        {activeTab === 'new' && (
-          <div className={`mb-4 flex items-start gap-3 ${BORDER_RADIUS.card} border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 sm:px-4 py-3 dark:border-[var(--color-success)]/40 dark:bg-[var(--color-success)]/20`}>
-            <svg className={`${ICON_SIZE.button} mt-0.5 shrink-0 text-[var(--color-success)] dark:text-emerald-400`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p className={`${TYPOGRAPHY.caption} text-emerald-800 dark:text-emerald-200`}>
-              <span className="font-semibold">Scope Creep Analysis:</span> Features added here represent what the client requested <em>after</em> the original scope was agreed. Running the analysis will calculate the exact hours, delay weeks, and risk these additions introduce.
-            </p>
-          </div>
-        )}
 
         {/* Main card */}
         <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
@@ -639,15 +647,15 @@ export function ScopeBuilder() {
           </div>
 
           {/* Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-[var(--border-primary)] px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-[var(--border-primary)] px-4 sm:px-6 py-4">
             {/* Mobile: Status Badge */}
             {newFeatures.length > 0 && (
-              <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[var(--color-success)] order-1 sm:order-2">
+              <span className="flex items-center gap-1.5 rounded-full border border-[var(--color-success)]/30 bg-[var(--color-success)]/10 px-3 py-1 text-xs font-medium text-[var(--color-success)] sm:mr-auto">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
                 {newFeatures.length} new addition{newFeatures.length !== 1 ? 's' : ''} — scope creep analysis ready
               </span>
             )}
-            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto order-2 sm:order-1">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <button
                 onClick={() => navigate(-1)}
                 className="w-full sm:w-auto rounded-xl border border-[var(--border-primary)] bg-white px-5 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] min-h-[44px]"

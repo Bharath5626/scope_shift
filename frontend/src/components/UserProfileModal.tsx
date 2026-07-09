@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
-import { useTheme } from '../context/ThemeContext'
 import { showToast } from './Toast'
 import { api } from '../services/api'
 
@@ -21,7 +20,6 @@ type ProfileUpdateResponse = {
 
 export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { user, updateUser } = useAuth()
-  const { theme, toggleTheme } = useTheme()
   const modalRef = useRef<HTMLDivElement>(null)
 
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile')
@@ -50,6 +48,28 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [otpNewPassword, setOtpNewPassword] = useState('')
   const [otpConfirmPassword, setOtpConfirmPassword] = useState('')
   const [otpCooldown, setOtpCooldown] = useState(0)
+  
+  // Get browser and device info
+  const getDeviceInfo = () => {
+    const userAgent = navigator.userAgent
+    let browser = 'Unknown Browser'
+    let os = 'Unknown OS'
+    
+    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'Chrome'
+    else if (userAgent.includes('Firefox')) browser = 'Firefox'
+    else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari'
+    else if (userAgent.includes('Edg')) browser = 'Edge'
+    
+    if (userAgent.includes('Windows')) os = 'Windows'
+    else if (userAgent.includes('Mac')) os = 'macOS'
+    else if (userAgent.includes('Linux')) os = 'Linux'
+    else if (userAgent.includes('Android')) os = 'Android'
+    else if (userAgent.includes('iOS')) os = 'iOS'
+    
+    return { browser, os }
+  }
+  
+  const deviceInfo = getDeviceInfo()
 
   // Close modal on Escape key
   useEffect(() => {
@@ -214,7 +234,21 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
         const data = await response.json()
         setImagePreview(data.data.avatarUrl)
-        updateUser({ ...user, profileImage: data.data.avatarUrl })
+        
+        // Fetch fresh user data from backend
+        const profileResponse = await fetch('/api/users/profile', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('scopeai_token')}`,
+          },
+        })
+        
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json()
+          updateUser(profileData.data)
+        } else {
+          updateUser({ ...user, profileImage: data.data.avatarUrl })
+        }
+        
         showToast('Avatar uploaded successfully', 'success')
       } catch (err) {
         showToast('Failed to upload avatar', 'error')
@@ -542,30 +576,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 </div>
               </div>
 
-              {/* Account Preferences */}
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300 mb-2">Theme</label>
-                <button
-                  onClick={toggleTheme}
-                  className="flex items-center gap-3 rounded-lg border border-[var(--border-secondary)] px-4 py-2.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
-                >
-                  {theme === 'light' ? (
-                    <>
-                      <svg className="h-5 w-5 text-[var(--text-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                      Light
-                    </>
-                  ) : (
-                    <>
-                      <svg className="h-5 w-5 text-[var(--text-soft)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                      </svg>
-                      Dark
-                    </>
-                  )}
-                </button>
-              </div>
             </div>
           )}
 
@@ -585,30 +595,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">This Device</p>
-                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Chrome on Windows • Current session</p>
+                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{deviceInfo.browser} on {deviceInfo.os} • Current session</p>
                       </div>
                     </div>
                     <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
                       Active
                     </span>
-                  </div>
-
-                  {/* Other Sessions (placeholder for future implementation) */}
-                  <div className="flex items-center justify-between rounded-lg border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4 dark:border-gray-700 dark:bg-gray-800">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--bg-section)] text-[var(--text-muted)] dark:bg-gray-700 dark:text-[var(--text-subtle)]">
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Mobile Device</p>
-                        <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Safari on iOS • 2 hours ago</p>
-                      </div>
-                    </div>
-                    <button className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                      Revoke
-                    </button>
                   </div>
                 </div>
               </div>
@@ -619,20 +611,14 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 <div className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-section)] p-4 dark:border-gray-700 dark:bg-gray-800">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Time</p>
-                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">{new Date().toLocaleString()}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">IP Address</p>
-                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">192.168.1.1</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Location</p>
-                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">San Francisco, CA</p>
+                      <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Account Created</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Device</p>
-                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">Chrome / Windows</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">{deviceInfo.browser} / {deviceInfo.os}</p>
                     </div>
                   </div>
                 </div>
@@ -709,7 +695,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <button
                     onClick={handleChangePassword}
                     disabled={changingPassword}
-                    className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {changingPassword ? (
                       <>
@@ -810,7 +796,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <button
                       onClick={handleResetPassword}
                       disabled={resettingPassword}
-                      className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {resettingPassword ? (
                         <>
@@ -841,39 +827,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Preferences</h3>
 
-              {/* Theme Preferences */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Theme</h4>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      document.documentElement.classList.remove('dark')
-                      localStorage.setItem('theme', 'light')
-                    }}
-                    className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
-                      theme === 'light'
-                        ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    Light
-                  </button>
-                  <button
-                    onClick={() => {
-                      document.documentElement.classList.add('dark')
-                      localStorage.setItem('theme', 'dark')
-                    }}
-                    className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
-                      theme === 'dark'
-                        ? 'border-indigo-600 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
-                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    Dark
-                  </button>
-                </div>
-              </div>
-
               {/* Notification Preferences */}
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Notifications</h4>
@@ -882,7 +835,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] dark:border-gray-600 dark:bg-gray-700"
                     />
                     <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Email notifications</span>
                   </label>
@@ -890,7 +843,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] dark:border-gray-600 dark:bg-gray-700"
                     />
                     <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Project alerts</span>
                   </label>
@@ -898,7 +851,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <input
                       type="checkbox"
                       defaultChecked={true}
-                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] dark:border-gray-600 dark:bg-gray-700"
                     />
                     <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Deadline reminders</span>
                   </label>
@@ -906,7 +859,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <input
                       type="checkbox"
                       defaultChecked={false}
-                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+                      className="h-4 w-4 rounded border-[var(--border-secondary)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] dark:border-gray-600 dark:bg-gray-700"
                     />
                     <span className="text-sm text-[var(--text-secondary)] dark:text-gray-300">Weekly reports</span>
                   </label>
@@ -928,7 +881,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             <button
               onClick={handleSaveProfile}
               disabled={savingProfile}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {savingProfile ? (
                 <>

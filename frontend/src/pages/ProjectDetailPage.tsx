@@ -211,11 +211,11 @@ export function ProjectDetailPage() {
                   </div>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Additional Hours</p>
-                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.additionalHours}h</p>
+                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--color-primary)]`}>{latestAnalysis.additionalHours}h</p>
                   </div>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Delay</p>
-                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-indigo-600`}>{latestAnalysis.delayWeeks}w</p>
+                    <p className={`mt-1 ${TYPOGRAPHY.body} font-semibold text-[var(--color-primary)]`}>{latestAnalysis.delayWeeks}w</p>
                   </div>
                   <div>
                     <p className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] uppercase tracking-wide`}>Risk Level</p>
@@ -229,7 +229,7 @@ export function ProjectDetailPage() {
                 </div>
                 <button
                   onClick={() => navigate(`/reports/${project.id}`)}
-                  className={`w-full mt-2 ${BORDER_RADIUS.small} border border-indigo-200 bg-indigo-50 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-indigo-700 ${TRANSITION} hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/30`}
+                  className={`w-full mt-2 ${BORDER_RADIUS.small} border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/10 ${SPACING.button.secondary} ${TYPOGRAPHY.body} font-medium text-[var(--color-primary)] ${TRANSITION} hover:bg-[var(--color-primary)]/20 dark:border-[var(--color-primary)]/30 dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)] dark:hover:bg-[var(--color-primary)]/20`}
                 >
                   View Full Report
                 </button>
@@ -256,7 +256,7 @@ export function ProjectDetailPage() {
               onClick={() => navigate(`/scope-builder?project=${project.id}`)}
               className={`flex items-center gap-3 ${BORDER_RADIUS.small} border border-[var(--border-primary)] bg-[var(--bg-section)] p-3 text-left ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600`}
             >
-              <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400`}>
+              <div className={`flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.small} bg-[var(--color-primary)]/10 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]`}>
                 <svg className={ICON_SIZE.button} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>

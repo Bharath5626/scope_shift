@@ -293,7 +293,7 @@ export function AnalysisPage() {
   className={`mb-3 sm:mb-5 ${TYPOGRAPHY.caption}
   font-semibold uppercase tracking-wide
   text-[var(--color-primary)]
-  dark:text-indigo-400`}
+  dark:text-[var(--color-primary)]`}
 >
     How it works
   </p>

@@ -22,10 +22,9 @@ export const PRIORITY_LABELS: Record<string, string> = {
 
 export const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: 'dashboard' },
-  { label: 'Shared Projects', path: '/shared-projects', icon: 'shared' },
   { label: 'New Project', path: '/projects/new', icon: 'plus' },
-  { label: 'Scope Builder', path: '/scope-builder', icon: 'layers' },
   { label: 'Analysis', path: '/analysis', icon: 'activity' },
   { label: 'Reports', path: '/reports', icon: 'file' },
+  { label: 'Shared Projects', path: '/shared-projects', icon: 'shared' },
   { label: 'Project History', path: '/history', icon: 'clock' },
 ] as const

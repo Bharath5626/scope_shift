@@ -56,11 +56,11 @@ export function EmptyState({
       {illustration ? (
         <div className="mb-6">{illustration}</div>
       ) : icon ? (
-        <div className={`mb-6 flex items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 ${styles.icon}`}>
+        <div className={`mb-6 flex items-center justify-center rounded-2xl bg-[var(--bg-section)] text-[var(--color-primary)] ${styles.icon}`}>
           {icon}
         </div>
       ) : (
-        <div className={`mb-6 flex items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 ${styles.icon}`}>
+        <div className={`mb-6 flex items-center justify-center rounded-2xl bg-[var(--bg-section)] text-[var(--color-primary)] ${styles.icon}`}>
           <svg className="h-1/2 w-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
           </svg>
@@ -83,7 +83,7 @@ export function EmptyState({
               className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium shadow-sm transition ${
                 action.variant === 'secondary'
                   ? 'border border-[var(--border-primary)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]'
               }`}
             >
               {action.label}

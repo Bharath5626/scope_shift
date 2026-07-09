@@ -64,10 +64,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Initialize auth state from localStorage
   useEffect(() => {
-    const stored = loadStoredAuth()
-    setToken(stored.token)
-    setUser(stored.user)
-    setIsLoading(false)
+    const initAuth = async () => {
+      const stored = loadStoredAuth()
+      setToken(stored.token)
+      
+      if (stored.token && stored.user) {
+        // Fetch fresh user data from backend
+        try {
+          const freshUser = await apiFetch<AuthUser>('/users/profile')
+          setUser(freshUser)
+        } catch (error) {
+          // If fetch fails, fall back to token data
+          setUser(stored.user)
+        }
+      } else {
+        setUser(stored.user)
+      }
+      
+      setIsLoading(false)
+    }
+    
+    initAuth()
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {

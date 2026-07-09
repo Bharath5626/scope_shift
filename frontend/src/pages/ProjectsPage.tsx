@@ -35,7 +35,7 @@ export function ProjectsPage() {
           {/* Empty state */}
           {projects.length === 0 ? (
             <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-8 sm:p-14 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-section)] text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]">
                 📁
               </div>
 
@@ -62,11 +62,11 @@ export function ProjectsPage() {
                 <Link
                   key={project.id}
                   to={`/scope-builder?project=${project.id}`}
-                  className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30"
+                  className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-primary)] hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-[var(--color-primary)] dark:hover:shadow-gray-900/30"
                 >
 
                   {/* Title */}
-                  <h3 className="text-base font-semibold text-[var(--text-primary)] transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] transition group-hover:text-[var(--color-primary)] dark:text-gray-100 dark:group-hover:text-[var(--color-primary)]">
                     {project.name}
                   </h3>
 
@@ -78,7 +78,7 @@ export function ProjectsPage() {
                   {/* Footer hint */}
                   <div className="mt-6 flex items-center justify-between text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
                     <span>Scope Builder</span>
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    <span className="group-hover:text-[var(--color-primary)] dark:group-hover:text-[var(--color-primary)]">
                       Open →
                     </span>
                   </div>

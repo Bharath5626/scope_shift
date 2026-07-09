@@ -47,6 +47,7 @@ function ProjectDetailsModal({
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'details' | 'logs'>('details')
   const [showFeaturesForLog, setShowFeaturesForLog] = useState<string | null>(null)
+  const [users, setUsers] = useState<any[]>([])
 
   useEffect(() => {
     const fetchAuditLogs = async () => {
@@ -61,6 +62,18 @@ function ProjectDetailsModal({
     }
     fetchAuditLogs()
   }, [project.id])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const usersData = await api.get<any[]>('/users')
+        setUsers(Array.isArray(usersData) ? usersData : ((usersData as any).data?.data || (usersData as any).data || []))
+      } catch (error) {
+        console.error('Failed to fetch users:', error)
+      }
+    }
+    fetchUsers()
+  }, [])
 
   const getUserName = (log: AuditLog) => {
     if (!log.user) return 'Unknown'
@@ -95,9 +108,9 @@ function ProjectDetailsModal({
         className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/30 flex flex-col">
+      <div className="relative mx-2 w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/30 flex flex-col sm:mx-4">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--border-primary)] p-6 dark:border-gray-700">
+        <div className="flex items-center justify-between border-b border-[var(--border-primary)] p-4 sm:p-6 dark:border-gray-700">
           <div>
             <h2 className="text-xl font-semibold text-[var(--text-primary)] dark:text-gray-100">{project.name}</h2>
             <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{PROJECT_TYPE_LABELS[project.type]}</p>
@@ -116,7 +129,7 @@ function ProjectDetailsModal({
         <div className="flex border-b border-[var(--border-primary)] dark:border-gray-700">
           <button
             onClick={() => setActiveTab('details')}
-            className={`px-6 py-3 text-sm font-medium transition ${
+            className={`flex-1 px-4 py-3 text-sm font-medium transition sm:px-6 ${
               activeTab === 'details'
                 ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
@@ -126,7 +139,7 @@ function ProjectDetailsModal({
           </button>
           <button
             onClick={() => setActiveTab('logs')}
-            className={`px-6 py-3 text-sm font-medium transition ${
+            className={`flex-1 px-4 py-3 text-sm font-medium transition sm:px-6 ${
               activeTab === 'logs'
                 ? 'border-b-2 border-[var(--color-primary)] text-[var(--color-primary)] dark:border-[var(--color-primary-light)] dark:text-[var(--color-primary-light)]'
                 : 'text-[var(--text-soft)] hover:text-[var(--text-secondary)] dark:text-[var(--text-subtle)] dark:hover:text-gray-300'
@@ -137,11 +150,11 @@ function ProjectDetailsModal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {activeTab === 'details' ? (
             <div className="space-y-6">
               {/* Basic Info */}
-              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
                 <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Project Information</h3>
                 <div className="space-y-4">
                   <div>
@@ -152,7 +165,7 @@ function ProjectDetailsModal({
                     <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Description</p>
                     <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.description || 'No description provided'}</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Type</p>
                       <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{PROJECT_TYPE_LABELS[project.type]}</p>
@@ -166,7 +179,7 @@ function ProjectDetailsModal({
               </div>
 
               {/* Technical Details */}
-              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
                 <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Technical Configuration</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -188,12 +201,49 @@ function ProjectDetailsModal({
                 </div>
                 <div className="mt-4">
                   <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Tech Stack</p>
-                  <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">{project.techStack || 'Not specified'}</p>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)] break-words dark:text-gray-300">
+                    {project.techStack ? project.techStack.replace(/,,+/g, ',').replace(/^,|,$/g, '') : 'Not specified'}
+                  </p>
                 </div>
               </div>
 
+              {/* Team Members */}
+              {project.teamMembers && project.teamMembers.length > 0 && (
+                <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                  <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Team Members ({project.teamMembers.length})</h3>
+                  <div className="space-y-3">
+                    {project.teamMembers.map((memberId) => {
+                      const member = users.find((u: any) => u.id === memberId)
+                      const memberName = member?.name || 'Unknown User'
+                      const memberImage = member?.profileImage || null
+                      const initials = memberName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+                      
+                      return (
+                        <div key={memberId} className="flex items-center gap-3">
+                          {memberImage ? (
+                            <img
+                              src={memberImage}
+                              alt={memberName}
+                              className="h-8 w-8 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                              {initials}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-sm font-medium text-[var(--text-primary)] dark:text-gray-100">{memberName}</p>
+                            <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">{member?.email || ''}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Timeline */}
-              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+              <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
                 <h3 className="mb-4 text-sm font-semibold text-[var(--text-secondary)] dark:text-gray-200">Timeline</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -218,7 +268,7 @@ function ProjectDetailsModal({
                   <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-primary)] border-t-transparent" />
                 </div>
               ) : auditLogs.length === 0 ? (
-                <div className="rounded-xl border border-[var(--border-primary)] bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
+                <div className="rounded-xl border border-[var(--border-primary)] bg-white p-4 sm:p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
                   <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">No logs available</p>
                 </div>
               ) : (
@@ -237,20 +287,32 @@ function ProjectDetailsModal({
                         )}
                         {log.features && (
                           <div className="mt-3">
-                            <button
-                              onClick={() => setShowFeaturesForLog(log.id)}
-                              className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]"
-                            >
-                              Show Features {log.features.length > 0 ? `(${log.features.length})` : ''}
-                            </button>
+                            {showFeaturesForLog === log.id ? (
+                              <button
+                                onClick={() => setShowFeaturesForLog(null)}
+                                className="flex items-center gap-1 text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]"
+                              >
+                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+                                </svg>
+                                Hide Features
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowFeaturesForLog(log.id)}
+                                className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary-light)] dark:hover:text-[var(--color-primary)]"
+                              >
+                                Show Features {log.features.length > 0 ? `(${log.features.length})` : ''}
+                              </button>
+                            )}
                             {showFeaturesForLog === log.id && (
-                              <div className="mt-2 space-y-2">
+                              <div className="mt-2 max-h-[300px] overflow-y-auto space-y-2 pr-2 feature-list-scroll">
                                 {!log.features || log.features.length === 0 ? (
                                   <p className="text-xs text-[var(--text-soft)]">No features available</p>
                                 ) : (
                                   log.features.map((feature: any, idx: number) => (
                                     <div key={idx} className="rounded-lg bg-gray-50 p-2 dark:bg-gray-700">
-                                      <p className="text-xs font-medium text-[var(--text-primary)] dark:text-gray-100">{feature.title}</p>
+                                      <p className="text-xs font-medium text-[var(--text-primary)] break-words dark:text-gray-100">{feature.title}</p>
                                       {feature.description && (
                                         <p className="mt-0.5 text-xs text-[var(--text-muted)] dark:text-[var(--text-subtle)]">{feature.description}</p>
                                       )}
@@ -271,7 +333,7 @@ function ProjectDetailsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-[var(--border-primary)] p-6 dark:border-gray-700">
+        <div className="flex flex-col-reverse gap-3 border-t border-[var(--border-primary)] p-4 sm:flex-row sm:justify-end sm:p-6 dark:border-gray-700">
           <button
             onClick={onClose}
             className="rounded-xl border border-[var(--border-primary)] bg-white px-4 py-2.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
@@ -323,7 +385,7 @@ function DeleteModal({
         </p>
         <p className="mt-1 text-xs font-medium text-red-500 dark:text-red-400">This action cannot be undone.</p>
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <button
             onClick={onCancel}
             disabled={deleting}
@@ -377,9 +439,9 @@ function ProjectCard({
   absolute right-3 top-3 z-10
   flex h-8 w-8 items-center justify-center
   rounded-lg text-gray-300
-  opacity-0 transition-all duration-150
+  opacity-100 sm:opacity-0 transition-all duration-150
   hover:bg-red-50 hover:text-red-500
-  group-hover:opacity-100
+  sm:group-hover:opacity-100
   cursor-pointer
   dark:hover:bg-red-900/30 dark:hover:text-red-400
 "
@@ -390,11 +452,14 @@ function ProjectCard({
       </button>
 
       {/* Clickable card body */}
-      <button onClick={() => onViewDetails(project)} className="w-full p-6 text-left flex-1">
+    <button
+  onClick={() => onViewDetails(project)}
+  className="w-full p-6 pr-14 text-left flex-1"
+>
         <div className="flex items-start gap-4">
           {/* Project Logo */}
           {project.logo ? (
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[var(--border-primary)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700">
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-[var(--border-primary)] bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 sm:h-12 sm:w-12">
               <img
                 src={project.logo}
                 alt={`${project.name} logo`}
@@ -402,7 +467,7 @@ function ProjectCard({
               />
             </div>
           ) : (
-            <div className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)]">
+            <div className="h-10 w-10 shrink-0 flex items-center justify-center rounded-xl bg-[var(--color-primary-50)] text-[var(--color-primary)] dark:bg-[var(--color-primary-dark)]/20 dark:text-[var(--color-primary-light)] sm:h-12 sm:w-12">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -410,7 +475,7 @@ function ProjectCard({
           )}
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-4 pr-12">
+            <div className="flex items-start justify-between gap-2 pr-10">
               <div className="min-w-0 flex-1">
                 <h3 className="truncate text-base font-semibold text-[var(--text-primary)] transition group-hover:text-[var(--color-primary)] dark:text-[var(--text-primary)] dark:group-hover:text-[var(--color-primary-light)]">
                   {project.name}
@@ -424,7 +489,7 @@ function ProjectCard({
               </span>
             </div>
 
-            <div className={`mt-4 flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700`}>
+            <div className={`mt-4 flex flex-col gap-2 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between dark:border-gray-700`}>
               <span className={`${TYPOGRAPHY.caption} font-medium text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
                 {PROJECT_TYPE_LABELS[project.type]}
               </span>
@@ -511,7 +576,7 @@ export function ProjectHistoryPage() {
         <div className={`w-full ${SPACING.page.padding}`}>
           <div className={`${SPACING.page.headerPadding} border-b border-[var(--border-primary)] dark:border-gray-700`}>
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h1 className={`${TYPOGRAPHY.pageTitle} text-[var(--text-primary)] dark:text-gray-100`}>Project History</h1>
                 <p className={`mt-1 ${TYPOGRAPHY.body} text-[var(--text-soft)] dark:text-[var(--text-subtle)]`}>
@@ -530,8 +595,8 @@ export function ProjectHistoryPage() {
 
             {/* Filters */}
             {projects.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-3">
-                <div className="relative flex-1 min-w-48">
+              <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <div className="relative w-full sm:flex-1 sm:min-w-48">
                   <svg
                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-subtle)] dark:text-[var(--text-soft)]"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -550,7 +615,7 @@ export function ProjectHistoryPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as ProjectStatus | typeof ALL)}
-                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200 sm:w-auto`}
                 >
                   <option value={ALL}>All Statuses</option>
                   {Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => (
@@ -561,7 +626,7 @@ export function ProjectHistoryPage() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value as ProjectType | typeof ALL)}
-                  className={`${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200`}
+                  className={`w-full ${BORDER_RADIUS.input} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-secondary)] ${SHADOW.card} focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20 dark:border-[var(--border-secondary)] dark:bg-[var(--bg-input)] dark:text-gray-200 sm:w-auto`}
                 >
                   <option value={ALL}>All Types</option>
                   {Object.entries(PROJECT_TYPE_LABELS).map(([value, label]) => (
@@ -572,7 +637,7 @@ export function ProjectHistoryPage() {
                 {hasFilters && (
                   <button
                     onClick={() => { setSearch(''); setStatusFilter(ALL); setTypeFilter(ALL) }}
-                    className={`${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200`}
+                    className={`w-full ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-3 py-2.5 ${TYPOGRAPHY.body} text-[var(--text-soft)] ${SHADOW.card} ${TRANSITION} hover:bg-gray-50 hover:text-[var(--text-secondary)] dark:border-gray-600 dark:bg-gray-700 dark:text-[var(--text-subtle)] dark:hover:bg-gray-600 dark:hover:text-gray-200 sm:w-auto`}
                   >
                     Clear filters
                   </button>
@@ -588,7 +653,7 @@ export function ProjectHistoryPage() {
         <div className={SPACING.section.marginTop}>
 
           {loading && (
-            <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
+            <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
               {[1, 2, 3].map((i) => (
                 <CardSkeleton key={i} />
               ))}
@@ -608,7 +673,7 @@ export function ProjectHistoryPage() {
           )}
 
           {!loading && projects.length > 0 && filtered.length === 0 && (
-            <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-12 text-center ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
+            <div className={`${BORDER_RADIUS.card} border border-[var(--border-primary)] bg-white p-6 text-center sm:p-12 ${SHADOW.card} dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20`}>
               <div className={`mx-auto mb-3 flex ${ICON_SIZE.card} items-center justify-center ${BORDER_RADIUS.button} bg-gray-100 dark:bg-gray-700`}>
                 <svg className={`${ICON_SIZE.button} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
@@ -630,7 +695,7 @@ export function ProjectHistoryPage() {
               <p className={`mb-4 ${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
                 Showing {filtered.length} of {projects.length} project{projects.length === 1 ? '' : 's'} — hover a card to delete it
               </p>
-              <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
+              <div className={`grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 ${SPACING.section.gap}`}>
                 {filtered.map((project) => (
                   <ProjectCard
                     key={project.id}

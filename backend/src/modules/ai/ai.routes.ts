@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { generateProjectFeatures } from "./ai.service";
+import * as aiService from "./ai.service";
 import { getProjectById, createProjectWithFeatures } from "../projects/project.service";
+import { createAnalysis } from "../analysis/analysis.service";
 import prisma from "../../config/database";
 import { handleDatabaseError } from "../../utils/database-errors";
 import { createAuditLog } from "../auditLogs/auditLog.service";
@@ -31,8 +32,7 @@ router.post(
       }),
     ]);
 
-    const { analyzeProjectScope } = await import("./ai.service");
-    const { createAnalysis } = await import("../analysis/analysis.service");
+    const { analyzeProjectScope } = aiService;
 
     // Use all project details from database for analysis
     const projectInfo = {
@@ -98,7 +98,7 @@ router.post(
     }
 
     // Use all project details from database
-    const suggestions = await generateProjectFeatures({
+    const suggestions = await aiService.generateProjectFeatures({
       name: project.name,
       description: project.description ?? undefined,
       type: project.type,
@@ -172,7 +172,7 @@ router.post(
     // Step 1: Call Gemini to generate features BEFORE creating project
     let features;
     try {
-      features = await generateProjectFeatures({
+      features = await aiService.generateProjectFeatures({
         name,
         description,
         type,

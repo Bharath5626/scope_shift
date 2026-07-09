@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useProjects } from '../context/ProjectContext'
+import { api } from '../services/api'
 import { BORDER_RADIUS, SHADOW, TRANSITION, ICON_SIZE } from '../utils/designSystem'
 import type { Project } from '../types'
 
@@ -12,44 +13,74 @@ function SharedIcon() {
     </svg>
   )
 }
-
+interface User {
+  id: string
+  name: string
+  profileImage?: string
+}
 export function SharedProjectsPage() {
   const { user } = useAuth()
   const { projects } = useProjects()
   const [activeTab, setActiveTab] = useState<'shared-with-me' | 'shared-by-me'>('shared-with-me')
 
-  const getInitials = (name: string) => {
-    let initials = ''
 
-    for (const part of name.split(' ')) {
-      if (part) initials += part[0]
+const [users, setUsers] = useState<User[]>([])
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await api.get<any>('/users')
+
+        const userList =
+          Array.isArray(response)
+            ? response
+            : response?.users ??
+              response?.data?.data ??
+              response?.data ??
+              []
+
+        setUsers(userList)
+      } catch (error) {
+        console.error('Failed to fetch users:', error)
+      }
     }
+    fetchUsers()
+  }, [])
 
-    return initials
+const getInitials = (name?: string) => {
+  if (!name) return 'U'
+
+  let initials = ''
+
+  for (const part of name.split(' ')) {
+    if (part) initials += part[0]
+  }
+
+  return initials.toUpperCase()
+}
+
+  const getUserProfileImage = (userId: string) => {
+    const foundUser = users.find((u: User) => u.id === userId)
+    return foundUser?.profileImage || null
   }
 
   // Filter projects where current user is in teamMembers (but not the creator)
   const sharedWithMe = projects.filter((project: Project) => {
     const isTeamMember = project.teamMembers?.includes(user?.id || '')
-    const isNotCreator = project.createdBy.id !== user?.id
+    const isNotCreator = project.createdBy?.id !== user?.id
     return isTeamMember && isNotCreator
   })
 
   // Filter projects created by current user that have team members
   const sharedByMe = projects.filter((project: Project) => {
-    const isCreator = project.createdBy.id === user?.id
+    const isCreator = project.createdBy?.id === user?.id
     const hasTeamMembers = project.teamMembers && project.teamMembers.length > 0
     return isCreator && hasTeamMembers
   })
 
   const getUserName = (userId: string) => {
-    // Try to get name from project's projectMembers if available
-    const project = projects.find((p) => p.teamMembers?.includes(userId))
-    if (project && (project as any).projectMembers) {
-      const member = (project as any).projectMembers.find((m: any) => m.userId === userId)
-      if (member?.user?.name) return member.user.name
-    }
-    return 'Unknown User'
+    const foundUser = users.find((u: User) => u.id === userId)
+    return foundUser?.name || 'Unknown User'
   }
 
   return (
@@ -66,13 +97,6 @@ export function SharedProjectsPage() {
               Collaborate on projects shared with you by team members
             </p>
           </div>
-
-          <button className="rounded-xl bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-hover)]">
-            <span className="flex items-center gap-2">
-              <SharedIcon />
-              Share Project
-            </span>
-          </button>
         </div>
 
         {/* Tabs */}
@@ -92,7 +116,7 @@ export function SharedProjectsPage() {
             </svg>
             <span className="truncate">Shared with me</span>
             <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
-              activeTab === 'shared-with-me' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-indigo-400'
+              activeTab === 'shared-with-me' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-[var(--color-primary)]'
             }`}>
               {sharedWithMe.length}
             </span>
@@ -112,7 +136,7 @@ export function SharedProjectsPage() {
             </svg>
             <span className="truncate">Shared by me</span>
             <span className={`shrink-0 ${BORDER_RADIUS.tag} px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-bold ${
-              activeTab === 'shared-by-me' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-indigo-400'
+              activeTab === 'shared-by-me' ? 'bg-white/20 text-white' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/30 dark:text-[var(--color-primary)]'
             }`}>
               {sharedByMe.length}
             </span>
@@ -126,7 +150,7 @@ export function SharedProjectsPage() {
             <>
               {sharedWithMe.length === 0 ? (
                 <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-8 sm:p-14 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-section)] text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]">
                     <SharedIcon />
                   </div>
 
@@ -144,12 +168,26 @@ export function SharedProjectsPage() {
                   {sharedWithMe.map((project) => (
                     <div
                       key={project.id}
-                      className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-indigo-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-500 dark:hover:shadow-gray-900/30"
+                      className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-[var(--color-primary)] hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-[var(--color-primary)] dark:hover:shadow-gray-900/30"
                     >
                       {/* Header */}
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-4">
+                        {/* Project Logo */}
+                        <div className="shrink-0">
+                          {project.logo ? (
+                            <img
+                              src={project.logo}
+                              alt={project.name}
+                              className="h-16 w-16 rounded-xl object-cover"
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+                              {getInitials(project.name)}
+                            </div>
+                          )}
+                        </div>
                         <div className="flex-1">
-                          <h3 className="text-base font-semibold text-[var(--text-primary)] transition group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
+                          <h3 className="text-base font-semibold text-[var(--text-primary)] transition group-hover:text-[var(--color-primary)] dark:text-gray-100 dark:group-hover:text-[var(--color-primary)]">
                             {project.name}
                           </h3>
                           <p className="mt-2 line-clamp-2 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
@@ -160,32 +198,20 @@ export function SharedProjectsPage() {
 
                       {/* Shared by info */}
                       <div className="mt-4 flex items-center gap-2 text-xs">
-                        <div className="h-6 w-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium">
-                          {getInitials(getUserName(project.createdBy.id))}
-                        </div>
+                        {getUserProfileImage(project.createdBy?.id) ? (
+                          <img
+                            src={getUserProfileImage(project.createdBy?.id)}
+                            alt={getUserName(project.createdBy?.id)}
+                            className="h-6 w-6 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-6 w-6 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white font-medium">
+                            {getInitials(getUserName(project.createdBy?.id))}
+                          </div>
+                        )}
                         <span className="text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
-                          Shared by <span className="font-medium text-[var(--text-primary)] dark:text-gray-200">{getUserName(project.createdBy.id)}</span>
+                          Shared by <span className="font-medium text-[var(--text-primary)] dark:text-gray-200">{getUserName(project.createdBy?.id)}</span>
                         </span>
-                      </div>
-
-                      {/* Shared with avatars */}
-                      <div className="mt-4 flex items-center gap-2">
-                        <div className="flex -space-x-2">
-                          {project.teamMembers?.slice(0, 3).map((memberId, idx) => (
-                            <div
-                              key={idx}
-                              className="h-7 w-7 rounded-full border-2 border-white bg-gradient-to-br from-purple-400 to-indigo-400 flex items-center justify-center text-xs text-white font-medium dark:border-gray-800"
-                              title={getUserName(memberId)}
-                            >
-                              {memberId === user?.id ? 'Y' : getInitials(getUserName(memberId))}
-                            </div>
-                          ))}
-                          {(project.teamMembers?.length || 0) > 3 && (
-                            <div className="h-7 w-7 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-xs text-gray-600 font-medium dark:border-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                              +{(project.teamMembers?.length || 0) - 3}
-                            </div>
-                          )}
-                        </div>
                       </div>
 
                       {/* Status and deadline */}
@@ -210,7 +236,7 @@ export function SharedProjectsPage() {
                       <div className="mt-4 pt-4 border-t border-[var(--border-primary)] dark:border-gray-700">
                         <Link
                           to={`/shared-projects/${project.id}`}
-                          className="flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                          className="flex items-center justify-between text-sm font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-hover)] dark:text-[var(--color-primary)] dark:hover:text-[var(--color-primary-hover)]"
                         >
                           <span>View Details</span>
                           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -228,7 +254,7 @@ export function SharedProjectsPage() {
             <>
               {sharedByMe.length === 0 ? (
                 <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-8 sm:p-14 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/20">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-section)] text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]">
                     <SharedIcon />
                   </div>
 
@@ -249,13 +275,29 @@ export function SharedProjectsPage() {
                       className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="text-base font-semibold text-[var(--text-primary)] dark:text-gray-100">
-                            {project.name}
-                          </h3>
-                          <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)] line-clamp-2">
-                            {project.description}
-                          </p>
+                        <div className="flex gap-4 flex-1">
+                          
+                          {/* Project Logo */}
+                          <div className="shrink-0">
+                            {project.logo ? (
+                              <img
+                                src={project.logo}
+                                alt={project.name}
+                                className="h-16 w-16 rounded-xl object-cover"
+                              />
+                            ) : (
+                              <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+                                {getInitials(project.name)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-base font-semibold text-[var(--text-primary)] dark:text-gray-100">
+                              {project.name}
+                            </h3>
+                            <p className="mt-1 text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)] line-clamp-2">
+                              {project.description}
+                            </p>
                           
                           {/* Team members list */}
                           <div className="mt-4">
@@ -266,11 +308,19 @@ export function SharedProjectsPage() {
                               {project.teamMembers?.map((memberId) => (
                                 <div
                                   key={memberId}
-                                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/20"
+                                 className="flex items-center gap-2 rounded-lg px-3 py-1.5 bg-[var(--bg-section)]"
                                 >
-                                  <div className="h-5 w-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
-                                    {getInitials(getUserName(memberId))}
-                                  </div>
+                                  {getUserProfileImage(memberId) ? (
+                                    <img
+                                      src={getUserProfileImage(memberId)}
+                                      alt={getUserName(memberId)}
+                                      className="h-5 w-5 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-5 w-5 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                                      {getInitials(getUserName(memberId))}
+                                    </div>
+                                  )}
                                   <span className="text-xs text-[var(--text-primary)] dark:text-gray-200">
                                     {getUserName(memberId)}
                                   </span>
@@ -278,11 +328,12 @@ export function SharedProjectsPage() {
                               ))}
                             </div>
                           </div>
+                          </div>
                         </div>
 
-                        <div className="flex sm:flex-col items-center sm:items-end gap-2">
+                        <div className="flex shrink-0 sm:flex-col items-center sm:items-end gap-2">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            project.status === 'active' 
+                            project.status === 'active'
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                               : project.status === 'at_risk'
                               ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
@@ -290,12 +341,6 @@ export function SharedProjectsPage() {
                           }`}>
                             {project.status === 'active' ? 'Active' : project.status === 'at_risk' ? 'At Risk' : 'Draft'}
                           </span>
-                          <Link
-                            to={`/projects/new?edit=${project.id}`}
-                            className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                          >
-                            Edit
-                          </Link>
                         </div>
                       </div>
                     </div>
@@ -307,16 +352,16 @@ export function SharedProjectsPage() {
         </div>
 
         {/* Info banner */}
-        <div className="mt-8 rounded-2xl border border-[var(--border-primary)] bg-gradient-to-r from-indigo-50 to-purple-50 p-4 dark:border-gray-700 dark:from-indigo-900/20 dark:to-purple-900/20">
+        <div className="mt-8 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
-              <svg className="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary)]/10 dark:bg-[var(--color-primary)]/10">
+              <svg className="h-5 w-5 text-[var(--color-primary)] dark:text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm text-[var(--text-primary)] dark:text-gray-300">
-                <span className="font-medium text-[var(--text-primary)] dark:text-gray-100">Shared Projects</span> allow you to collaborate with team members on scope analysis. Changes made by any collaborator are visible to all members.
+              <p className="text-sm text-[var(--text-primary)] dark:text-white">
+                <span className="font-medium text-[var(--text-primary)] dark:text-white">Shared Projects</span> allow you to collaborate with team members on scope analysis. Changes made by any collaborator are visible to all members.
               </p>
             </div>
           </div>
