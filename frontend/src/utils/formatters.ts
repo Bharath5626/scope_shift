@@ -9,17 +9,17 @@ export function formatRelativeDate(isoDate: string): string {
   if (diffDays < 7) return `${diffDays} days ago`
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
 
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
+  return date.toLocaleDateString('en-GB', {
     day: 'numeric',
+    month: 'short',
     year: 'numeric',
   })
 }
 
 export function formatDate(isoDate: string): string {
-  return new Date(isoDate).toLocaleDateString('en-US', {
-    month: 'short',
+  return new Date(isoDate).toLocaleDateString('en-GB', {
     day: 'numeric',
+    month: 'short',
     year: 'numeric',
   })
 }

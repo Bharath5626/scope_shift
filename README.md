@@ -10,6 +10,8 @@ A comprehensive project management tool that leverages artificial intelligence t
 - **Project Types**: Support for SaaS, E-commerce, Chatbot, Landing Page, and custom project types
 - **Scope Versioning**: Track changes to project scope over time with version history
 - **Deadline Tracking**: Automatic status updates based on project deadlines and capacity analysis
+- **Project Sharing**: Share projects with team members with role-based access control
+- **Audit Logging**: Comprehensive audit trail for all project changes and actions
 
 ### AI-Powered Analysis
 - **Hybrid AI Architecture**: Google Gemini AI for feature-level analysis + deterministic backend calculations
@@ -21,53 +23,56 @@ A comprehensive project management tool that leverages artificial intelligence t
 
 ### User Experience
 - **Modern Design System**: Consistent UI components with reusable Button, Input, and card components
-- **Dark Mode**: Full dark mode support with theme persistence
+- **Dark Mode**: Full dark mode support with theme persistence in database
 - **Responsive Design**: Mobile-optimized interface with adaptive layouts
 - **Accessibility**: WCAG-compliant with ARIA attributes, keyboard navigation, and screen reader support
 - **Form Validation**: Real-time validation with clear error messages
 - **Performance**: Lazy loading with React Suspense for optimal initial load times
+- **Standardized Date Format**: Consistent "12 Jun 2026" format across all date displays
 
 ### Reporting & Export
 - **PDF Export**: Download comprehensive analysis reports as formatted PDFs
 - **CSV Export**: Export project data and analysis results to CSV spreadsheets
 - **Interactive Reports**: Detailed report pages with visualizations and metrics
 - **Dashboard Analytics**: Aggregated statistics across all projects
+- **Effort Breakdown**: Detailed breakdown of development, testing, integration, and documentation hours
 
 ### User Management
 - **Secure Authentication**: JWT-based authentication with bcrypt password hashing
 - **Profile Management**: User profiles with avatar upload functionality
 - **Password Reset**: OTP-based password reset system
 - **Session Management**: Automatic token expiry handling and secure session management
+- **Theme Preferences**: User-specific theme preferences (light/dark mode)
 
 ## 🛠 Tech Stack
 
 ### Frontend
 | Tool | Version | Purpose |
 |------|---------|---------|
-| React | 19.2 | UI framework with hooks |
-| Vite | 8.0 | Dev server & bundler |
-| TypeScript | 6.0 | Type safety |
-| Tailwind CSS | 4.3 | Utility-first styling |
-| React Router | 7.18 | Client-side routing with lazy loading |
-| @dnd-kit | 6.3/10.0 | Drag-and-drop feature reordering |
-| jsPDF | 4.2 | PDF generation |
-| jspdf-autotable | 5.0 | PDF table generation |
-| xlsx | 0.18 | Excel/CSV export |
+| React | 19.2.6 | UI framework with hooks |
+| Vite | 8.0.12 | Dev server & bundler |
+| TypeScript | 6.0.2 | Type safety |
+| Tailwind CSS | 4.3.1 | Utility-first styling |
+| React Router | 7.18.0 | Client-side routing with lazy loading |
+| @dnd-kit | 6.3.1/10.0.0 | Drag-and-drop feature reordering |
+| jsPDF | 4.2.1 | PDF generation |
+| jspdf-autotable | 5.0.8 | PDF table generation |
+| xlsx | 0.18.5 | Excel/CSV export |
 
 ### Backend
 | Tool | Version | Purpose |
 |------|---------|---------|
-| Express | 5.2 | HTTP server framework |
-| TypeScript | 6.0 | Type safety |
-| Prisma | 5.22 | ORM & database migrations |
+| Express | 5.2.1 | HTTP server framework |
+| TypeScript | 6.0.3 | Type safety |
+| Prisma | 5.22.0 | ORM & database migrations |
 | MySQL | — | Primary database |
-| jsonwebtoken | 9.0 | JWT authentication |
-| bcryptjs | 3.0 | Password hashing |
-| Zod | 4.4 | Request validation |
-| @google/genai | 2.8 | Gemini AI integration |
-| node-cron | 4.5 | Scheduled tasks |
-| Swagger UI | 5.0 | API documentation |
-| multer | 2.2 | File upload handling |
+| jsonwebtoken | 9.0.3 | JWT authentication |
+| bcryptjs | 3.0.3 | Password hashing |
+| Zod | 4.4.3 | Request validation |
+| @google/genai | 2.8.0 | Gemini AI integration |
+| node-cron | 4.5.0 | Scheduled tasks |
+| Swagger UI | 5.0.1 | API documentation |
+| multer | 2.2.0 | File upload handling |
 
 ## 📁 Project Structure
 
@@ -80,14 +85,16 @@ A comprehensive project management tool that leverages artificial intelligence t
 │       │   ├── ProjectsPage.tsx       # Project listing and management
 │       │   ├── CreateProjectPage.tsx  # Project creation wizard
 │       │   ├── ProjectDetailPage.tsx  # Individual project view
-│       │   ├── ScopeBuilder.tsx       # Feature scope definition
+│       │   ├── ScopeBuilder.tsx       # Feature scope definition with drag-and-drop
 │       │   ├── AnalysisPage.tsx      # AI analysis initiation
 │       │   ├── AnalyzingPage.tsx      # Analysis progress display
 │       │   ├── AnalysisResultsPage.tsx # Analysis results view
 │       │   ├── ReportsPage.tsx        # Reports listing with export
-│       │   ├── ReportDetailPage.tsx   # Detailed report view
-│       │   ├── ProjectHistoryPage.tsx # Project history tracking
+│       │   ├── ReportDetailPage.tsx   # Detailed report view with tabs
+│       │   ├── ProjectHistoryPage.tsx # Project history with delete functionality
 │       │   ├── UpcomingDeadlinesPage.tsx # Deadline tracking
+│       │   ├── SharedProjectsPage.tsx # Shared projects management
+│       │   ├── SharedProjectDetailPage.tsx # Shared project details
 │       │   ├── LoginPage.tsx          # Authentication
 │       │   └── SignupPage.tsx         # User registration
 │       ├── context/
@@ -98,14 +105,20 @@ A comprehensive project management tool that leverages artificial intelligence t
 │       ├── services/
 │       │   └── api.ts                 # Enhanced fetch wrapper with retry logic
 │       ├── components/
-│       │   ├── layout/                # AppLayout, Sidebar, DashboardLayout
+│       │   ├── layout/                # AppLayout, Sidebar, DashboardLayout, UserDropdown
 │       │   ├── cards/                 # ProjectCard, AnalysisCard, StatsCard
 │       │   ├── ui/                    # Reusable Button, Input components
-│       │   └── EmptyState.tsx         # Empty state component
+│       │   ├── EmptyState.tsx         # Empty state component
+│       │   ├── LoadingSkeleton.tsx    # Loading skeleton component
+│       │   ├── ThemeToggle.tsx        # Theme toggle component
+│       │   ├── Toast.tsx              # Toast notification component
+│       │   └── UserProfileModal.tsx   # User profile modal with settings
 │       ├── utils/
 │       │   ├── constants.ts           # Project types, labels, status
 │       │   ├── designSystem.ts        # Design system constants
 │       │   └── formatters.ts          # Date and number formatting
+│       ├── types/
+│       │   └── index.ts               # TypeScript type definitions
 │       └── routes/
 │           └── AppRouter.tsx          # Route configuration with lazy loading
 │
@@ -113,16 +126,18 @@ A comprehensive project management tool that leverages artificial intelligence t
 │   └── src/
 │       ├── modules/
 │       │   ├── auth/                  # Register, login, password reset (JWT)
-│       │   ├── users/                 # User profile, avatar upload
+│       │   ├── users/                 # User profile, avatar upload, theme preferences
 │       │   ├── projects/              # CRUD, status sync, metadata
 │       │   ├── features/              # CRUD + reorder, scope tracking
 │       │   ├── scopeVersions/         # Scope version history
 │       │   ├── analysis/              # Analysis results, history
+│       │   ├── auditLogs/             # Audit logging for project changes
 │       │   ├── ai/                    # Gemini integration, capacity engine
 │       │   │   ├── ai.service.ts      # AI analysis orchestration
 │       │   │   ├── ai-utils.ts        # Error handling, validation
 │       │   │   ├── scope-calculations.ts # Capacity calculations
-│       │   │   └── prompts/           # AI prompt templates
+│       │   │   ├── prompts/           # AI prompt templates
+│       │   │   └── *.test.ts          # Comprehensive test suites
 │       │   └── dashboard/             # Aggregated stats, analytics
 │       ├── middlewares/
 │       │   ├── auth.middleware.ts     # JWT verification
@@ -130,30 +145,56 @@ A comprehensive project management tool that leverages artificial intelligence t
 │       │   ├── rateLimit.middleware.ts # API rate limiting
 │       │   ├── upload.middleware.ts   # File upload handling
 │       │   └── validate.middleware.ts # Request validation with Zod
-│       └── config/
-│           ├── database.ts           # Prisma client
-│           ├── env.ts                # Environment variables
-│           └── swagger.ts             # API docs configuration
+│       ├── config/
+│       │   ├── database.ts           # Prisma client
+│       │   ├── env.ts                # Environment variables
+│       │   └── swagger.ts             # API docs configuration
+│       ├── routes/
+│       │   └── index.ts              # Route aggregation
+│       ├── app.ts                    # Express app configuration
+│       └── server.ts                 # Server entry point
 │
-└── backend/prisma/
-    └── schema.prisma                 # Database schema
+├── backend/prisma/
+│   └── schema.prisma                 # Database schema with User, Project, Feature, Analysis, AuditLog, ProjectMember
+│
+└── docs/
+    ├── api-spec.md                   # API specification
+    ├── architecture.md               # System architecture documentation
+    └── database-schema.md            # Database schema documentation
 ```
 
 ## 🗄 Database Schema
 
 ```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserTheme {
+  light
+  dark
+}
+
 model User {
   id            String   @id @default(uuid())
   name          String
   email         String   @unique
-  password      String   // bcrypt hashed
+  password      String
   profileImage  String?
-  
+  theme         UserTheme @default(light)
+
   // OTP for password reset
   otpCode       String?
   otpExpiresAt  DateTime?
 
   projects      Project[]
+  projectMembers ProjectMember[]
+  auditLogs     AuditLog[]
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -185,6 +226,8 @@ model Project {
 
   features      Feature[]
   analyses      Analysis[]
+  auditLogs     AuditLog[]
+  projectMembers ProjectMember[]
 }
 
 model Feature {
@@ -245,6 +288,41 @@ model Analysis {
   
   @@unique([projectId, analysisHash])
 }
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  projectId   String
+  action      String   // created, updated, deleted, status_changed, feature_added, feature_removed, etc.
+  description String?  @db.Text
+  changes     Json?    // JSON object with field changes { field: { from: value, to: value } }
+  userId      String?
+  features    Json?    // Snapshot of features at the time of this log
+
+  createdAt   DateTime @default(now())
+
+  project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("member") // owner, admin, member, viewer
+
+  createdAt DateTime @default(now())
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
 ```
 
 ## 🔄 Project Status Workflow
@@ -301,8 +379,9 @@ Interactive docs: `http://localhost:3000/api-docs`
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/users/me` | Get current user profile |
-| PUT | `/users/me` | Update user profile |
+| PUT | `/users/me` | Update user profile (including theme) |
 | POST | `/users/me/avatar` | Upload profile avatar |
+| GET | `/users` | List all users (for project sharing) |
 
 ### Projects
 | Method | Endpoint | Description |
@@ -313,6 +392,7 @@ Interactive docs: `http://localhost:3000/api-docs`
 | PUT | `/projects/:id` | Update project details |
 | DELETE | `/projects/:id` | Delete project (cascades features & analyses) |
 | GET | `/projects/analyzed` | Get projects with completed analyses |
+| GET | `/projects/shared` | Get projects shared with user |
 
 ### Features
 | Method | Endpoint | Description |
@@ -347,6 +427,19 @@ Interactive docs: `http://localhost:3000/api-docs`
 |--------|----------|-------------|
 | GET | `/dashboard/stats` | Get aggregated dashboard statistics |
 | GET | `/dashboard/deadlines` | Get upcoming project deadlines |
+
+### Audit Logs
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/projects/:id/audit-logs` | Get audit logs for a project |
+
+### Project Members
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/projects/:id/members` | List project members |
+| POST | `/projects/:id/members` | Add member to project |
+| DELETE | `/projects/:id/members/:userId` | Remove member from project |
+| PUT | `/projects/:id/members/:userId` | Update member role |
 
 ## 🚀 Getting Started
 
@@ -423,6 +516,9 @@ The application uses a comprehensive design system defined in `frontend/src/util
 - **Button**: Primary, secondary, and danger variants with loading states
 - **Input**: Text inputs with validation states and error messages
 - **Cards**: Project cards, analysis cards, stats cards with consistent styling
+- **Layout Components**: Sidebar, AppLayout, DashboardLayout for consistent page structure
+- **Modal Components**: UserProfileModal with tabs for account, preferences, security
+- **Feedback Components**: Toast notifications, LoadingSkeleton for async operations
 
 ### Accessibility
 - ARIA attributes on interactive elements
@@ -430,6 +526,9 @@ The application uses a comprehensive design system defined in `frontend/src/util
 - Skip-to-content links
 - Focus management
 - Screen reader compatibility
+
+### Date Formatting
+All dates across the application use a standardized format: "12 Jun 2026" (day numeric, month short, year numeric) using the `en-GB` locale for consistency.
 
 ## 🔑 Key Design Decisions
 
@@ -444,6 +543,10 @@ The application uses a comprehensive design system defined in `frontend/src/util
 - **Error Handling**: Enhanced API error handling with retry logic, timeouts, and user-friendly error messages.
 - **Rate Limiting**: API rate limiting middleware prevents abuse and ensures fair usage.
 - **File Upload**: Multer middleware handles avatar uploads with size and type validation.
+- **Theme Persistence**: User theme preferences stored in database and synced across devices.
+- **Audit Logging**: Comprehensive audit trail for all project changes with feature snapshots.
+- **Project Sharing**: Role-based access control for project collaboration.
+- **Permission Checks**: Frontend permission checks prevent unauthorized actions (e.g., delete button only for project creator).
 
 ## 🧪 Testing
 
@@ -492,6 +595,13 @@ AI prompts are located in `backend/src/modules/ai/prompts/`. When modifying prom
 - Add loading skeletons for async operations
 - Optimize database queries with Prisma
 - Cache frequently accessed data
+
+### Code Quality
+- TypeScript for type safety across frontend and backend
+- ESLint for code linting
+- Consistent code formatting
+- Comprehensive error handling
+- Input validation with Zod
 
 ## 🚢 Deployment
 

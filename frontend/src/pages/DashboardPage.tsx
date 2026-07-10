@@ -337,14 +337,14 @@ label="Completed Projects"
 
                 <p className="text-sm text-[var(--text-soft)]">
                   Due{" "}
-                  {new Date(project.deadline!).toLocaleDateString()}
+                  {new Date(project.deadline!).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-end">
                 {!hasStarted && project.startDate && (
                   <span className="text-xs text-[var(--text-soft)]">
-                    Starts {new Date(project.startDate).toLocaleDateString()}
+                    Starts {new Date(project.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </span>
                 )}
                 <div

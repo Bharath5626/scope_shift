@@ -108,7 +108,7 @@ function ProjectDetailsModal({
         className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative mx-2 w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/30 flex flex-col sm:mx-4">
+      <div className="relative mx-2 w-full max-w-4xl h-[80vh] max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/30 flex flex-col sm:mx-4">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--border-primary)] p-4 sm:p-6 dark:border-gray-700">
           <div>
@@ -249,13 +249,13 @@ function ProjectDetailsModal({
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Start Date</p>
                     <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
-                      {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
+                      {project.startDate ? new Date(project.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not specified'}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Deadline</p>
                     <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
-                      {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not specified'}
+                      {project.deadline ? new Date(project.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not specified'}
                     </p>
                   </div>
                 </div>
@@ -428,28 +428,30 @@ function ProjectCard({
   return (
     <div className="group relative flex flex-col rounded-2xl border border-[var(--border-primary)] bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)]/50 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-[var(--color-primary-light)] dark:hover:shadow-gray-900/30">
 
-      {/* Delete button — appears on hover */}
-      <button
-  onClick={(e) => {
-    e.stopPropagation()
-    onDeleteClick(project)
-  }}
-  title="Delete project"
-  className="
-  absolute right-3 top-3 z-10
-  flex h-8 w-8 items-center justify-center
-  rounded-lg text-gray-300
-  opacity-100 sm:opacity-0 transition-all duration-150
-  hover:bg-red-50 hover:text-red-500
-  sm:group-hover:opacity-100
-  cursor-pointer
-  dark:hover:bg-red-900/30 dark:hover:text-red-400
-"
->
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-      </button>
+      {/* Delete button — appears on hover, only for project creator */}
+      {user?.id === project.createdBy.id && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDeleteClick(project)
+          }}
+          title="Delete project"
+          className="
+          absolute right-3 top-3 z-10
+          flex h-8 w-8 items-center justify-center
+          rounded-lg text-gray-300
+          opacity-100 sm:opacity-0 transition-all duration-150
+          hover:bg-red-50 hover:text-red-500
+          sm:group-hover:opacity-100
+          cursor-pointer
+          dark:hover:bg-red-900/30 dark:hover:text-red-400
+        "
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      )}
 
       {/* Clickable card body */}
     <button
@@ -495,10 +497,10 @@ function ProjectCard({
               </span>
              <span className={`${TYPOGRAPHY.caption} text-[var(--text-subtle)] dark:text-[var(--text-soft)]`}>
   Created{" "}
-  {new Date(project.createdAt).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+  {new Date(project.createdAt).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   })}
   {" • By "}
   {createdBy}

@@ -50,10 +50,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <span className="text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
          Created{" "}
-  {new Date(project.createdAt).toLocaleDateString("en-IN", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
+  {new Date(project.createdAt).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
 })}
         </span>
       </div>

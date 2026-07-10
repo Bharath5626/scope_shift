@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import { showToast } from './Toast'
 import { api } from '../services/api'
 
@@ -20,6 +21,7 @@ type ProfileUpdateResponse = {
 
 export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { user, updateUser } = useAuth()
+  const { theme, setTheme } = useTheme()
   const modalRef = useRef<HTMLDivElement>(null)
 
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile')
@@ -29,6 +31,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [resettingPassword, setResettingPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false)
 
   // Profile state
   const [name, setName] = useState(user?.name || '')
@@ -130,9 +133,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
         if (hasUnsavedChanges) {
-          if (confirm('You have unsaved changes. Are you sure you want to close?')) {
-            onClose()
-          }
+          setShowUnsavedChangesDialog(true)
         } else {
           onClose()
         }
@@ -555,7 +556,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <div>
                     <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Member Since</p>
                     <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                     </p>
                   </div>
                   <div>
@@ -613,7 +614,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <div>
                       <p className="text-xs text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Account Created</p>
                       <p className="text-sm font-medium text-[var(--text-primary)] dark:text-white">
-                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
+                        {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}
                       </p>
                     </div>
                     <div>
@@ -827,6 +828,33 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             <div className="space-y-6">
               <h3 className="text-lg font-medium text-[var(--text-primary)] dark:text-white">Preferences</h3>
 
+              {/* Theme Preferences */}
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Theme</h4>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setTheme('light')}
+                    className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
+                      theme === 'light'
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    Light
+                  </button>
+                  <button
+                    onClick={() => setTheme('dark')}
+                    className={`flex-1 rounded-lg border px-4 py-3 text-sm transition ${
+                      theme === 'dark'
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)] dark:bg-[var(--color-primary)]/10 dark:text-[var(--color-primary)]'
+                        : 'border-[var(--border-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-section)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    Dark
+                  </button>
+                </div>
+              </div>
+
               {/* Notification Preferences */}
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-[var(--text-secondary)] dark:text-gray-300">Notifications</h4>
@@ -898,6 +926,35 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           </div>
         )}
       </div>
+
+      {/* Unsaved Changes Dialog */}
+      {showUnsavedChangesDialog && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-[var(--bg-surface)] p-6 shadow-2xl dark:bg-gray-800">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] dark:text-white mb-2">Unsaved Changes</h3>
+            <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)] mb-6">
+              You have unsaved changes. Are you sure you want to close?
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowUnsavedChangesDialog(false)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-section)] dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowUnsavedChangesDialog(false)
+                  onClose()
+                }}
+                className="rounded-lg bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-primary-hover)]"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>,
     document.body
   )

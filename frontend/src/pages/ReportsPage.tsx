@@ -37,7 +37,7 @@ const RISK_COLORS: Record<string, { badge: string; dot: string }> = {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export function ReportsPage() {

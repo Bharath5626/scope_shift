@@ -163,7 +163,7 @@ export function SharedProjectDetailPage() {
               </span>
               {project.deadline && (
                 <span className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">
-                  Due: {new Date(project.deadline).toLocaleDateString()}
+                  Due: {new Date(project.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               )}
             </div>
@@ -191,7 +191,7 @@ export function SharedProjectDetailPage() {
                 <div>
                   <p className="text-sm text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Start Date</p>
                   <p className="font-medium text-[var(--text-primary)] dark:text-gray-100">
-                    {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
+                    {project.startDate ? new Date(project.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not specified'}
                   </p>
                 </div>
                 <div>

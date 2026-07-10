@@ -16,10 +16,10 @@ const statusStyles: Record<Project['status'], string> = {
 
 function formatDate(dateString: string | null) {
   if (!dateString) return 'Not set'
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
+  return new Date(dateString).toLocaleDateString('en-GB', {
     day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   })
 }
 

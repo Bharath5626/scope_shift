@@ -192,6 +192,7 @@ export function CreateProjectPage() {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<{
     name?: string
+    description?: string
     techStack?: string
   }>({})
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
@@ -298,12 +299,19 @@ export function CreateProjectPage() {
 
   // Real-time validation using useEffect (only after user interaction)
   useEffect(() => {
-    const errors: { name?: string; techStack?: string } = {}
+    const errors: { name?: string; description?: string; techStack?: string } = {}
 
     // Validate project name (only if user has interacted with name field)
     if (touchedFields.has('name')) {
       if (name.trim() && name.trim().length < 3) {
         errors.name = 'Project name must be at least 3 characters'
+      }
+    }
+
+    // Validate description (only if user has interacted with description field)
+    if (touchedFields.has('description')) {
+      if (!description.trim()) {
+        errors.description = 'Description is required'
       }
     }
 
@@ -318,7 +326,7 @@ if (touchedFields.has('techStack')) {
 }
 
     setFieldErrors(errors)
-  }, [name, selectedSkills, touchedFields])
+  }, [name, description, selectedSkills, touchedFields])
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
@@ -360,13 +368,18 @@ if (touchedFields.has('techStack')) {
     setLogoPreview(null)
   }
 const handleCreate = async () => {
-  const errors: { name?: string; techStack?: string } = {}
+  const errors: { name?: string; description?: string; techStack?: string } = {}
 
   // Validate project name
   if (!name.trim()) {
     errors.name = 'Project name is required'
   } else if (name.trim().length < 3) {
     errors.name = 'Project name must be at least 3 characters'
+  }
+
+  // Validate description
+  if (!description.trim()) {
+    errors.description = 'Description is required'
   }
 
   // Validate tech stack
@@ -543,17 +556,23 @@ const filteredSkills = SKILLS.filter(
               </div>
 
               <div>
-                <label className={labelCls}>Description</label>
+                <label className={labelCls}>
+                  Description <span className="text-red-500">*</span>
+                </label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => {
                     setDescription(e.target.value)
-                    handleFieldChange()
+                    handleFieldChange('description')
                   }}
+                  onBlur={() => handleFieldChange('description')}
                   placeholder="Describe what this project does..."
-                  className={`${inputCls} resize-none`}
+                  className={`${inputCls} resize-none ${fieldErrors.description ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
                 />
+                {fieldErrors.description && (
+                  <p className={`mt-1.5 ${TYPOGRAPHY.caption} text-red-600 dark:text-red-400`}>{fieldErrors.description}</p>
+                )}
               </div>
             </div>
 
@@ -1092,6 +1111,17 @@ const filteredSkills = SKILLS.filter(
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+             {editProjectId && (
+              <button
+                onClick={() => navigate(`/scope-builder?project=${editProjectId}`)}
+                className={`flex items-center gap-2 ${BORDER_RADIUS.button} border border-[var(--border-primary)] bg-white px-7 py-2.5 ${TYPOGRAPHY.body} font-semibold text-[var(--text-secondary)] ${SHADOW.card} ${TRANSITION} hover:bg-[var(--bg-section)] dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back
+              </button>
+            )}
             {hasUnsavedChanges && (
               <button
                 onClick={handleCancel}
@@ -1114,6 +1144,7 @@ const filteredSkills = SKILLS.filter(
             >
               {editProjectId ? 'Update & Regenerate Features' : 'Create Project & Generate Requirements'}
             </button>
+           
           </div>
         </div>
 

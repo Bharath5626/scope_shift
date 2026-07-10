@@ -43,8 +43,8 @@ function ProjectCard({ project }: { project: Project }) {
           {project.deadline && (
             <p className="mt-1 text-xs font-medium text-[var(--color-danger)] dark:text-red-400">
               Deadline:{' '}
-              {new Date(project.deadline).toLocaleDateString('en-IN', {
-                day: '2-digit',
+              {new Date(project.deadline).toLocaleDateString('en-GB', {
+                day: 'numeric',
                 month: 'short',
                 year: 'numeric',
               })}

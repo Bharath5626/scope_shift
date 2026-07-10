@@ -142,7 +142,7 @@ export function AnalyzingPage() {
                 <div className="mt-3 flex gap-2 text-xs text-[var(--text-subtle)] dark:text-[var(--text-soft)]">
                   <span>{project.type}</span>
                   {project.deadline && (
-                    <span>• Due {new Date(project.deadline).toLocaleDateString()}</span>
+                    <span>• Due {new Date(project.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                   )}
                 </div>
               </div>

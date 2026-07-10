@@ -200,8 +200,8 @@ const getInitials = (name?: string) => {
                       <div className="mt-4 flex items-center gap-2 text-xs">
                         {getUserProfileImage(project.createdBy?.id) ? (
                           <img
-                            src={getUserProfileImage(project.createdBy?.id)}
-                            alt={getUserName(project.createdBy?.id)}
+                            src={getUserProfileImage(project.createdBy?.id) ?? undefined}
+                            alt={getUserName(project.createdBy?.id) ?? ''}
                             className="h-6 w-6 rounded-full object-cover"
                           />
                         ) : (
@@ -227,7 +227,7 @@ const getInitials = (name?: string) => {
                         </span>
                         {project.deadline && (
                           <span className="text-xs text-gray-500 dark:text-gray-500">
-                            Due {new Date(project.deadline).toLocaleDateString()}
+                            Due {new Date(project.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         )}
                       </div>
@@ -312,7 +312,7 @@ const getInitials = (name?: string) => {
                                 >
                                   {getUserProfileImage(memberId) ? (
                                     <img
-                                      src={getUserProfileImage(memberId)}
+                                      src={getUserProfileImage(memberId) ?? undefined}
                                       alt={getUserName(memberId)}
                                       className="h-5 w-5 rounded-full object-cover"
                                     />

@@ -387,13 +387,13 @@ function ProjectDetailsTab({ project, users }: { project: Project; users: any[] 
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Start Date</p>
             <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
-              {project.startDate ? new Date(project.startDate).toLocaleDateString() : 'Not specified'}
+              {project.startDate ? new Date(project.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not specified'}
             </p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--text-soft)] dark:text-[var(--text-subtle)]">Deadline</p>
             <p className="mt-1 text-sm text-[var(--text-secondary)] dark:text-gray-300">
-              {project.deadline ? new Date(project.deadline).toLocaleDateString() : 'Not specified'}
+              {project.deadline ? new Date(project.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not specified'}
             </p>
           </div>
         </div>
@@ -576,7 +576,7 @@ export function ReportDetailPage() {
       doc.setTextColor(60)
       doc.text(`Type: ${PROJECT_TYPE_LABELS[project.type] ?? project.type}`, 20, 45)
       doc.text(`Status: ${project.status}`, 20, 52)
-      doc.text(`Analysis Date: ${new Date(analysis.createdAt).toLocaleDateString()}`, 20, 59)
+      doc.text(`Analysis Date: ${new Date(analysis.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`, 20, 59)
 
       // Summary stats
       doc.setFontSize(14)
