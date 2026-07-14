@@ -29,7 +29,7 @@ export async function apiFetch<T>(path: string, opts: RequestInit = {}, retries 
   const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
 
   try {
-    const res = await fetch(`${BASE}${path}`, {
+    const res = await fetch(`${BASE_URL}${path}`, {
       ...opts,
       signal: controller.signal,
       headers: {
