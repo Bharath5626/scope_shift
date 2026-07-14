@@ -1,5 +1,6 @@
 import prisma from "../../config/database";
-import cron from "node-cron";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+   const cron = require('node-cron');
 import {
   handleDatabaseError,
   getDatabaseErrorStatusCode
