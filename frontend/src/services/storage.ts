@@ -39,32 +39,38 @@ export function seedDemoData(): AppState {
   const state: AppState = {
     projects: [
       {
-        id: 'demo-1',
-        name: 'Marketing Landing Page',
-        description: 'High-converting landing page for product launch',
-        type: 'landing_page',
-        status: 'active',
-        createdAt: twoDaysAgo,
-        updatedAt: yesterday,
-      },
-      {
-        id: 'demo-2',
-        name: 'Customer Support Chatbot',
-        description: 'AI-powered chatbot for customer support',
-        type: 'chatbot',
-        status: 'draft',
-        createdAt: yesterday,
-        updatedAt: now,
-      },
-      {
-        id: 'demo-3',
-        name: 'Analytics SaaS Platform',
-        description: 'B2B analytics dashboard with billing',
-        type: 'saas',
-        status: 'at_risk',
-        createdAt: twoDaysAgo,
-        updatedAt: now,
-      },
+  id: 'demo-1',
+  name: 'Marketing Landing Page',
+  description: 'High-converting landing page for product launch',
+  type: 'landing_page',
+  status: 'active',
+  createdAt: twoDaysAgo,
+  updatedAt: yesterday,
+  deadline: null,        // add this
+  createdBy: 'demo-user', // add this
+},
+{
+  id: 'demo-2',
+  name: 'Customer Support Chatbot',
+  description: 'AI-powered chatbot for customer support',
+  type: 'chatbot',
+  status: 'draft',
+  createdAt: yesterday,
+  updatedAt: now,
+  deadline: null,        // add this
+  createdBy: 'demo-user', // add this
+},
+{
+  id: 'demo-3',
+  name: 'Analytics SaaS Platform',
+  description: 'B2B analytics dashboard with billing',
+  type: 'saas',
+  status: 'at_risk',
+  createdAt: twoDaysAgo,
+  updatedAt: now,
+  deadline: null,        // add this
+  createdBy: 'demo-user', // add this
+},
     ],
     features: [],
     analyses: [],
