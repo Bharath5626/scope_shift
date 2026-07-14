@@ -157,3 +157,29 @@ model ProjectMember {
   @@index([projectId])
   @@index([userId])
 }
+model ScopeVersion {
+  id            String   @id @default(uuid())
+  projectId     String
+  versionNumber Int
+  title         String
+  description   String?  @db.Text
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  features      ScopeVersionFeature[]
+
+  @@index([projectId])
+}
+
+model ScopeVersionFeature {
+  id              String  @id @default(uuid())
+  scopeVersionId  String
+  title           String
+  description     String?
+  priority        String  @default("medium")
+
+  scopeVersion    ScopeVersion @relation(fields: [scopeVersionId], references: [id], onDelete: Cascade)
+}
+
