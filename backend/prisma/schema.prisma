@@ -65,7 +65,7 @@ model Project {
   projectMembers ProjectMember[]
   scopeVersions  ScopeVersion[]
 }
-}
+
 model Feature {
   id          String @id @default(uuid())
   projectId   String
