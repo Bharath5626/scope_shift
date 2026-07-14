@@ -63,6 +63,8 @@ model Project {
   analyses      Analysis[]
   auditLogs     AuditLog[]
   projectMembers ProjectMember[]
+  scopeVersions  ScopeVersion[]
+}
 }
 model Feature {
   id          String @id @default(uuid())
