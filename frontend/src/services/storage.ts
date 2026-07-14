@@ -47,7 +47,7 @@ export function seedDemoData(): AppState {
   createdAt: twoDaysAgo,
   updatedAt: yesterday,
   deadline: null,        // add this
-  createdBy: 'demo-user', // add this
+  createdBy: { id: 'demo-user', name: 'Demo User' }, // add this
 },
 {
   id: 'demo-2',
@@ -58,7 +58,7 @@ export function seedDemoData(): AppState {
   createdAt: yesterday,
   updatedAt: now,
   deadline: null,        // add this
-  createdBy: 'demo-user', // add this
+  createdBy: { id: 'demo-user', name: 'Demo User' }, // add this
 },
 {
   id: 'demo-3',
@@ -69,7 +69,7 @@ export function seedDemoData(): AppState {
   createdAt: twoDaysAgo,
   updatedAt: now,
   deadline: null,        // add this
-  createdBy: 'demo-user', // add this
+  createdBy: { id: 'demo-user', name: 'Demo User' }, // add this
 },
     ],
     features: [],
