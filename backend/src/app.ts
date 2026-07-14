@@ -17,7 +17,6 @@ app.use(
 app.use(
   cors({
     origin: "*",
-    'https://scope-shift.vercel.app/',
   })
 );
 app.use(express.json());
