@@ -38,7 +38,7 @@ Scope creep is one of the most common — and most quietly destructive — reaso
 
 | Dashboard | Scope Builder | Risk Analysis |
 |---|---|---|
-| _screenshot here_ | _screenshot here_ | _screenshot here_ |
+|![Dashboard](screenshots/dashboard.png) | ![scopebuilder](screenshots/scopebuilder.png) | ![report](screenshots/report.png) |
 
 ---
 
